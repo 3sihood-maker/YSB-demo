@@ -71,7 +71,25 @@ button:focus-visible, a:focus-visible, input:focus-visible, select:focus-visible
 main { position: relative; flex: 1; min-height: 0; margin: 9.2px 9.2px 0; background: var(--surface); border-radius: 36.8px 36.8px 0 0; overflow: hidden; display: flex; flex-direction: column; }
 .view { flex: 1; min-height: 0; overflow-y: auto; -webkit-overflow-scrolling: touch; scrollbar-width: none; }
 .view::-webkit-scrollbar { display: none; }
-.bible-page { padding: 0 17.7px 40px; }
+.bible-page { position: relative; padding: 0 17.7px 40px; }
+/* ---------- guided call-outs on the Mark page (the demo walk-through) ---------- */
+.callout { position: absolute; z-index: 4; width: min(272px, calc(100% - 28px)); padding: 12px 14px 12px; border-radius: 12px; background: #f7f9fc; color: #14213d;
+  font: 500 14.5px/1.42 "Archivo", var(--sys); box-shadow: 0 10px 28px rgba(0,0,0,.38), 0 2px 6px rgba(0,0,0,.25);
+  opacity: 0; transform: translateY(var(--from, 8px)) scale(.97); transition: opacity .5s ease, transform .5s cubic-bezier(.2,.8,.3,1.2); pointer-events: none; }
+.callout.show { opacity: 1; transform: none; pointer-events: auto; }
+.callout::after { content: ""; position: absolute; left: var(--tail, 30px); width: 14px; height: 14px; background: inherit; transform: translateX(-50%) rotate(45deg); border-radius: 2px; }
+.callout.above::after { bottom: -6px; box-shadow: 3px 3px 5px rgba(0,0,0,.12); }
+.callout.below::after { top: -6px; }
+.callout.above { --from: 8px; } .callout.below { --from: -8px; }
+.callout b { color: #1b3577; font-weight: 700; }
+.callout .co-row { display: flex; justify-content: space-between; align-items: center; margin-top: 8px; }
+.callout .co-step { font: 600 11px/1 "Archivo", var(--sys); letter-spacing: .08em; color: #6b7a90; text-transform: uppercase; }
+.callout .co-next { display: inline-flex; align-items: center; gap: 6px; padding: 6px 12px; border-radius: 999px; background: #1b3577; color: #fff; font: 600 13px/1 "Archivo", var(--sys); }
+.callout .co-x { position: absolute; top: 4px; right: 6px; width: 24px; height: 24px; display: grid; place-items: center; color: #6b7a90; font-size: 17px; line-height: 1; }
+.callout.has-x { padding-right: 28px; }
+.ball-link.pulse::before { content: ""; position: absolute; inset: -5px; border-radius: 50%; border: 2px solid #7cc8ff; animation: ballPulse 1.6s ease-out infinite; pointer-events: none; }
+@keyframes ballPulse { 0% { transform: scale(.8); opacity: .9; } 100% { transform: scale(1.7); opacity: 0; } }
+@media (prefers-reduced-motion: reduce) { .ball-link.pulse::before { animation: none; } }
 
 /* hero title page */
 .book-title { position: relative; height: 487px; display: flex; align-items: center; justify-content: center; margin: 0 0 20px; overflow: hidden; }
@@ -196,6 +214,78 @@ main { position: relative; flex: 1; min-height: 0; margin: 9.2px 9.2px 0; backgr
 .linked-back { position: absolute; left: 14px; bottom: calc(18px + env(safe-area-inset-bottom, 0px)); z-index: 2; display: flex; align-items: center; gap: 6px; padding: 10px 16px 10px 12px; border-radius: 999px; background: rgba(8,18,34,.72); border: 1px solid rgba(255,255,255,.22); color: #fff; font: 600 14px/1 var(--sys); backdrop-filter: blur(8px); -webkit-backdrop-filter: blur(8px); }
 @media (prefers-reduced-motion: reduce) { .ball-link::after { animation: none; } }
 
+
+/* ---------- after the title: the two pilots, on the track at night ---------- */
+.ysb-why { position: absolute; inset: 0; z-index: 7; background: #04060e; overflow: hidden; border-radius: inherit; --digital: #7cc8ff; --pink-1987: #f6a6ab; }
+.why-photo { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; object-position: 50% 100%; opacity: 0; transition: opacity 1.2s ease; }
+.ysb-why.lit .why-photo { opacity: 1; }
+/* the dark gradient behind the words: as the words arrive it reaches further down and darkens, until by the
+   end of the video the sky, floodlights and runners are black and only the Bibles in the foreground remain.
+   --k runs 0 -> 1 with the video (set from JS). */
+.why-shade { position: absolute; inset: 0; pointer-events: none; --k: 0;
+  background:
+    radial-gradient(120% 70% at 100% 0%, rgba(0,0,0,calc(var(--k) * .9)), rgba(0,0,0,0) 70%),
+    linear-gradient(to bottom,
+      rgba(0,0,0,calc(.55 + var(--k) * .45)) 0%,
+      rgba(0,0,0,calc(.45 + var(--k) * .55)) calc(8% + var(--k) * 40%),
+      rgba(0,0,0,calc(.2 + var(--k) * .55)) calc(30% + var(--k) * 25%),
+      rgba(0,0,0,0) calc(46% + var(--k) * 18%),
+      rgba(0,0,0,0) 84%, rgba(0,0,0,.5) 100%); }
+/* the words: the same style as the pilot pages (centred Archivo on the dark gradient, lines arriving one by one) */
+.why-boxes { position: absolute; left: 0; right: 0; top: calc(74px + env(safe-area-inset-top, 0px)); padding: 0 26px; display: flex; flex-direction: column; align-items: center; gap: 10px; text-align: center; }
+.why-box { margin: 0; max-width: 33ch; font: 400 15px/1.45 "Archivo", var(--sys); color: rgba(255,255,255,.86); text-wrap: balance; text-shadow: 0 1px 10px rgba(0,0,0,.9);
+  opacity: 0; transform: translateY(10px); transition: opacity 1s ease var(--d, 0s), transform 1s ease var(--d, 0s); }
+.why-box.lead { font: 600 17.5px/1.38 "Archivo", var(--sys); color: #fff; }
+.why-box b { font-weight: 700; color: var(--digital); }
+.why-box b.pk { color: var(--pink-1987); }
+.why-box.last { font: italic 600 16.5px/1.38 "Archivo", var(--sys); color: var(--digital); }
+.ysb-why.lit .why-box { opacity: 1; transform: none; }
+.ysb-why .why-go { opacity: 0; transition: opacity .8s ease var(--d, 0s), background .2s, border-color .2s; }
+.ysb-why.lit .why-go { opacity: 1; }
+.ysb-why .why-go { margin-top: 10px; display: inline-flex; align-items: center; gap: 10px; padding: 13px 22px 13px 24px; border-radius: 999px; border: 1px solid rgba(124,200,255,.6); background: rgba(124,200,255,.08); color: #fff; font: 600 15px/1 "Archivo", var(--sys); letter-spacing: .02em; box-shadow: none; }
+.ysb-why .why-go:hover { background: rgba(124,200,255,.18); border-color: var(--digital); }
+@media (max-height: 720px) { .why-boxes { top: calc(62px + env(safe-area-inset-top, 0px)); gap: 9px; } .why-box { font-size: 14px; } .why-box.lead { font-size: 16px; } .why-box.last { font-size: 15.5px; } }
+
+/* ---------- the two teens: lit from behind (like the pilot's first page), the phone held out to us ---------- */
+.teens { position: absolute; inset: 0; z-index: 7; background: #000; overflow: hidden; border-radius: inherit; display: flex; flex-direction: column; --digital: #7cc8ff; }
+.tt-art { position: relative; flex: none; height: 63%; overflow: hidden; }
+.tt-light { position: absolute; inset: 0; pointer-events: none; opacity: 0; transition: opacity 2.4s ease .2s; }
+.teens.lit .tt-light { opacity: 1; }
+.tt-rays { position: absolute; left: var(--lx, 50%); top: var(--ly, 30%); width: 260%; aspect-ratio: 1; transform: translate(-50%, -50%) rotate(var(--rot, 0deg)); filter: blur(7px);
+  background: repeating-conic-gradient(from 0deg, rgba(255,255,255,.0) 0deg 3deg, rgba(240,245,255,.36) 5.5deg 8deg, rgba(255,255,255,0) 10.5deg 14deg, rgba(225,235,255,.22) 16deg 18.5deg, rgba(255,255,255,0) 21deg 26deg);
+  -webkit-mask: radial-gradient(closest-side, #000 6%, rgba(0,0,0,.7) 30%, rgba(0,0,0,.25) 52%, transparent 72%); mask: radial-gradient(closest-side, #000 6%, rgba(0,0,0,.7) 30%, rgba(0,0,0,.25) 52%, transparent 72%); }
+.tt-rays2 { --rot: 0deg; opacity: .7; transform: translate(-50%, -50%) rotate(calc(var(--rot2, 0deg))) scale(.82); }
+.tt-glow { position: absolute; left: var(--lx, 50%); top: var(--ly, 30%); width: 175%; aspect-ratio: 1; transform: translate(-50%, -50%);
+  background: radial-gradient(closest-side, #fff, rgba(240,245,255,.85) 12%, rgba(215,228,250,.42) 28%, rgba(160,185,230,.14) 50%, rgba(120,150,210,.04) 66%, transparent 80%); }
+.tt-stage { position: absolute; left: 0; top: 0; width: 3764px; height: 6688px; transform-origin: 0 0; }
+.tt-people { position: absolute; left: 453px; top: 1173px; width: 2812px; height: 4804px; opacity: 0; transition: opacity 1.6s ease .3s; will-change: transform; }
+.teens.lit .tt-people { opacity: 1; }
+.tt-hand { position: absolute; left: 1079px; top: 1858px; width: 1186px; height: 1569px; transform-origin: 48% 50%; transform-style: preserve-3d; opacity: 0; transition: opacity 1.4s ease 1s; will-change: transform; }
+.teens.lit .tt-hand { opacity: 1; }
+.tt-screen { position: absolute; left: 165px; top: 26px; width: 813px; height: 1519px; }
+.tt-handimg { position: absolute; inset: 0; width: 100%; height: 100%; }
+.tt-sheen { position: absolute; left: 175px; top: 40px; width: 795px; height: 1490px; border-radius: 90px; pointer-events: none; mix-blend-mode: screen;
+  background: linear-gradient(115deg, transparent 30%, rgba(255,255,255,.16) var(--sh, 45%), transparent calc(var(--sh, 45%) + 14%)); }
+.tt-fade { position: absolute; left: 0; right: 0; bottom: 0; height: 26%; background: linear-gradient(to bottom, rgba(0,0,0,0), #000); pointer-events: none; }
+.tt-copies { flex: 1; display: grid; position: relative; z-index: 2; margin-top: -18px; }
+.tt-copies > .tt-copy { grid-area: 1 / 1; }
+.tt-copy { display: flex; flex-direction: column; align-items: center; justify-content: flex-start; gap: 14px; padding: 4px 28px calc(20px + env(safe-area-inset-bottom, 0px)); text-align: center; }
+.tt-line { margin: 0; max-width: 32ch; opacity: 0; transform: translateY(10px); transition: opacity 1s ease var(--d, 0s), transform 1s ease var(--d, 0s), background .2s, border-color .2s; }
+.teens.lit .tt-a .tt-line { opacity: 1; transform: none; }
+/* after "Open the Bible": the first words go, the next ones arrive */
+.teens.focus .tt-a .tt-line { opacity: 0 !important; transform: translateY(-8px) !important; transition: opacity .45s ease, transform .45s ease !important; pointer-events: none; }
+.tt-b { pointer-events: none; }
+.teens.focus .tt-b { pointer-events: auto; }
+.teens.focus .tt-b .tt-line { opacity: 1; transform: none; }
+.tt-screen-mark { opacity: 0; transition: opacity .7s ease; }
+.teens.marked .tt-screen-mark { opacity: 1; }
+.tt-copy .lead { font: 600 18px/1.4 "Archivo", var(--sys); color: #fff; text-wrap: balance; }
+.tt-copy .lead b { color: var(--digital); font-weight: 700; }
+.tt-copy .last { font: italic 600 16.5px/1.4 "Archivo", var(--sys); color: var(--digital); text-wrap: balance; }
+.tt-go { margin-top: 4px; display: inline-flex; align-items: center; gap: 10px; padding: 13px 22px 13px 24px; border-radius: 999px; border: 1px solid rgba(124,200,255,.6); background: rgba(124,200,255,.08); color: #fff; font: 600 15px/1 "Archivo", var(--sys); letter-spacing: .02em; }
+.tt-go:hover { background: rgba(124,200,255,.18); border-color: var(--digital); }
+@media (max-height: 720px) { .tt-art { height: 58%; } .tt-copy { gap: 10px; } .tt-copy .lead { font-size: 16px; } .tt-copy .last { font-size: 15px; } }
+@media (prefers-reduced-motion: reduce) { .tt-line, .tt-people, .tt-hand, .tt-light { transition: none; } }
 </style>
 </head>
 <body>
@@ -382,8 +472,44 @@ main { position: relative; flex: 1; min-height: 0; margin: 9.2px 9.2px 0; backgr
   <div class="toast" id="toast" hidden></div>
   <div class="title-screen" id="title-screen">
     <iframe id="title-frame" title="Youth Sports Bible title" allow="autoplay; fullscreen"></iframe>
-    <button class="enter" id="enter" type="button">Open the Bible<svg width="10" height="16" viewBox="0 0 10 16" aria-hidden="true"><path d="m2 2 6 6-6 6" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg></button>
+    <button class="enter" id="enter" type="button">Show me!<svg width="10" height="16" viewBox="0 0 10 16" aria-hidden="true"><path d="m2 2 6 6-6 6" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg></button>
   </div>
+  <section class="ysb-why" id="ysb-why" hidden>
+    <video class="why-photo" id="why-video" muted playsinline preload="auto" poster="assets/ysb-track-poster.jpg" src="assets/ysb-track.mp4" aria-label="Youth Sports New Testaments and phones showing the Youth Sports Bible, beside a kit bag, ball and whistle on a running track at night, with athletes training under floodlights"></video>
+    <div class="why-shade" id="why-shade" aria-hidden="true"></div>
+    <div class="why-boxes">
+      <p class="why-box lead">These two pilots of a <b class="pk">printed New Testament</b> and a <b>digital Bible</b> work together to serve sport ministry worldwide.</p>
+      <p class="why-box">All in partnership with the <b>American Bible Society</b> and Bible Societies worldwide.</p>
+      <p class="why-box">The <b>Youth Sport Bible (YSB)</b> is one of the first Bibles being built in their new digital Bible Engagement Platform.</p>
+      <button class="why-go" id="why-go" type="button">Let&rsquo;s go<svg width="14" height="11" viewBox="0 0 16 12" aria-hidden="true"><path d="M1 6h13M9.5 1.5 14 6l-4.5 4.5" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg></button>
+    </div>
+  </section>
+  <section class="teens" id="teens" hidden>
+    <div class="tt-art" id="tt-art">
+      <div class="tt-light" id="tt-light" aria-hidden="true"><div class="tt-rays"></div><div class="tt-rays tt-rays2"></div><div class="tt-glow"></div></div>
+      <div class="tt-stage" id="tt-stage">
+        <img class="tt-people" id="tt-people" src="assets/tt-teens.webp" alt="Two young athletes in silhouette, one holding a basketball and one a soccer ball, lit from behind">
+        <div class="tt-hand" id="tt-hand">
+          <img class="tt-screen" src="assets/tt-screen.webp" alt="The Youth Sports Bible on a phone screen">
+          <img class="tt-screen tt-screen-mark" src="assets/tt-screen-mark.webp" alt="The book of Mark open in the Youth Sports Bible">
+          <img class="tt-handimg" src="assets/tt-hand.webp" alt="">
+          <div class="tt-sheen" aria-hidden="true"></div>
+        </div>
+      </div>
+      <div class="tt-fade" aria-hidden="true"></div>
+    </div>
+    <div class="tt-copies">
+    <div class="tt-copy tt-a">
+      <p class="tt-line lead">As a small team has been exploring and prototyping this pilot, we realized that this digital Bible could be a <b>powerful tool</b>.</p>
+      <p class="tt-line last">We want to demonstrate just a small taste of the possibilities.</p>
+      <button class="tt-line tt-go" id="tt-go" type="button">Open the Bible<svg width="14" height="11" viewBox="0 0 16 12" aria-hidden="true"><path d="M1 6h13M9.5 1.5 14 6l-4.5 4.5" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg></button>
+    </div>
+    <div class="tt-copy tt-b" aria-hidden="true">
+      <p class="tt-line lead">The YSB is a <b>complete Bible</b> in many languages and versions. What we&rsquo;ll take you through is how it might work as you look at a book like <b>Mark</b>.</p>
+      <button class="tt-line tt-go" id="tt-next" type="button" tabindex="-1">Next<svg width="14" height="11" viewBox="0 0 16 12" aria-hidden="true"><path d="M1 6h13M9.5 1.5 14 6l-4.5 4.5" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg></button>
+    </div>
+    </div>
+  </section>
   <div class="linked-page" id="linked-page" hidden>
     <iframe id="linked-frame" title="Linked page" allow="autoplay; fullscreen"></iframe>
     <button class="linked-back" id="linked-back" type="button"><svg width="9" height="15" viewBox="0 0 9 15" aria-hidden="true"><path d="M7.5 1.5 1.5 7.5l6 6" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg><span id="linked-back-label">Mark 1</span></button>
@@ -639,9 +765,165 @@ function hideTitle() {
   if (TITLE_SRC) titleFrame.src = 'about:blank'; else titleFrame.srcdoc = '';
   $('#enter').blur();
 }
-$('#enter').onclick = hideTitle;
+/* "Show me!" leads to the two-pilots photo page, then on into the Bible */
+const why = $('#ysb-why');
+function showWhy() {
+  why.hidden = false; why.classList.remove('lit');
+  $$('.why-box, .why-go', why).forEach((el, k) => el.style.setProperty('--d', (0.6 + k * 0.55).toFixed(2) + 's'));
+  requestAnimationFrame(() => requestAnimationFrame(() => why.classList.add('lit')));
+  /* the video plays once (no sound) and holds on its last frame */
+  whyShade.style.setProperty('--k', 0);
+  try { whyVideo.currentTime = 0; const pr = whyVideo.play(); if (pr) pr.catch(() => {}); } catch (e) {}
+  cancelAnimationFrame(whyRAF); whyLoop(performance.now());
+}
+const whyVideo = $('#why-video'), whyShade = $('#why-shade');
+let whyRAF = 0;
+function whyLoop(t0) {
+  const step = now => {
+    /* follow the video when it plays; if it can't (autoplay blocked), follow the clock over the same 10 s */
+    const d = whyVideo.duration || 10, vt = whyVideo.currentTime || 0;
+    const p = Math.min(1, Math.max(whyVideo.ended ? 1 : vt / d, whyVideo.paused && !whyVideo.ended ? (now - t0) / 1000 / 10 : 0));
+    const k = p * p * (3 - 2 * p);
+    whyShade.style.setProperty('--k', k.toFixed(4));
+    if (p < 1) whyRAF = requestAnimationFrame(step);
+  };
+  whyRAF = requestAnimationFrame(step);
+}
+function hideWhy() { why.hidden = true; why.classList.remove('lit'); cancelAnimationFrame(whyRAF); try { whyVideo.pause(); } catch (e) {} }
+$('#enter').onclick = () => { showWhy(); hideTitle(); };
+$('#why-go').onclick = () => { showTeens(); hideWhy(); };
+/* ---------- the two teens: light behind, phone held out; moves with finger, mouse and phone tilt ---------- */
+const teens = $('#teens'), ttStage = $('#tt-stage'), ttPeople = $('#tt-people'), ttHand = $('#tt-hand'), ttLight = $('#tt-light');
+/* the crop: zoomed in on the two of them (PSD pixels) */
+const TT = { x0: 640, x1: 3140, y0: 760, s: 1, f: 0, focus: false, raf: 0, px: null, py: null, tx: 0, ty: 0, x: 0, y: 0, tiltX: 0, tiltY: 0, tiltOn: false };
+function ttLayout() {
+  const r = $('#tt-art').getBoundingClientRect();
+  TT.s = r.width / (TT.x1 - TT.x0);
+  ttStage.style.transform = `scale(${TT.s}) translate(${-TT.x0}px, ${-TT.y0}px)`;
+  /* the light sits between their heads, just above the shoulders */
+  ttLight.style.setProperty('--lx', ((1880 - TT.x0) * TT.s) + 'px');
+  ttLight.style.setProperty('--ly', ((1880 - TT.y0) * TT.s) + 'px');
+}
+addEventListener('resize', () => { if (!teens.hidden) ttLayout(); });
+teens.addEventListener('pointermove', e => { const r = teens.getBoundingClientRect(); TT.px = (e.clientX - r.left) / r.width * 2 - 1; TT.py = (e.clientY - r.top) / r.height * 2 - 1; });
+teens.addEventListener('pointerleave', () => { TT.px = TT.py = null; });
+function ttOnTilt(e) {
+  if (e.gamma == null) return;
+  TT.tiltX = Math.max(-1, Math.min(1, e.gamma / 25)); TT.tiltY = Math.max(-1, Math.min(1, ((e.beta || 45) - 45) / 25));
+}
+teens.addEventListener('pointerdown', () => {      /* iPhone asks permission for motion on the first tap */
+  if (TT.tiltOn) return; TT.tiltOn = true;
+  const D = window.DeviceOrientationEvent;
+  if (D && typeof D.requestPermission === 'function') D.requestPermission().then(r => { if (r === 'granted') addEventListener('deviceorientation', ttOnTilt); }).catch(() => {});
+  else addEventListener('deviceorientation', ttOnTilt);
+});
+if (window.DeviceOrientationEvent && typeof DeviceOrientationEvent.requestPermission !== 'function') { TT.tiltOn = true; addEventListener('deviceorientation', ttOnTilt); }
+function ttLoop(t0) {
+  const still = matchMedia('(prefers-reduced-motion: reduce)').matches;
+  let last = t0;
+  const step = now => {
+    const t = (now - t0) / 1000, dt = Math.min(0.05, (now - last) / 1000); last = now;
+    let tx = TT.tiltX + (TT.px != null ? TT.px * 0.9 : 0) + (still ? 0 : 0.22 * Math.sin(t * 0.33));
+    let ty = TT.tiltY + (TT.py != null ? TT.py * 0.7 : 0) + (still ? 0 : 0.14 * Math.sin(t * 0.26 + 1.3));
+    tx = Math.max(-1, Math.min(1, tx)); ty = Math.max(-1, Math.min(1, ty));
+    const e = 1 - Math.pow(0.04, dt); TT.x += (tx - TT.x) * e; TT.y += (ty - TT.y) * e;
+    const k = 1 / TT.s;   /* screen pixels -> PSD pixels */
+    /* the pull focus: eases in quickly once "Open the Bible" is tapped */
+    TT.f += ((TT.focus ? 1 : 0) - TT.f) * (1 - Math.pow(0.004, dt));
+    const f = TT.f, fs = f * f * (3 - 2 * f), calm = 1 - 0.6 * fs;
+    /* the two of them sit back (and go soft and a little closer once the phone has the focus) */
+    const art = $('#tt-art'), aw = art.clientWidth, ah = art.clientHeight;
+    ttPeople.style.transform = `translate(${(-TT.x * 7 * k).toFixed(1)}px, ${(-TT.y * 5 * k).toFixed(1)}px) scale(${(1 + 0.09 * fs).toFixed(4)})`;
+    ttPeople.style.transformOrigin = '50% 30%';
+    ttPeople.style.filter = fs > 0.002 ? `blur(${(6 * fs * k).toFixed(1)}px) brightness(${(1 - 0.25 * fs).toFixed(3)})` : 'none';
+    /* the hand is nearer to us: it moves more, turns toward the viewer and rocks a few degrees on its own */
+    const bob = still ? 0 : Math.sin(t * 0.9) * 6, sway = still ? 0 : Math.sin(t * 0.62) * 3.2 + Math.sin(t * 1.37 + 0.6) * 1.1;
+    const turn = still ? 0 : Math.sin(t * 0.47 + 2.1) * 5;
+    const cx = TT.x0 + aw / 2 * k, cy = TT.y0 + ah * 0.47 * k;               /* centre of the picture, in PSD pixels */
+    const zx = (cx - 1648) * fs, zy = (cy - 2643) * fs, zs = 1 + 0.82 * fs;    /* bring the screen to the centre, larger */
+    const roll = Math.sin(Math.PI * Math.min(1, f * 1.15)) * 5 - 2 * fs;       /* a slight turn as it comes in */
+    ttHand.style.transform = `translate(${(zx + TT.x * 26 * k * calm).toFixed(1)}px, ${(zy + (TT.y * 16 + bob) * k * calm).toFixed(1)}px) scale(${zs.toFixed(4)}) perspective(${(1400 * k).toFixed(0)}px) rotateY(${((TT.x * 22 + turn) * calm).toFixed(2)}deg) rotateX(${(-TT.y * 14 * calm).toFixed(2)}deg) rotateZ(${((TT.x * -3.5 + sway) * calm + roll).toFixed(2)}deg)`;
+    if (TT.focus && f > 0.45 && !teens.classList.contains('marked')) teens.classList.add('marked');
+    ttHand.style.setProperty('--sh', (45 + TT.x * 30 - TT.y * 12).toFixed(1) + '%');
+    ttLight.style.setProperty('--rot', (t * 1.6 + TT.x * 6).toFixed(2) + 'deg');
+    ttLight.style.setProperty('--rot2', (-t * 1.1 - TT.x * 4).toFixed(2) + 'deg');
+    TT.raf = requestAnimationFrame(step);
+  };
+  TT.raf = requestAnimationFrame(step);
+}
+function showTeens() {
+  teens.hidden = false; teens.classList.remove('lit', 'focus', 'marked'); TT.focus = false; TT.f = 0;
+  $('.tt-b').setAttribute('aria-hidden', 'true'); $('#tt-next').tabIndex = -1; $('#tt-go').tabIndex = 0; ttLayout();
+  $$('.tt-a .tt-line', teens).forEach((el, k) => el.style.setProperty('--d', (1.4 + k * 0.8).toFixed(2) + 's'));
+  $$('.tt-b .tt-line', teens).forEach((el, k) => el.style.setProperty('--d', (0.9 + k * 0.7).toFixed(2) + 's'));
+  cancelAnimationFrame(TT.raf); ttLoop(performance.now());
+  requestAnimationFrame(() => requestAnimationFrame(() => teens.classList.add('lit')));
+}
+function hideTeens() { teens.hidden = true; teens.classList.remove('lit'); cancelAnimationFrame(TT.raf); }
+/* "Open the Bible": pull focus onto the phone; its screen turns to Mark */
+$('#tt-go').onclick = () => {
+  TT.focus = true; teens.classList.add('focus');
+  $('.tt-b').removeAttribute('aria-hidden'); $('#tt-next').tabIndex = 0; $('#tt-go').tabIndex = -1;
+};
+/* "Next": into the Bible itself, opened at Mark (past the welcome panel) */
+$('#tt-next').onclick = () => {
+  hideTeens();
+  const bt = $('.book-title'); if (bt) { reader.style.scrollBehavior = 'auto'; reader.scrollTop += bt.getBoundingClientRect().top - reader.getBoundingClientRect().top - 8; reader.style.scrollBehavior = 'smooth'; }
+  startWalkthrough();
+};
+
 $('#cover img').onclick = showTitle;
 if (h) titleScreen.hidden = true; else showTitle();
+
+/* ---------- the walk-through call-outs on Mark 1 ---------- */
+const CALLOUTS = [
+  { target: () => $('.vs[data-v="MRK.1.1"]'), at: 'start', place: 'above',
+    html: 'Imagine a young person is reading <b>Mark 1</b> and sees a reference to the <b>Good News</b>.', next: true },
+  { target: () => $('.ball-link'), at: 'center', place: 'below', pulse: true, close: true,
+    html: 'They would be able to click on a link to find out more about this good news. <b>Click on it to see!</b>' }
+];
+const coPage = $('.bible-page');
+let coIdx = -1, coEl = null;
+function coPlace() {
+  if (!coEl || coIdx < 0) return;
+  const c = CALLOUTS[coIdx], t = c.target(); if (!t) return;
+  const pr = coPage.getBoundingClientRect(), tr = (t.getClientRects()[0] || t.getBoundingClientRect());
+  const tx = (c.at === 'start' ? tr.left + 6 : tr.left + tr.width / 2) - pr.left;
+  const w = coEl.offsetWidth, h = coEl.offsetHeight;
+  const left = Math.max(12, Math.min(pr.width - w - 12, tx - 34));
+  coEl.style.left = left + 'px';
+  coEl.style.top = (c.place === 'above' ? tr.top - pr.top - h - 14 : tr.bottom - pr.top + 14) + 'px';
+  coEl.style.setProperty('--tail', Math.max(18, Math.min(w - 18, tx - left)) + 'px');
+}
+function coHide() {
+  if (coEl) { const el = coEl; el.classList.remove('show'); setTimeout(() => el.remove(), 500); }
+  coEl = null; $$('.ball-link.pulse').forEach(b => b.classList.remove('pulse'));
+}
+function coShow(i) {
+  coHide(); coIdx = i; if (i >= CALLOUTS.length) { coIdx = -1; return; }
+  const c = CALLOUTS[i], el = document.createElement('div');
+  el.className = 'callout ' + c.place + (c.close ? ' has-x' : ''); el.setAttribute('role', 'note');
+  el.innerHTML = c.html + (c.next ? `<div class="co-row"><span class="co-step">${i + 1} of ${CALLOUTS.length}</span><button type="button" class="co-next">Next<svg width="12" height="10" viewBox="0 0 16 12" aria-hidden="true"><path d="M1 6h13M9.5 1.5 14 6l-4.5 4.5" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg></button></div>` : '')
+    + (c.close ? '<button type="button" class="co-x" aria-label="Close">&times;</button>' : '');
+  coPage.append(el); coEl = el; coPlace();
+  /* bring it into view if needed, then let it appear */
+  const er = el.getBoundingClientRect(), rr = reader.getBoundingClientRect();
+  if (er.top < rr.top + 12 || er.bottom > rr.bottom - 12) reader.scrollBy({ top: er.top - rr.top - rr.height * 0.28, behavior: 'smooth' });
+  if (c.pulse) { const t = c.target(); if (t) t.classList.add('pulse'); }
+  const nx = el.querySelector('.co-next'); if (nx) nx.onclick = e => { e.stopPropagation(); coShow(i + 1); };
+  const cx = el.querySelector('.co-x'); if (cx) cx.onclick = e => { e.stopPropagation(); coHide(); coIdx = -1; };
+  requestAnimationFrame(() => requestAnimationFrame(() => el.classList.add('show')));
+}
+addEventListener('resize', coPlace);
+/* the walk-through starts after "Next" on the teens page: settle on MARK, glide down to verse 1, then the first call-out */
+function startWalkthrough() {
+  setTimeout(() => {
+    const v = $('.vs[data-v="MRK.1.1"]'); if (!v) return;
+    const vr = v.getBoundingClientRect(), rr = reader.getBoundingClientRect();
+    reader.scrollBy({ top: vr.top - rr.top - rr.height * 0.55, behavior: 'smooth' });
+    setTimeout(() => coShow(0), 900);
+  }, 1100);
+}
 /* ---------- verse links: tiny 3D balls placed in the text ---------- */
 const BALL_ICONS = { soccer: 'data:image/png;base64,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' };
 const VERSE_LINKS = [
@@ -665,6 +947,7 @@ VERSE_LINKS.forEach(l => {
   a.innerHTML = '<span class="ball-tip"></span>'; a.firstChild.textContent = l.tip;
   a.addEventListener('click', e => {
     e.preventDefault(); e.stopPropagation();
+    if (coIdx >= 0) { coHide(); coIdx = -1; }
     if (touchOnly && !a.classList.contains('tip')) { a.classList.add('tip'); setTimeout(() => { a.classList.remove('tip'); openLinked(l.href, l.back); }, 900); return; }
     openLinked(l.href, l.back);
   });
