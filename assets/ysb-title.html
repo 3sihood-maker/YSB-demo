@@ -355,6 +355,7 @@ function ret(id){
 Array.prototype.forEach.call(document.querySelectorAll('.hot'),function(h){
   h.addEventListener('pointerdown',function(ev){
     ev.stopPropagation(); if(!AC)return;
+    lastKick=performance.now(); hint.classList.remove('show');
     kick(h.getAttribute('data-ball')==='basket'?'basket':
          h.getAttribute('data-ball')==='tennis'?'tennis':'soccer', ev.clientX, ev.clientY);
   });
@@ -447,7 +448,7 @@ function play(){
     Array.prototype.forEach.call(document.querySelectorAll('.hot'),function(h){
       h.classList.remove('hint'); void h.offsetWidth; h.classList.add('hint');
     });
-    T.push(setTimeout(function(){hint.classList.remove('show');},6200));
+    /* the hint stays until someone kicks a ball */
   });
 }
 
@@ -482,7 +483,27 @@ document.getElementById('bBeat').onclick=function(e){
 document.getElementById('bReplay').onclick=function(e){e.stopPropagation(); play();};
 addEventListener('keydown',function(e){if(e.key==='r'||e.key==='R')play();});
 
-fit(); loop(); play();
+/* ============ when nobody plays: the balls fly off and come back on their own ============ */
+/* Once the intro is done, if nobody has kicked a ball for 3 seconds, a random ball is kicked
+   every couple of seconds — each ball once, in a random order, then it stops.
+   Any tap on a ball resets the 3-second wait (and hides the hint). */
+var lastKick=0, autoReady=0, autoDone={};
+function autoKick(){
+  var now=performance.now();
+  if(!reduce && autoReady && now>autoReady && now-lastKick>3000){
+    var free=Object.keys(BALLS).filter(function(k){return !BALLS[k].busy && !autoDone[k];});
+    if(!free.length && Object.keys(autoDone).length>=3) return;   /* each ball has had its turn: stop */
+    if(free.length){
+      var id=free[Math.floor(Math.random()*free.length)];
+      var r=document.querySelector('#'+id+' .hot').getBoundingClientRect();
+      autoDone[id]=true; kick(id, r.left+r.width/2, r.top+r.height/2);
+    }
+  }
+  setTimeout(autoKick, 1800+Math.random()*1600);
+}
+var _play=play;
+play=function(){ autoReady=0; autoDone={}; _play(); autoReady=performance.now()+2400+3000; lastKick=0; };
+fit(); loop(); play(); autoKick();
 </script>
 </body>
 </html>
