@@ -67,6 +67,34 @@ button:focus-visible, a:focus-visible, input:focus-visible, select:focus-visible
 .front-matter article { padding: 18.4px; }
 .front-matter article img { display: block; width: 100%; aspect-ratio: 1; }
 
+
+/* ---------- the torn-paper arrow: every "next" button (both pages) ----------
+   It flies up from below with a 3D tip-and-settle as its button appears, then floats gently. */
+.paper-next { display: inline-block; width: 70px; height: 55px; padding: 0 !important; border: 0 !important; background: none !important; box-shadow: none !important; border-radius: 6px; perspective: 520px; cursor: pointer; -webkit-tap-highlight-color: transparent; transition-duration: .2s !important; }
+.paper-next img { display: block; width: 100%; height: 100%; pointer-events: none; user-select: none; transform-origin: 50% 85%; opacity: 0;
+  filter: drop-shadow(0 7px 9px rgba(0,0,0,.55)) drop-shadow(0 1px 2px rgba(0,0,0,.45)); }
+.paper-next.fly img { animation: paperIn .85s cubic-bezier(.2,.85,.3,1) both, paperIdle 3.4s ease-in-out .85s infinite; }
+.paper-next:active img { filter: drop-shadow(0 3px 4px rgba(0,0,0,.6)) brightness(.92); }
+@keyframes paperIn {   /* fades up from faint as it flies in */
+  0%   { opacity: 0; transform: translateY(110px) rotateX(68deg) rotateZ(-9deg) scale(.62); filter: drop-shadow(0 34px 26px rgba(0,0,0,.18)); }
+  30%  { opacity: .22; }
+  58%  { opacity: .6; transform: translateY(-9px) rotateX(-14deg) rotateZ(3deg) scale(1.06); filter: drop-shadow(0 16px 16px rgba(0,0,0,.4)); }
+  78%  { opacity: .9; transform: translateY(3px) rotateX(5deg) rotateZ(-1.2deg) scale(.985); }
+  100% { opacity: 1; transform: none; filter: drop-shadow(0 7px 9px rgba(0,0,0,.55)) drop-shadow(0 1px 2px rgba(0,0,0,.45)); }
+}
+@keyframes paperIdle { 0%, 100% { opacity: 1; transform: none; } 50% { opacity: 1; transform: translateY(-3px) rotateZ(-1.4deg) rotateX(6deg); } }
+/* the title screen: the arrow waits 2 s for the badge and balls to land */
+#enter.paper-next.fly img { animation-delay: 2s, 2.85s; }
+#enter.paper-next:not(.fly), #enter.paper-next.wait { pointer-events: none; }
+@media (prefers-reduced-motion: reduce) { .paper-next.fly img { animation: none; opacity: 1; } }
+.story-btns:has(.paper-next) { transition-duration: .2s !important; }
+
+/* ---------- Back: small, slightly faded, bottom-left on every screen ---------- */
+.back-btn { position: absolute; left: 14px; bottom: calc(16px + env(safe-area-inset-bottom, 0px)); z-index: 9; display: inline-flex; align-items: center; gap: 5px;
+  padding: 7px 12px 7px 9px; border-radius: 999px; border: 1px solid rgba(255,255,255,.22); background: rgba(0,0,0,.35); -webkit-backdrop-filter: blur(6px); backdrop-filter: blur(6px);
+  color: rgba(255,255,255,.85); font: 600 12.5px/1 "Archivo", var(--sys); letter-spacing: .02em; opacity: .55; transition: opacity .25s ease, background .2s; }
+.back-btn:hover, .back-btn:focus-visible { opacity: 1; background: rgba(0,0,0,.55); }
+.back-btn svg { flex: none; }
 /* ---------- intro pages (before the title) ---------- */
 .phone { --pink-1987: #f6a6ab; }
 .intro { --pink-1987: #f6a6ab;   /* sampled from the 1987 Pan Am Games New Testament cover */
@@ -197,6 +225,9 @@ button:focus-visible, a:focus-visible, input:focus-visible, select:focus-visible
 .tn-story .tn-group { position: absolute; left: 0; right: 0; bottom: 0; padding: 110px 24px calc(78px + env(safe-area-inset-bottom, 0px)); display: flex; flex-direction: column; align-items: center; justify-content: flex-end;
   background: linear-gradient(to bottom, rgba(0,0,0,0), rgba(0,0,0,.78) 12%, rgba(0,0,0,.9) 30%, rgba(0,0,0,.96)); opacity: 0; transition: opacity .9s ease; }
 .tn-story .tn-group.on { opacity: 1; }
+/* the words start from the middle of the screen (the last page stays low, under the two NTs) */
+.tn-story .tn-group:not(:last-child) { top: calc(46% - 60px); padding-top: 60px; justify-content: flex-start;
+  background: linear-gradient(to bottom, rgba(0,0,0,0), rgba(0,0,0,.72) 60px, rgba(0,0,0,.9) 40%, rgba(0,0,0,.96)); }
 .tn-story .tn-line { opacity: 0; transform: translateY(12px); transition: opacity 1s ease, transform 1s ease; }
 .tn-story .tn-line.on { opacity: 1; transform: none; }
 .tunnel .tn-story .tn-go { position: static; left: auto; bottom: auto; pointer-events: auto; margin-top: 14px; }
@@ -204,6 +235,42 @@ button:focus-visible, a:focus-visible, input:focus-visible, select:focus-visible
 .tn-progress { position: absolute; left: 22%; right: 22%; top: calc(122px + env(safe-area-inset-top, 0px)); height: 2px; border-radius: 2px; background: rgba(255,255,255,.12); z-index: 2; pointer-events: none; overflow: hidden; }
 .tn-progress i { display: block; height: 100%; width: 0; background: var(--pink-1987); }
 
+/* ---------- tunnel words: a highlight as each line arrives (to catch the eye of people used to reels) ----------
+   hl-words: the words pop in one after another, yellow, then settle to their normal colour (caption style)
+   hl-line:  the whole line arrives yellow, then settles to its normal colour
+   hl-off:   no highlight (as before) */
+.tunnel { --hl: #ffec3d; }
+.tn-story .w { display: inline-block; }
+.tunnel.hl-words .tn-story .tn-line:not(.tn-go) { transition: opacity .2s ease, transform .2s ease; transform: none; }
+.tunnel.hl-words .tn-story .tn-line:not(.on) .w { opacity: 0; }
+.tunnel.hl-words .tn-story .tn-line.on .w { animation: tnWord 1.9s cubic-bezier(.2,.7,.3,1) calc(var(--i) * var(--st, .15s)) both; }
+.tunnel.hl-line .tn-story .tn-line { transform-origin: 50% 50%; transition: opacity .45s ease, transform .45s ease; }
+.tunnel.hl-line .tn-story .tn-line.on:not(.tn-go) { animation: tnLineSize 3.2s cubic-bezier(.3,.7,.3,1) both; }
+.tunnel.hl-line .tn-story .tn-line.on .w { animation: tnLine 3.2s ease both; }
+@keyframes tnWord {
+  0%   { opacity: 0; transform: translateY(.42em) scale(.96); color: var(--hl); text-shadow: 0 0 16px rgba(255,216,74,.55), 0 1px 10px rgba(0,0,0,.9); }
+  12%  { opacity: 1; transform: none; color: var(--hl); text-shadow: 0 0 16px rgba(255,216,74,.55), 0 1px 10px rgba(0,0,0,.9); }
+  42%  { color: var(--hl); text-shadow: 0 0 12px rgba(255,216,74,.35), 0 1px 10px rgba(0,0,0,.9); }
+  100% { opacity: 1; transform: none; color: var(--to); text-shadow: 0 1px 10px rgba(0,0,0,.9); }
+}
+@keyframes tnLine {
+  0%, 50% { color: var(--hl); text-shadow: 0 0 18px rgba(255,236,61,.6), 0 0 4px rgba(255,236,61,.45), 0 1px 10px rgba(0,0,0,.9); }
+  100% { color: var(--to); text-shadow: 0 1px 10px rgba(0,0,0,.9); }
+}
+@keyframes tnLineSize { 0% { scale: 1.2; } 28% { scale: 1.2; } 62% { scale: 1; } 100% { scale: 1; } }   /* bigger first, back to size while still yellow */
+.tunnel.hl-line .tn-story .tn-group:last-child .tn-line.on:not(.tn-go) { animation-name: tnLineSizeSm; }
+@keyframes tnLineSizeSm { 0% { scale: 1.1; } 20% { scale: 1.1; } 50% { scale: 1; } 100% { scale: 1; } }
+/* stepping back: show the words at once, no replay */
+.tunnel .tn-story .tn-line.snapped, .tunnel .tn-story .tn-line.snapped .w { animation: none !important; transition: none !important; }
+@media (prefers-reduced-motion: reduce) { .tn-story .w { animation: none !important; opacity: 1 !important; } }
+/* the comparison switch: laptop only, beside the phone, while the tunnel is showing */
+.hl-test { position: fixed; right: 24px; top: 50%; transform: translateY(-50%); z-index: 50; width: 196px; padding: 14px; border-radius: 14px; background: #1c1e22; border: 1px solid #33363c; color: #e8eaee; font: 500 13px/1.35 "Archivo", var(--sys); box-shadow: 0 10px 30px rgba(0,0,0,.4); }
+.hl-test h3 { margin: 0 0 4px; font: 700 12px/1.2 "Archivo", var(--sys); letter-spacing: .1em; text-transform: uppercase; color: #ffd84a; }
+.hl-test p { margin: 0 0 10px; color: #9aa0a8; font-size: 12px; }
+.hl-test button { display: block; width: 100%; text-align: left; margin-top: 6px; padding: 9px 11px; border-radius: 9px; border: 1px solid #3a3e45; background: #24272c; color: #e8eaee; font: 600 13px/1.2 "Archivo", var(--sys); }
+.hl-test button[aria-pressed="true"] { border-color: #ffd84a; background: rgba(255,216,74,.12); color: #fff; }
+.hl-test button small { display: block; margin-top: 2px; font-weight: 400; font-size: 11.5px; color: #9aa0a8; }
+@media (max-width: 519px) { .hl-test { display: none !important; } }
 /* ---------- story pages on black (6b, 7, 8, 9) ---------- */
 .story { justify-content: center; padding: 64px 0 calc(28px + env(safe-area-inset-bottom, 0px)); }
 .story-scroll { flex: 1; min-height: 0; overflow-y: auto; display: flex; flex-direction: column; scrollbar-width: none; }
@@ -312,13 +379,13 @@ button:focus-visible, a:focus-visible, input:focus-visible, select:focus-visible
         <p class="lead2">This was the <b class="pk">world&rsquo;s first</b> <b>Sport Bible</b>. Printed in English and Spanish for the Pan American Games in Indianapolis.</p>
         <p class="simple">A simple idea.</p>
         <p class="never">Yet an idea that had never been done in the <b>500 years</b> of the Bible being printed.</p>
-        <button class="intro-go" id="intro2-go" type="button">Continue<svg width="16" height="12" viewBox="0 0 16 12" aria-hidden="true"><path d="M1 6h13M9.5 1.5 14 6l-4.5 4.5" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg></button>
+        <button class="paper-next intro-go" id="intro2-go" type="button" aria-label="Continue"><img data-paper alt="" draggable="false"></button>
       </div>
       <!-- INTRO PAGE 3: same cover, new words, the sport Bibles video behind -->
       <div class="intro-copy copy-b" aria-hidden="true">
         <p class="p3a">This powerful <b class="pk">pink Bible</b> enabled a ground-swell of countless sport Bibles since. In many languages, for many sports and often catalyzed by a major sports event.</p>
         <p class="p3b">The Bible has always been central to the sport movement. Now the sport movement was seeing <b class="pk">sport themed Bibles across the world</b>.</p>
-        <button class="intro-go" id="intro3-go" type="button" tabindex="-1">Continue<svg width="16" height="12" viewBox="0 0 16 12" aria-hidden="true"><path d="M1 6h13M9.5 1.5 14 6l-4.5 4.5" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg></button>
+        <button class="paper-next intro-go" id="intro3-go" type="button" tabindex="-1" aria-label="Continue"><img data-paper alt="" draggable="false"></button>
       </div>
     </div>
   </section>
@@ -336,6 +403,7 @@ button:focus-visible, a:focus-visible, input:focus-visible, select:focus-visible
     <div class="story-scroll"><div class="story-copy" id="story-copy"></div></div>
     <div class="toast-inline" id="story-toast" hidden></div>
   </section>
+  <button class="back-btn" id="back-btn" type="button" hidden><svg width="8" height="13" viewBox="0 0 9 15" aria-hidden="true"><path d="M7.5 1.5 1.5 7.5l6 6" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>Back</button>
 </div>
 </div>
 
@@ -344,6 +412,30 @@ button:focus-visible, a:focus-visible, input:focus-visible, select:focus-visible
 <script>
 const $ = (s, r = document) => r.querySelector(s);
 const $$ = (s, r = document) => [...r.querySelectorAll(s)];
+/* Back: each page lists its screens (top-most first); the button shows the first one that is open */
+const BACK = [];
+const backBtn = $('#back-btn');
+function backUpdate() {
+  const sc = BACK.find(b => b.on());
+  backBtn.hidden = !sc || !!sc.none;
+  if (sc && sc.lift) { const ph = $('#phone').getBoundingClientRect(), y = sc.lift(); backBtn.style.bottom = (ph.bottom - y + 10) + 'px'; }
+  else backBtn.style.bottom = '';
+}
+backBtn.onclick = () => { const sc = BACK.find(b => b.on()); if (sc && sc.go) sc.go(); requestAnimationFrame(backUpdate); };
+setInterval(backUpdate, 250);
+const PAPER_SRC = "assets/paper-arrow.webp";
+const PAPER_IMG = '<img data-paper alt="" draggable="false" src="' + PAPER_SRC + '">';
+$$('img[data-paper]').forEach(i => { i.src = PAPER_SRC; });
+(function paperWatch() {
+  /* how visible is a button really (its own fade and its parents')? */
+  const seen = el => { if (!el.offsetParent) return 0; let o = 1; for (let n = el; n && n !== document.body; n = n.parentElement) { o *= +getComputedStyle(n).opacity; if (o < 0.02) return 0; } return o; };
+  let f = 0;
+  const tick = () => {
+    if (++f % 2 === 0) $$('.paper-next').forEach(b => { const v = seen(b); if (v > 0.06) b.classList.add('fly'); else if (v < 0.02) b.classList.remove('fly'); });
+    requestAnimationFrame(tick);
+  };
+  requestAnimationFrame(tick);
+})();
 /* ---------- intro pages ---------- */
 const intro1 = $('#intro1');
 let introRAF = 0;
@@ -440,7 +532,7 @@ function showIntro() {
 function hideIntro() { intro1.hidden = true; cancelAnimationFrame(introRAF); }
 /* for now the button carries on into the animated title; the next intro page will slot in here */
 // (intro 1's button is wired to page 2 below)
-showIntro();
+if (location.hash === '#end') { requestAnimationFrame(() => showStory(STORY.length - 1)); } else showIntro();
 /* ---------- intro page 2: close on the Pan Am logo, pull back to the whole cover ---------- */
 const intro2 = $('#intro2'), cZoom = $('#cover-zoom'), cTilt = $('#cover-tilt'), cBack = $('#cover-back'), cSheen = $('#cover-sheen');
 let intro2RAF = 0, intro2Timer = 0;
@@ -555,6 +647,29 @@ $('#intro2-go').onclick = () => {
   const v = $('#intro-video'); try { v.currentTime = 0; const pr = v.play(); if (pr && pr.catch) pr.catch(() => {}); } catch (e) {}
 };
 $('#intro3-go').onclick = () => { hideIntro2(); showIntro4(); };
+/* Back on the print pilot */
+function backToP3() {   /* the "This powerful pink Bible" page */
+  showIntro2(); cancelAnimationFrame(CAM.raf); camRest(camBase()); intro2.classList.add('out');
+  $('#intro2-go').onclick();
+}
+BACK.push(
+  { on: () => !intro1.hidden, none: true },
+  { on: () => !intro2.hidden && intro2.classList.contains('p3'), go: () => {
+      intro2.classList.remove('p3'); $('.copy-b').setAttribute('aria-hidden', 'true'); $('.copy-a').removeAttribute('aria-hidden');
+      $('#intro2-go').tabIndex = 0; $('#intro3-go').tabIndex = -1; try { $('#intro-video').pause(); } catch (e) {} } },
+  { on: () => !intro2.hidden, go: () => { hideIntro2(); showIntro(); } },
+  { on: () => !intro4.hidden, go: () => {
+      /* within the tunnel: back one page of words; from the first page, back to the pink Bible page */
+      let g = -1; TN_G0.forEach((t0, k) => { if (TN.T >= t0 - 0.6) g = k; });
+      if (g >= 1) {
+        /* land on the page before, with all its words already there and its arrow waiting */
+        TN_LINES.forEach(ln => { if (ln.g === g - 1) ln.el.classList.add('snapped'); });
+        TN.released[g - 1] = false; TN.T = TN_PAGES[g - 1].hold + 0.05; TN.vT = 0; TN.jump = null; TN.rate = 0.04;
+      } else { hideIntro4(); backToP3(); } } },
+  { on: () => !story.hidden, go: () => {
+      if (storyIdx > 0) goStory(storyIdx - 1);
+      else { hideStory(); showIntro4(); TN_LINES.forEach(ln => { if (ln.g === TN_PAGES.length - 1) ln.el.classList.add('snapped'); }); TN.T = TN_TEND; TN.z = tnZOf(TN.T); } } }
+);
 /* ---------- intro page 4: the tunnel through time ----------
    A players' tunnel lined with the sport Bible covers in date order, 1987 at the mouth and
    today's at the far end where the stadium light is. A finger or mouse drag runs you through
@@ -838,23 +953,67 @@ function tnRenderText() {
     const grp = document.createElement('div'); grp.className = 'tn-group';
     pg.forEach(ln => {
       const p = document.createElement('p'); p.className = 'tn-line ' + (ln.cls || ''); p.innerHTML = ln.h;
+      tnWrapWords(p);
       grp.append(p); ln.el = p;
     });
     if (g === TN_PAGES.length - 1) {
-      const b = document.createElement('button'); b.type = 'button'; b.className = 'intro-go tn-go tn-line'; b.id = 'intro4-go';
-      b.innerHTML = 'Continue<svg width="16" height="12" viewBox="0 0 16 12" aria-hidden="true"><path d="M1 6h13M9.5 1.5 14 6l-4.5 4.5" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>';
+      const b = document.createElement('button'); b.type = 'button'; b.className = 'intro-go tn-go tn-line paper-next'; b.id = 'intro4-go'; b.setAttribute('aria-label', 'Continue');
+      b.innerHTML = PAPER_IMG;
       b.onclick = () => { hideIntro4(); showStory(0); };
       grp.append(b); TN.goBtn = b;
     } else {
-      const b = document.createElement('button'); b.type = 'button'; b.className = 'intro-go tn-go tn-line tn-next';
-      b.innerHTML = 'Next<svg width="16" height="12" viewBox="0 0 16 12" aria-hidden="true"><path d="M1 6h13M9.5 1.5 14 6l-4.5 4.5" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>';
+      const b = document.createElement('button'); b.type = 'button'; b.className = 'intro-go tn-go tn-line tn-next paper-next'; b.setAttribute('aria-label', 'Next');
+      b.innerHTML = PAPER_IMG;
       b.onclick = () => { TN.released[g] = true; TN.jump = TN_G0[g + 1] - 0.3; $('#tn-hint').classList.add('gone'); };
       grp.append(b);
       TN_LINES.push({ el: b, g, t: pg.hold });   /* appears with the slow-down */
     }
     box.append(grp); pg.el = grp;
   });
+  /* each line's words share out the time before the next line arrives (never slower than ~6.5 words a second) */
+  TN_LINES.forEach((ln, k) => {
+    if (!ln.el || ln.el.tagName !== 'P') return;
+    const words = ln.el.querySelectorAll('.w').length || 1, nx = TN_LINES.slice(k + 1).find(l => l.g === ln.g && l.el && l.el.tagName === 'P');
+    const slot = nx ? nx.t - ln.t : 2.2;
+    ln.el.style.setProperty('--st', Math.max(0.05, Math.min(0.15, slot * 0.7 / words)).toFixed(3) + 's');
+  });
+  $$('.tn-story .w').forEach(w => w.style.setProperty('--to', getComputedStyle(w).color));
 }
+function tnWrapWords(p) {
+  let i = 0;
+  const walk = node => {
+    [...node.childNodes].forEach(n => {
+      if (n.nodeType === 3) {
+        const frag = document.createDocumentFragment();
+        n.textContent.split(/(\s+)/).forEach(part => {
+          if (!part) return;
+          if (/^\s+$/.test(part)) frag.append(part);
+          else { const sp = document.createElement('span'); sp.className = 'w'; sp.textContent = part; sp.style.setProperty('--i', i++); frag.append(sp); }
+        });
+        n.replaceWith(frag);
+      } else if (n.nodeType === 1 && n.tagName !== 'BR') walk(n);
+    });
+  };
+  walk(p);
+}
+/* which highlight the tunnel words use; the switch beside the phone (laptop only) is for comparing them */
+const TN_HL = [
+  { id: 'words', label: 'Word by word', note: 'Words pop in yellow, one after another, then turn white' },
+  { id: 'line', label: 'Yellow, then white', note: 'Each line arrives yellow and fades to white' },
+  { id: 'off', label: 'No highlight', note: 'As before' }
+];
+let tnHL = 'line';   /* chosen: whole line arrives bright yellow and a little larger, then settles to white */
+function tnSetHL(id) {
+  tnHL = id;
+  const t = $('#intro4'); TN_HL.forEach(h => t.classList.toggle('hl-' + h.id, h.id === id));
+  $$('.hl-test button').forEach(b => b.setAttribute('aria-pressed', String(b.dataset.hl === id)));
+}
+const hlPanel = document.createElement('div'); hlPanel.className = 'hl-test'; hlPanel.hidden = true;
+hlPanel.innerHTML = '<h3>Tunnel text test</h3><p>Try each style while the words come in. (Shown on laptops only.)</p>' +
+  TN_HL.map(h => `<button type="button" data-hl="${h.id}" aria-pressed="false">${h.label}<small>${h.note}</small></button>`).join('');
+/* comparison panel no longer shown */
+hlPanel.addEventListener('click', e => { const b = e.target.closest('button[data-hl]'); if (b) tnSetHL(b.dataset.hl); });
+tnSetHL(tnHL);
 /* where the camera is for a given moment of the story: through the wall covers during
    pages 4 and 5, then easing to a stop in front of the two Youth Sports New Testaments */
 function tnZOf(T) {
@@ -928,7 +1087,7 @@ function tnLoop(t0) {
     /* the words: one page at a time, its lines arriving as the story reaches them */
     const g = TN.T < TN_G0[0] - 0.3 ? -1 : (TN.T < TN_G0[1] - 0.6 ? 0 : TN.T < TN_G0[2] - 0.6 ? 1 : 2);
     TN_PAGES.forEach((pg, k) => pg.el.classList.toggle('on', k === g && !TN.card && !(TN.fz > 0.2)));
-    TN_LINES.forEach(ln => ln.el.classList.toggle('on', ln.g === g && TN.T >= ln.t));
+    TN_LINES.forEach(ln => { const on = ln.g === g && TN.T >= ln.t; ln.el.classList.toggle('on', on); if (!on) ln.el.classList.remove('snapped'); });
     TN.goBtn.classList.toggle('on', TN.T >= TN_GO);
     const R = TN.renderer;
     R.clear();
@@ -948,7 +1107,7 @@ function showIntro4() {
   $('#tn-hint').classList.remove('gone');
   cancelAnimationFrame(TN.raf); tnLoop(performance.now());
 }
-function hideIntro4() { intro4.hidden = true; cancelAnimationFrame(TN.raf); }
+function hideIntro4() { intro4.hidden = true; cancelAnimationFrame(TN.raf); hlPanel.hidden = true; }
 
 /* ---------- story pages on black: 6b, 7, 8, 9 (visuals to come) ---------- */
 const BOOK_UI = `<div class="book-wrap">
@@ -993,8 +1152,10 @@ function renderStory(i) {
   const btns = document.createElement('div'); btns.className = 'story-btns';
   pg.buttons.forEach(bt => {
     const b = document.createElement('button'); b.type = 'button';
-    b.className = bt.link ? 'story-link' : 'intro-go' + (bt.primary ? ' primary' : '');
-    b.innerHTML = bt.label + (bt.link ? '' : ARROW);
+    const paper = bt.next && !bt.link && !bt.primary;   /* plain "Continue" -> the paper arrow */
+    b.className = bt.link ? 'story-link' : 'intro-go' + (bt.primary ? ' primary' : '') + (paper ? ' paper-next' : '');
+    if (paper) { b.innerHTML = PAPER_IMG; b.setAttribute('aria-label', bt.label); }
+    else b.innerHTML = bt.label + (bt.link ? '' : ARROW);
     b.onclick = () => {
       if (bt.toast) { const t = $('#story-toast'); t.textContent = bt.toast; t.hidden = false; clearTimeout(storyToastT); storyToastT = setTimeout(() => t.hidden = true, 2200); }
       else if (bt.next) goStory(i + 1);

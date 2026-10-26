@@ -67,6 +67,34 @@ button:focus-visible, a:focus-visible, input:focus-visible, select:focus-visible
 .front-matter article { padding: 18.4px; }
 .front-matter article img { display: block; width: 100%; aspect-ratio: 1; }
 
+
+/* ---------- the torn-paper arrow: every "next" button (both pages) ----------
+   It flies up from below with a 3D tip-and-settle as its button appears, then floats gently. */
+.paper-next { display: inline-block; width: 70px; height: 55px; padding: 0 !important; border: 0 !important; background: none !important; box-shadow: none !important; border-radius: 6px; perspective: 520px; cursor: pointer; -webkit-tap-highlight-color: transparent; transition-duration: .2s !important; }
+.paper-next img { display: block; width: 100%; height: 100%; pointer-events: none; user-select: none; transform-origin: 50% 85%; opacity: 0;
+  filter: drop-shadow(0 7px 9px rgba(0,0,0,.55)) drop-shadow(0 1px 2px rgba(0,0,0,.45)); }
+.paper-next.fly img { animation: paperIn .85s cubic-bezier(.2,.85,.3,1) both, paperIdle 3.4s ease-in-out .85s infinite; }
+.paper-next:active img { filter: drop-shadow(0 3px 4px rgba(0,0,0,.6)) brightness(.92); }
+@keyframes paperIn {   /* fades up from faint as it flies in */
+  0%   { opacity: 0; transform: translateY(110px) rotateX(68deg) rotateZ(-9deg) scale(.62); filter: drop-shadow(0 34px 26px rgba(0,0,0,.18)); }
+  30%  { opacity: .22; }
+  58%  { opacity: .6; transform: translateY(-9px) rotateX(-14deg) rotateZ(3deg) scale(1.06); filter: drop-shadow(0 16px 16px rgba(0,0,0,.4)); }
+  78%  { opacity: .9; transform: translateY(3px) rotateX(5deg) rotateZ(-1.2deg) scale(.985); }
+  100% { opacity: 1; transform: none; filter: drop-shadow(0 7px 9px rgba(0,0,0,.55)) drop-shadow(0 1px 2px rgba(0,0,0,.45)); }
+}
+@keyframes paperIdle { 0%, 100% { opacity: 1; transform: none; } 50% { opacity: 1; transform: translateY(-3px) rotateZ(-1.4deg) rotateX(6deg); } }
+/* the title screen: the arrow waits 2 s for the badge and balls to land */
+#enter.paper-next.fly img { animation-delay: 2s, 2.85s; }
+#enter.paper-next:not(.fly), #enter.paper-next.wait { pointer-events: none; }
+@media (prefers-reduced-motion: reduce) { .paper-next.fly img { animation: none; opacity: 1; } }
+.story-btns:has(.paper-next) { transition-duration: .2s !important; }
+
+/* ---------- Back: small, slightly faded, bottom-left on every screen ---------- */
+.back-btn { position: absolute; left: 14px; bottom: calc(16px + env(safe-area-inset-bottom, 0px)); z-index: 9; display: inline-flex; align-items: center; gap: 5px;
+  padding: 7px 12px 7px 9px; border-radius: 999px; border: 1px solid rgba(255,255,255,.22); background: rgba(0,0,0,.35); -webkit-backdrop-filter: blur(6px); backdrop-filter: blur(6px);
+  color: rgba(255,255,255,.85); font: 600 12.5px/1 "Archivo", var(--sys); letter-spacing: .02em; opacity: .55; transition: opacity .25s ease, background .2s; }
+.back-btn:hover, .back-btn:focus-visible { opacity: 1; background: rgba(0,0,0,.55); }
+.back-btn svg { flex: none; }
 /* ---------- main page ---------- */
 main { position: relative; flex: 1; min-height: 0; margin: 9.2px 9.2px 0; background: var(--surface); border-radius: 36.8px 36.8px 0 0; overflow: hidden; display: flex; flex-direction: column; }
 .view { flex: 1; min-height: 0; overflow-y: auto; -webkit-overflow-scrolling: touch; scrollbar-width: none; }
@@ -472,7 +500,7 @@ main { position: relative; flex: 1; min-height: 0; margin: 9.2px 9.2px 0; backgr
   <div class="toast" id="toast" hidden></div>
   <div class="title-screen" id="title-screen">
     <iframe id="title-frame" title="Youth Sports Bible title" allow="autoplay; fullscreen"></iframe>
-    <button class="enter" id="enter" type="button">Show me!<svg width="10" height="16" viewBox="0 0 10 16" aria-hidden="true"><path d="m2 2 6 6-6 6" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg></button>
+    <button class="enter paper-next" id="enter" type="button" aria-label="Show me!"><img data-paper alt="" draggable="false"></button>
   </div>
   <section class="ysb-why" id="ysb-why" hidden>
     <video class="why-photo" id="why-video" muted playsinline preload="auto" poster="assets/ysb-track-poster.jpg" src="assets/ysb-track.mp4" aria-label="Youth Sports New Testaments and phones showing the Youth Sports Bible, beside a kit bag, ball and whistle on a running track at night, with athletes training under floodlights"></video>
@@ -481,7 +509,7 @@ main { position: relative; flex: 1; min-height: 0; margin: 9.2px 9.2px 0; backgr
       <p class="why-box lead">These two pilots of a <b class="pk">printed New Testament</b> and a <b>digital Bible</b> work together to serve sport ministry worldwide.</p>
       <p class="why-box">All in partnership with the <b>American Bible Society</b> and Bible Societies worldwide.</p>
       <p class="why-box">The <b>Youth Sport Bible (YSB)</b> is one of the first Bibles being built in their new digital Bible Engagement Platform.</p>
-      <button class="why-go" id="why-go" type="button">Let&rsquo;s go<svg width="14" height="11" viewBox="0 0 16 12" aria-hidden="true"><path d="M1 6h13M9.5 1.5 14 6l-4.5 4.5" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg></button>
+      <button class="paper-next why-go" id="why-go" type="button" aria-label="Next"><img data-paper alt="" draggable="false"></button>
     </div>
   </section>
   <section class="teens" id="teens" hidden>
@@ -506,7 +534,7 @@ main { position: relative; flex: 1; min-height: 0; margin: 9.2px 9.2px 0; backgr
     </div>
     <div class="tt-copy tt-b" aria-hidden="true">
       <p class="tt-line lead">The YSB is a <b>complete Bible</b> in many languages and versions. What we&rsquo;ll take you through is how it might work as you look at a book like <b>Mark</b>.</p>
-      <button class="tt-line tt-go" id="tt-next" type="button" tabindex="-1">Next<svg width="14" height="11" viewBox="0 0 16 12" aria-hidden="true"><path d="M1 6h13M9.5 1.5 14 6l-4.5 4.5" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg></button>
+      <button class="paper-next tt-line tt-go" id="tt-next" type="button" tabindex="-1" aria-label="Next"><img data-paper alt="" draggable="false"></button>
     </div>
     </div>
   </section>
@@ -515,12 +543,37 @@ main { position: relative; flex: 1; min-height: 0; margin: 9.2px 9.2px 0; backgr
     <button class="linked-back" id="linked-back" type="button"><svg width="9" height="15" viewBox="0 0 9 15" aria-hidden="true"><path d="M7.5 1.5 1.5 7.5l6 6" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg><span id="linked-back-label">Mark 1</span></button>
   </div>
   <div class="watermark" aria-hidden="true">DEMO ONLY</div>
+  <button class="back-btn" id="back-btn" type="button" hidden><svg width="8" height="13" viewBox="0 0 9 15" aria-hidden="true"><path d="M7.5 1.5 1.5 7.5l6 6" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>Back</button>
 </div>
 </div>
 
 <script>
 const $ = (s, r = document) => r.querySelector(s);
 const $$ = (s, r = document) => [...r.querySelectorAll(s)];
+/* Back: each page lists its screens (top-most first); the button shows the first one that is open */
+const BACK = [];
+const backBtn = $('#back-btn');
+function backUpdate() {
+  const sc = BACK.find(b => b.on());
+  backBtn.hidden = !sc || !!sc.none;
+  if (sc && sc.lift) { const ph = $('#phone').getBoundingClientRect(), y = sc.lift(); backBtn.style.bottom = (ph.bottom - y + 10) + 'px'; }
+  else backBtn.style.bottom = '';
+}
+backBtn.onclick = () => { const sc = BACK.find(b => b.on()); if (sc && sc.go) sc.go(); requestAnimationFrame(backUpdate); };
+setInterval(backUpdate, 250);
+const PAPER_SRC = "assets/paper-arrow.webp";
+const PAPER_IMG = '<img data-paper alt="" draggable="false" src="' + PAPER_SRC + '">';
+$$('img[data-paper]').forEach(i => { i.src = PAPER_SRC; });
+(function paperWatch() {
+  /* how visible is a button really (its own fade and its parents')? */
+  const seen = el => { if (!el.offsetParent) return 0; let o = 1; for (let n = el; n && n !== document.body; n = n.parentElement) { o *= +getComputedStyle(n).opacity; if (o < 0.02) return 0; } return o; };
+  let f = 0;
+  const tick = () => {
+    if (++f % 2 === 0) $$('.paper-next').forEach(b => { const v = seen(b); if (v > 0.06) b.classList.add('fly'); else if (v < 0.02) b.classList.remove('fly'); });
+    requestAnimationFrame(tick);
+  };
+  requestAnimationFrame(tick);
+})();
 const FOOTNOTES = {"1-0": "1.1: Some manuscripts do not have the Son of God.", "1-1": "1.2: Ml 3.1", "1-2": "1.3: Is 40.3 (LXX)", "1-3": "1.4: John appeared in the desert, baptizing and preaching; some manuscripts have John the Baptist appeared in the desert, preaching.", "1-4": "1.6: 2 K 1.8", "1-5": "1.11: Gn 22.2; Ps 2.7; Is 42.1; Mt 3.17; 12.18; Mk 9.7; Lk 3.22", "1-6": "1.15: Mt 3.2", "1-7": "1.22: Mt 7.28,29", "1-8": "1.39: Mt 4.23; 9.35", "1-9": "1.40: make me clean: This disease was considered to make a person ritually unclean.", "1-10": "1.41: pity; some manuscripts have anger.", "1-11": "1.44: Lv 14.1-32", "2-0": "2.15: in Levi's house; or in his (that is Jesus') house.", "2-1": "2.23: Dt 23.25", "2-2": "2.25,26: 1 S 21.1-6", "2-3": "2.26: Lv 24.9", "3-0": "3.9,10: Mk 4.1; Lk 5.1-3", "3-1": "3.22: Mt 9.34; 10.25", "3-2": "3.28: evil things they may say; or evil things they may say against God.", "3-3": "3.29: Lk 12.10", "4-0": "4.1: Lk 5.1-3", "4-1": "4.12: Is 6.9,10 (LXX)", "4-2": "4.21: Mt 5.15; Lk 11.33", "4-3": "4.22: Mt 10.26; Lk 12.2", "4-4": "4.24: Mt 7.2; Lk 6.38", "4-5": "4.25: Mt 13.12; 25.29; Lk 19.26", "4-6": "4.29: Jl 3.13"};
 const CHAPTERS = [1, 2, 3, 4];
 
@@ -769,7 +822,7 @@ function hideTitle() {
 const why = $('#ysb-why');
 function showWhy() {
   why.hidden = false; why.classList.remove('lit');
-  $$('.why-box, .why-go', why).forEach((el, k) => el.style.setProperty('--d', (0.6 + k * 0.55).toFixed(2) + 's'));
+  $$('.why-box, .why-go', why).forEach((el, k) => el.style.setProperty('--d', (2.6 + k * 0.55).toFixed(2) + 's'));   /* ~2 s to take in the video first */
   requestAnimationFrame(() => requestAnimationFrame(() => why.classList.add('lit')));
   /* the video plays once (no sound) and holds on its last frame */
   whyShade.style.setProperty('--k', 0);
@@ -792,6 +845,8 @@ function whyLoop(t0) {
 function hideWhy() { why.hidden = true; why.classList.remove('lit'); cancelAnimationFrame(whyRAF); try { whyVideo.pause(); } catch (e) {} }
 $('#enter').onclick = () => { showWhy(); hideTitle(); };
 $('#why-go').onclick = () => { showTeens(); hideWhy(); };
+/* Back on the digital demo */
+const PILOT_URL = "index.html#end";
 /* ---------- the two teens: light behind, phone held out; moves with finger, mouse and phone tilt ---------- */
 const teens = $('#teens'), ttStage = $('#tt-stage'), ttPeople = $('#tt-people'), ttHand = $('#tt-hand'), ttLight = $('#tt-light');
 /* the crop: zoomed in on the two of them (PSD pixels) */
@@ -865,6 +920,17 @@ $('#tt-go').onclick = () => {
   TT.focus = true; teens.classList.add('focus');
   $('.tt-b').removeAttribute('aria-hidden'); $('#tt-next').tabIndex = 0; $('#tt-go').tabIndex = -1;
 };
+BACK.push(
+  { on: () => !$('#linked-page').hidden, none: true },       /* the linked page has its own back */
+  { on: () => !teens.hidden && TT.focus, go: () => {
+      TT.focus = false; teens.classList.remove('focus', 'marked');
+      $('.tt-b').setAttribute('aria-hidden', 'true'); $('#tt-next').tabIndex = -1; $('#tt-go').tabIndex = 0; } },
+  { on: () => !teens.hidden, go: () => { hideTeens(); showWhy(); } },
+  { on: () => !why.hidden, go: () => { hideWhy(); showTitle(); } },
+  { on: () => !titleScreen.hidden, go: () => { try { window.top.location.href = PILOT_URL; } catch (e) { window.open(PILOT_URL, '_blank', 'noopener'); } } },
+  { on: () => true, lift: () => $('#bible-nav').hidden ? $('#main-nav').getBoundingClientRect().top : $('#bible-nav').getBoundingClientRect().top,
+    go: () => { coHide(); coIdx = -1; closeSheet(); closeIndex(); showTeens(); TT.f = 1; $('#tt-go').onclick(); teens.classList.add('marked'); } }
+);
 /* "Next": into the Bible itself, opened at Mark (past the welcome panel) */
 $('#tt-next').onclick = () => {
   hideTeens();
