@@ -293,6 +293,7 @@ main { position: relative; flex: 1; min-height: 0; margin: 9.2px 9.2px 0; backgr
 .ball-link:focus-visible { outline: 2px solid var(--link); outline-offset: 3px; }
 .ball-tip { position: absolute; left: 50%; bottom: calc(100% + 10px); transform: translate(-50%, 4px); padding: 7px 11px; border-radius: 8px; background: var(--ui); color: var(--app); font: 600 13px/1.2 var(--sys); white-space: nowrap; opacity: 0; pointer-events: none; transition: opacity .15s, transform .15s; z-index: 3; }
 .ball-tip::after { content: ""; position: absolute; left: 50%; top: 100%; margin-left: -6px; border: 6px solid transparent; border-top-color: var(--ui); }
+.ball-link.tip-wide .ball-tip { white-space: normal; width: 220px; text-align: center; line-height: 1.35; }
 .ball-link:hover .ball-tip, .ball-link:focus-visible .ball-tip, .ball-link.tip .ball-tip { opacity: 1; transform: translate(calc(-50% + var(--tipShift, 0px)), 0); }
 .ball-tip::after { margin-left: calc(-6px - var(--tipShift, 0px)); }
 
@@ -1147,7 +1148,9 @@ const STORY_CARDS = [
   { before: 'MRK.1.6', img: 'assets/jessica-card.webp?v=e2284bf9', href: 'jessica.html', b64: '',
     alt: 'Jessica: knows what it feels like to love sports and still be left out. Click to read her story.', back: 'Mark 1' },
   { after: 'MRK.1.13', kick: 'Word Ball', img: 'assets/wol-card.webp?v=adb124a3', href: 'word-ball.html', b64: '',
-    alt: 'How are you feeling? God spoke to Jesus about his identity in verse 11. How might God speak to you today through this Bible?', back: 'Mark 1' }
+    alt: 'How are you feeling? God spoke to Jesus about his identity in verse 11. How might God speak to you today through this Bible?', back: 'Mark 1' },
+  { after: 'MRK.1.45', kick: 'Reading plan', img: 'assets/go-card.webp?v=a0d6e92c', href: 'go.html', ext: 'https://claude.ai/artifact/2QYsBX7zqdLnJ39Y7Bk9dK',
+    alt: 'Now you have looked at chapter one of Mark, why not try a reading plan to guide you through? GO! 31-day reading plan from the Gospel of Mark.', back: 'Mark 1' }
 ];
 STORY_CARDS.forEach(c => {
   const v = $$(`.vs[data-v="${c.before || c.after}"]`).pop(); if (!v) return;
@@ -1157,6 +1160,7 @@ STORY_CARDS.forEach(c => {
     if (coIdx >= 0) { coHide(); coIdx = -1; }
     e.preventDefault();
     if (TITLE_SRC) openLinked(c.href, c.back);   /* the site: its own file */
+    else if (c.ext) window.open(c.ext, '_blank', 'noopener');   /* too big to build in: its own demo page, in a new tab */
     else openLinkedHTML(new TextDecoder().decode(Uint8Array.from(atob(c.b64), ch => ch.charCodeAt(0))), c.back);   /* the Claude viewer: built in */
   });
   if (c.after) v.closest('p').after(a); else v.closest('p').before(a);
@@ -1225,7 +1229,8 @@ function makeClip(el) {
   return true;
 }
 const VERSE_LINKS = [
-  { after: '[data-fn="1-0"]', ball: 'clipboard', href: 'good-news-track.html', tip: 'What is the Good News?', back: 'Mark 1' }
+  { after: '[data-fn="1-0"]', ball: 'clipboard', href: 'good-news-track.html', tip: 'What is the Good News?', back: 'Mark 1' },
+  { after: () => $$('.vs[data-v="MRK.1.15"]').pop(), ball: 'clipboard', href: 'sofija.html', b64: '', tip: 'Sofija is a snowboarder who does believe the good news.', back: 'Mark 1', wide: true }
 ];
 function makeBall(el, kind) { const im = new Image(); im.alt = ''; im.src = BALL_ICONS[kind]; el.prepend(im); }
 function openLinked(href, back) {
@@ -1250,16 +1255,21 @@ addEventListener('message', e => {
 });
 $('#linked-back').onclick = () => { $('#linked-page').hidden = true; $('#linked-back').hidden = false; const f = $('#linked-frame'); f.removeAttribute('srcdoc'); f.removeAttribute('src'); };
 const touchOnly = matchMedia('(hover: none)').matches;
+/* the site opens the page's own file; the Claude viewer uses the copy built into this page */
+function goLink(l) {
+  if (l.b64 && !TITLE_SRC) openLinkedHTML(new TextDecoder().decode(Uint8Array.from(atob(l.b64), ch => ch.charCodeAt(0))), l.back);
+  else openLinked(l.href, l.back);
+}
 VERSE_LINKS.forEach(l => {
-  const anchor = $(l.after); if (!anchor) return;
+  const anchor = typeof l.after === 'function' ? l.after() : $(l.after); if (!anchor) return;
   const a = document.createElement('a');
   a.className = 'ball-link'; a.href = l.href; a.setAttribute('aria-label', l.tip);
-  a.innerHTML = '<span class="ball-tip"></span>'; a.firstChild.textContent = l.tip;
+  a.innerHTML = '<span class="ball-tip"></span>'; a.firstChild.textContent = l.tip; if (l.wide) a.classList.add('tip-wide');
   a.addEventListener('click', e => {
     e.preventDefault(); e.stopPropagation();
     if (coIdx >= 0) { coHide(); coIdx = -1; }
-    if (touchOnly && !a.classList.contains('tip')) { a.classList.add('tip'); setTimeout(() => { a.classList.remove('tip'); openLinked(l.href, l.back); }, 900); return; }
-    openLinked(l.href, l.back);
+    if (touchOnly && !a.classList.contains('tip')) { a.classList.add('tip'); setTimeout(() => { a.classList.remove('tip'); goLink(l); }, 900); return; }
+    goLink(l);
   });
   anchor.after(a);
   /* keep the tooltip inside the reading column */
