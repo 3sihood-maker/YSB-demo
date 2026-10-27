@@ -256,9 +256,25 @@ main { position: relative; flex: 1; min-height: 0; margin: 9.2px 9.2px 0; backgr
 .results mark { background: var(--hl-yellow); color: inherit; }
 
 /* placeholder tabs */
-.placeholder { padding: 68px 22px 34px; }
+.placeholder { padding: 68px 22px 84px; }
 .placeholder h2 { margin: 0 0 6px; font: 700 28px/1.2 var(--sys); }
 .placeholder p { margin: 0 0 22px; font: 400 15px/1.5 var(--sys); color: var(--muted); }
+.dlist { display: grid; gap: 18px; }
+.dtile { display: block; width: 100%; text-align: left; padding: 0; border-radius: 14px; overflow: hidden; background: var(--surface); border: 1px solid var(--line); box-shadow: 0 8px 18px rgba(0,0,0,.35); transition: transform .2s ease, box-shadow .2s ease; }
+.dtile:hover, .dtile:focus-visible { transform: translateY(-2px); box-shadow: 0 12px 24px rgba(0,0,0,.45), 0 0 0 2px rgba(124,200,255,.5); }
+.dtile img { display: block; width: 100%; height: auto; }
+.dtile-wrap { border-radius: 14px; background: var(--surface); border: 1px solid var(--line); box-shadow: 0 8px 18px rgba(0,0,0,.35); overflow: hidden; }
+.dtile-wrap .dtile { border: 0; border-radius: 0; box-shadow: none; }
+.dtile-wrap .dtile:hover, .dtile-wrap .dtile:focus-visible { transform: none; box-shadow: none; background: rgba(255,255,255,.03); }
+.dt-more { display: flex; gap: 8px; padding: 0 14px 14px; }
+.dt-more button { flex: 1; padding: 9px 8px; border-radius: 999px; border: 1px solid rgba(124,200,255,.55); background: rgba(124,200,255,.08); color: var(--ui);
+  font: 700 11.5px/1.15 "Archivo", var(--sys); letter-spacing: .06em; text-transform: uppercase; }
+.dt-more button:hover { background: rgba(124,200,255,.2); }
+.dtile img.crop { aspect-ratio: 5 / 3; object-fit: cover; object-position: 50% 0; }
+.dtile .dt-txt { display: block; padding: 11px 14px 13px; }
+.dtile .dt-kick { display: block; font: 700 10.5px/1 "Archivo", var(--sys); letter-spacing: .1em; text-transform: uppercase; color: #ffd84a; margin-bottom: 5px; }
+.dtile .dt-title { display: block; font: 700 16.5px/1.25 var(--sys); color: var(--ui); }
+.dtile .dt-sub { display: block; margin-top: 3px; font: 400 13.5px/1.4 var(--sys); color: var(--muted); }
 .placeholder .slot { border: 1.5px dashed var(--line); border-radius: 16px; height: 120px; display: grid; place-items: center; margin-bottom: 14px; font: 600 13px var(--sys); color: var(--muted); letter-spacing: .06em; text-transform: uppercase; }
 .saved-list { list-style: none; margin: 0; padding: 0; }
 .saved-list li { padding: 14px 0; border-bottom: 1px solid var(--line); font: 400 16px/1.5 var(--scripture); color: var(--text); }
@@ -526,8 +542,8 @@ main { position: relative; flex: 1; min-height: 0; margin: 9.2px 9.2px 0; backgr
     </div>
 
     <!-- PLACEHOLDER TABS -->
-    <div class="view" id="tab-discover" hidden><div class="placeholder"><h2>Discover</h2><p>Mock-up screen. Add the links and inserts to show here.</p><div class="slot">Insert</div><div class="slot">Insert</div><div class="slot">Insert</div></div></div>
-    <div class="view" id="tab-plans" hidden><div class="placeholder"><h2>Plans</h2><p>Mock-up screen for reading plans.</p><div class="slot">Plan card</div><div class="slot">Plan card</div></div></div>
+    <div class="view" id="tab-discover" hidden><div class="placeholder"><h2>Discover</h2><p>Stories, games and things to explore alongside Mark.</p><div class="dlist" id="discover-list"></div></div></div>
+    <div class="view" id="tab-plans" hidden><div class="placeholder"><h2>Plans</h2><p>Reading plans to guide you through the Bible.</p><div class="dlist" id="plans-list"></div></div></div>
     <div class="view" id="tab-saves" hidden><div class="placeholder"><h2>Saves</h2><p id="saves-empty">Verses you save from Mark show up here. Tap a verse, then Save.</p><ul class="saved-list" id="saved-list"></ul></div></div>
     <div class="view" id="tab-settings" hidden><div class="placeholder"><h2>Settings</h2><p>Mock-up screen for text size, theme and account.</p><div class="slot">Settings</div></div></div>
 
@@ -1143,13 +1159,25 @@ function coStartArrow(delay) {
 }
 function coStart() { $$('.co-start, .co-start-tag').forEach(x => x.remove()); coShow(0); }
 function startWalkthrough() { coStartArrow(1000); }
+/* the linked pages and their thumbnails, each held once */
+const BLOB = {
+  JESSICA_B64: '',
+  WOL_B64: '',
+  SOFIJA_B64: '',
+  GN_PACK: null,
+  JESSICA_CARD: 'assets/jessica-card.webp?v=e2284bf9',
+  WOL_CARD: 'assets/wol-card.webp?v=adb124a3',
+  GO_CARD: 'assets/go-card.webp?v=a0d6e92c',
+  GNT_CARD: 'assets/gnt-card.webp?v=1f42c5dc',
+  SOF_CARD: 'assets/sof-card.webp?v=b559fa38'
+};
 /* ---------- athlete story cards placed between verses ---------- */
 const STORY_CARDS = [
-  { before: 'MRK.1.6', img: 'assets/jessica-card.webp?v=e2284bf9', href: 'jessica.html', b64: '',
+  { before: 'MRK.1.6', img: BLOB.JESSICA_CARD, href: 'jessica.html', b64: BLOB.JESSICA_B64,
     alt: 'Jessica: knows what it feels like to love sports and still be left out. Click to read her story.', back: 'Mark 1' },
-  { after: 'MRK.1.13', kick: 'Word Ball', img: 'assets/wol-card.webp?v=adb124a3', href: 'word-ball.html', b64: '',
+  { after: 'MRK.1.13', kick: 'Word Ball', img: BLOB.WOL_CARD, href: 'word-ball.html', b64: BLOB.WOL_B64,
     alt: 'How are you feeling? God spoke to Jesus about his identity in verse 11. How might God speak to you today through this Bible?', back: 'Mark 1' },
-  { after: 'MRK.1.45', kick: 'Reading plan', img: 'assets/go-card.webp?v=a0d6e92c', href: 'go.html', ext: 'https://claude.ai/artifact/2QYsBX7zqdLnJ39Y7Bk9dK',
+  { after: 'MRK.1.45', kick: 'Reading plan', img: BLOB.GO_CARD, href: 'go.html', ext: 'https://claude.ai/artifact/2QYsBX7zqdLnJ39Y7Bk9dK',
     alt: 'Now you have looked at chapter one of Mark, why not try a reading plan to guide you through? GO! 31-day reading plan from the Gospel of Mark.', back: 'Mark 1' }
 ];
 STORY_CARDS.forEach(c => {
@@ -1229,8 +1257,8 @@ function makeClip(el) {
   return true;
 }
 const VERSE_LINKS = [
-  { after: '[data-fn="1-0"]', ball: 'clipboard', href: 'good-news-track.html', tip: 'What is the Good News?', back: 'Mark 1' },
-  { after: () => $$('.vs[data-v="MRK.1.15"]').pop(), ball: 'clipboard', href: 'sofija.html', b64: '', tip: 'Sofija is a snowboarder who does believe the good news.', back: 'Mark 1', wide: true }
+  { after: '[data-fn="1-0"]', ball: 'clipboard', href: 'good-news-track.html', pack: 'track', tip: 'What is the Good News?', back: 'Mark 1' },
+  { after: () => $$('.vs[data-v="MRK.1.15"]').pop(), ball: 'clipboard', href: 'sofija.html', b64: BLOB.SOFIJA_B64, tip: 'Sofija is a snowboarder who does believe the good news.', back: 'Mark 1', wide: true }
 ];
 function makeBall(el, kind) { const im = new Image(); im.alt = ''; im.src = BALL_ICONS[kind]; el.prepend(im); }
 function openLinked(href, back) {
@@ -1256,10 +1284,42 @@ addEventListener('message', e => {
 $('#linked-back').onclick = () => { $('#linked-page').hidden = true; $('#linked-back').hidden = false; const f = $('#linked-frame'); f.removeAttribute('srcdoc'); f.removeAttribute('src'); };
 const touchOnly = matchMedia('(hover: none)').matches;
 /* the site opens the page's own file; the Claude viewer uses the copy built into this page */
+function gnPage(k) {
+  const P = BLOB.GN_PACK, html = new TextDecoder().decode(Uint8Array.from(atob(P.pages[k]), ch => ch.charCodeAt(0)));
+  return html.replace(/~~GNIMG(\d+)~~/g, (m, i) => P.imgs[+i]);
+}
 function goLink(l) {
-  if (l.b64 && !TITLE_SRC) openLinkedHTML(new TextDecoder().decode(Uint8Array.from(atob(l.b64), ch => ch.charCodeAt(0))), l.back);
+  if (TITLE_SRC) openLinked(l.href, l.back);   /* the site: its own file */
+  else if (l.pack && BLOB.GN_PACK) openLinkedHTML(gnPage(l.pack), l.back);   /* the three Good News pages share their pictures */
+  else if (l.b64) openLinkedHTML(new TextDecoder().decode(Uint8Array.from(atob(l.b64), ch => ch.charCodeAt(0))), l.back);   /* the Claude viewer: built in */
+  else if (l.ext) window.open(l.ext, '_blank', 'noopener');   /* too big to build in: its own demo page */
   else openLinked(l.href, l.back);
 }
+/* ---------- the Discover and Plans tabs: everything linked from Mark, in one place ---------- */
+const PAGES = {
+  gnt:     { href: 'good-news-track.html', pack: 'track', img: BLOB.GNT_CARD, crop: true, kick: 'Overview',
+             more: [{ label: 'Pool version', href: 'good-news-pool.html', pack: 'pool' }, { label: 'Basketball version', href: 'good-news-ball.html', pack: 'ball' }], title: 'What is the Good News?', sub: 'Run the track and find out. Linked from Mark 1:1.' },
+  jessica: { href: 'jessica.html', b64: BLOB.JESSICA_B64, img: BLOB.JESSICA_CARD, kick: 'Athlete story', title: 'Jessica · Audience of One', sub: 'Cricket. Loving sport and still being left out.' },
+  wordball:{ href: 'word-ball.html', b64: BLOB.WOL_B64, img: BLOB.WOL_CARD, kick: 'Word Ball', title: 'How are you feeling?', sub: 'Spin the ball and find a verse for how you feel.' },
+  sofija:  { href: 'sofija.html', b64: BLOB.SOFIJA_B64, img: BLOB.SOF_CARD, crop: true, kick: 'Athlete story', title: 'Sofija · With me in the snow', sub: 'Snowboarding, perseverance and not comparing.' },
+  go:      { href: 'go.html', ext: 'https://claude.ai/artifact/2QYsBX7zqdLnJ39Y7Bk9dK', img: BLOB.GO_CARD, kick: 'Reading plan', title: 'GO! 31 days through Mark', sub: 'A daily plan to guide you through the Gospel of Mark.' }
+};
+function tile(key, back) {
+  const pg = PAGES[key], w = document.createElement('div'); w.className = 'dtile-wrap';
+  const b = document.createElement('button'); b.type = 'button'; b.className = 'dtile';
+  b.innerHTML = `<img alt="" class="${pg.crop ? 'crop' : ''}" src="${pg.img}"><span class="dt-txt"><span class="dt-kick"></span><span class="dt-title"></span><span class="dt-sub"></span></span>`;
+  b.querySelector('.dt-kick').textContent = pg.kick; b.querySelector('.dt-title').textContent = pg.title; b.querySelector('.dt-sub').textContent = pg.sub;
+  b.onclick = () => goLink(Object.assign({ back }, pg));
+  w.append(b);
+  if (pg.more) {   /* other versions of the same page */
+    const row = document.createElement('div'); row.className = 'dt-more';
+    pg.more.forEach(m => { const x = document.createElement('button'); x.type = 'button'; x.textContent = m.label; x.onclick = () => goLink(Object.assign({ back }, m)); row.append(x); });
+    w.append(row);
+  }
+  return w;
+}
+['gnt', 'jessica', 'wordball', 'sofija'].forEach(k => $('#discover-list').append(tile(k, 'Discover')));
+$('#plans-list').append(tile('go', 'Plans'));
 VERSE_LINKS.forEach(l => {
   const anchor = typeof l.after === 'function' ? l.after() : $(l.after); if (!anchor) return;
   const a = document.createElement('a');
