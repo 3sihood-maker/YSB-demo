@@ -94,6 +94,8 @@ button:focus-visible, a:focus-visible, input:focus-visible, select:focus-visible
   padding: 7px 12px 7px 9px; border-radius: 999px; border: 1px solid rgba(255,255,255,.22); background: rgba(0,0,0,.35); -webkit-backdrop-filter: blur(6px); backdrop-filter: blur(6px);
   color: rgba(255,255,255,.85); font: 600 12.5px/1 "Archivo", var(--sys); letter-spacing: .02em; opacity: .55; transition: opacity .25s ease, background .2s; }
 .back-btn:hover, .back-btn:focus-visible { opacity: 1; background: rgba(0,0,0,.55); }
+/* the organisers' skip: same look, bottom-right, no word */
+.fwd-btn { left: auto; right: 14px; padding: 7px 11px; opacity: .4; }
 .back-btn svg { flex: none; }
 /* ---------- intro pages (before the title) ---------- */
 .phone { --pink-1987: #f6a6ab; }
@@ -296,6 +298,7 @@ button:focus-visible, a:focus-visible, input:focus-visible, select:focus-visible
 .story-copy .slot { width: 100%; max-width: 300px; border: 1.5px dashed rgba(255,255,255,.22); border-radius: 16px; padding: 22px 16px; font: 600 12px/1.4 "Archivo", var(--sys); letter-spacing: .14em; text-transform: uppercase; color: rgba(255,255,255,.45); }
 .story-btns { display: flex; flex-direction: column; align-items: center; gap: 10px; margin-top: 6px; }
 .story-copy .intro-go { opacity: 1; transform: none; }
+.story-copy p.story-link-row { margin: -6px 0 2px; }
 .story-link { font: 600 14px/1 "Archivo", var(--sys); color: rgba(255,255,255,.75); padding: 10px 14px; border-radius: 999px; text-decoration: underline; text-decoration-color: rgba(246,166,171,.6); text-underline-offset: 4px; }
 .story-link:hover { color: #fff; }
 .story-copy .intro-go.primary { background: var(--digital); border-color: var(--digital); color: #04121f; }
@@ -403,6 +406,7 @@ button:focus-visible, a:focus-visible, input:focus-visible, select:focus-visible
     <div class="story-scroll"><div class="story-copy" id="story-copy"></div></div>
     <div class="toast-inline" id="story-toast" hidden></div>
   </section>
+  <button class="back-btn fwd-btn" id="fwd-btn" type="button" hidden aria-label="Skip forward"><svg width="8" height="13" viewBox="0 0 9 15" aria-hidden="true"><path d="M1.5 1.5 7.5 7.5l-6 6" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg></button>
   <button class="back-btn" id="back-btn" type="button" hidden><svg width="8" height="13" viewBox="0 0 9 15" aria-hidden="true"><path d="M7.5 1.5 1.5 7.5l6 6" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>Back</button>
 </div>
 </div>
@@ -415,13 +419,16 @@ const $$ = (s, r = document) => [...r.querySelectorAll(s)];
 /* Back: each page lists its screens (top-most first); the button shows the first one that is open */
 const BACK = [];
 const backBtn = $('#back-btn');
+const fwdBtn = $('#fwd-btn');
 function backUpdate() {
   const sc = BACK.find(b => b.on());
   backBtn.hidden = !sc || !!sc.none;
-  if (sc && sc.lift) { const ph = $('#phone').getBoundingClientRect(), y = sc.lift(); backBtn.style.bottom = (ph.bottom - y + 10) + 'px'; }
-  else backBtn.style.bottom = '';
+  fwdBtn.hidden = !sc || !sc.fwd || (sc.fwdOk && !sc.fwdOk());
+  const b = sc && sc.lift ? ($('#phone').getBoundingClientRect().bottom - sc.lift() + 10) + 'px' : '';
+  backBtn.style.bottom = b; fwdBtn.style.bottom = b;
 }
 backBtn.onclick = () => { const sc = BACK.find(b => b.on()); if (sc && sc.go) sc.go(); requestAnimationFrame(backUpdate); };
+fwdBtn.onclick = () => { const sc = BACK.find(b => b.on()); if (sc && sc.fwd) sc.fwd(); requestAnimationFrame(backUpdate); };
 setInterval(backUpdate, 250);
 const PAPER_SRC = "assets/paper-arrow.webp";
 const PAPER_IMG = '<img data-paper alt="" draggable="false" src="' + PAPER_SRC + '">';
@@ -653,11 +660,12 @@ function backToP3() {   /* the "This powerful pink Bible" page */
   $('#intro2-go').onclick();
 }
 BACK.push(
-  { on: () => !intro1.hidden, none: true },
+  { on: () => !intro1.hidden, none: true, fwd: () => $('#intro1-go').click() },
   { on: () => !intro2.hidden && intro2.classList.contains('p3'), go: () => {
       intro2.classList.remove('p3'); $('.copy-b').setAttribute('aria-hidden', 'true'); $('.copy-a').removeAttribute('aria-hidden');
-      $('#intro2-go').tabIndex = 0; $('#intro3-go').tabIndex = -1; try { $('#intro-video').pause(); } catch (e) {} } },
-  { on: () => !intro2.hidden, go: () => { hideIntro2(); showIntro(); } },
+      $('#intro2-go').tabIndex = 0; $('#intro3-go').tabIndex = -1; try { $('#intro-video').pause(); } catch (e) {} },
+    fwd: () => $('#intro3-go').click() },
+  { on: () => !intro2.hidden, go: () => { hideIntro2(); showIntro(); }, fwd: () => $('#intro2-go').click() },
   { on: () => !intro4.hidden, go: () => {
       /* within the tunnel: back one page of words; from the first page, back to the pink Bible page */
       let g = -1; TN_G0.forEach((t0, k) => { if (TN.T >= t0 - 0.6) g = k; });
@@ -665,10 +673,18 @@ BACK.push(
         /* land on the page before, with all its words already there and its arrow waiting */
         TN_LINES.forEach(ln => { if (ln.g === g - 1) ln.el.classList.add('snapped'); });
         TN.released[g - 1] = false; TN.T = TN_PAGES[g - 1].hold + 0.05; TN.vT = 0; TN.jump = null; TN.rate = 0.04;
-      } else { hideIntro4(); backToP3(); } } },
+      } else { hideIntro4(); backToP3(); } },
+    fwd: () => {   /* on to the next page of words, shown at once; from the last, on to the story pages */
+      let g = -1; TN_G0.forEach((t0, k) => { if (TN.T >= t0 - 0.6) g = k; });
+      if (g < TN_G0.length - 1) {
+        const n = g + 1; if (g >= 0) TN.released[g] = true;
+        TN_LINES.forEach(ln => { if (ln.g === n) ln.el.classList.add('snapped'); });
+        TN.T = n < TN_G0.length - 1 ? TN_PAGES[n].hold + 0.05 : TN_TEND; TN.vT = 0; TN.jump = null; TN.rate = 0.04;
+      } else { hideIntro4(); showStory(0); } } },
   { on: () => !story.hidden, go: () => {
       if (storyIdx > 0) goStory(storyIdx - 1);
-      else { hideStory(); showIntro4(); TN_LINES.forEach(ln => { if (ln.g === TN_PAGES.length - 1) ln.el.classList.add('snapped'); }); TN.T = TN_TEND; TN.z = tnZOf(TN.T); } } }
+      else { hideStory(); showIntro4(); TN_LINES.forEach(ln => { if (ln.g === TN_PAGES.length - 1) ln.el.classList.add('snapped'); }); TN.T = TN_TEND; TN.z = tnZOf(TN.T); } },
+    fwd: () => goStory(storyIdx + 1) }
 );
 /* ---------- intro page 4: the tunnel through time ----------
    A players' tunnel lined with the sport Bible covers in date order, 1987 at the mouth and
@@ -1136,8 +1152,9 @@ const STORY = [
       <p>This is a pilot aimed at making the printed Word of God with a sports theme available in <b>more languages</b> and <b>more countries</b>.</p>
       <p>It&rsquo;s a pilot with huge potential as the sport movement partners with Bible agencies.</p>
       <p>This is also linked to a parallel <b class="dg">2nd pilot</b> focused on a <b class="dg">digital Scripture strategy</b> that may well be unlike anything we&rsquo;ve ever seen.</p>`,
-    buttons: [{ label: 'See the numbers', link: true, toast: 'The stats page is coming soon' }, { label: 'Continue', next: true }] },
+    buttons: [{ label: 'Continue', next: true }] },
   { id: '9', html: `<p class="lead">We all know the power of the <b>printed Word of God</b>. We also are seeing the spread of the <b class="dg">digital Word of God</b> on phones worldwide.</p>
+      <p class="story-link-row"><button type="button" class="story-link" data-toast="The stats page is coming soon">See the data on Bibles</button></p>
       <p>Imagine the possibility of a <b class="dg">global sport Bible</b>, driven and developed by the sport movement, in many languages, free to use and interactive in ways that we have never seen before.</p>
       <p class="blueline">Rather than imagine it &hellip;</p>`,
     after: `<p class="small">This is a prototype and demo, developed over recent weeks. It is not a fully functioning version, but rather a taste of what is possible. Give it a try!</p>`,
@@ -1164,6 +1181,8 @@ function renderStory(i) {
     btns.append(b);
   });
   box.append(btns);
+  /* links placed inside the words themselves */
+  $$('.story-link[data-toast]', box).forEach(b => b.onclick = () => { const t = $('#story-toast'); t.textContent = b.dataset.toast; t.hidden = false; clearTimeout(storyToastT); storyToastT = setTimeout(() => t.hidden = true, 2200); });
   if (pg.after) box.insertAdjacentHTML('beforeend', pg.after);
   /* stagger the fade-in, one line after another */
   [...box.children].forEach((el, k) => el.style.setProperty('--d', (0.25 + k * 0.45).toFixed(2) + 's'));
