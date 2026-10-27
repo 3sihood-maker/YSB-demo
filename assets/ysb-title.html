@@ -52,9 +52,9 @@
     background:linear-gradient(to top,rgba(3,6,14,.78),rgba(3,6,14,.34) 42%,transparent);
     transition:opacity .8s ease}
   #scrim.show{opacity:1}
-  #hint{position:fixed;left:0;right:0;bottom:calc(78px + env(safe-area-inset-bottom));text-align:center;
+  #hint{position:fixed;left:0;right:0;top:calc(60px + env(safe-area-inset-top));   /* just under the DEMO ONLY watermark */text-align:center;
     z-index:10;color:#bfe6ff;font-size:12px;letter-spacing:.18em;text-transform:uppercase;opacity:0;
-    text-shadow:0 2px 14px #000;transition:opacity .9s ease;padding:0 76px;pointer-events:none}
+    text-shadow:0 2px 14px #000;transition:opacity .9s ease;padding:0 20px;pointer-events:none}
   #hint.show{opacity:.55}
 
   @media (prefers-reduced-motion:reduce){
