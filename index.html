@@ -101,6 +101,30 @@ button:focus-visible, a:focus-visible, input:focus-visible, select:focus-visible
 .phone { --pink-1987: #f6a6ab; }
 .intro { --pink-1987: #f6a6ab;   /* sampled from the 1987 Pan Am Games New Testament cover */
   position: absolute; inset: 0; z-index: 7; background: #000; color: #f2f4f7; overflow: hidden; display: flex; flex-direction: column; justify-content: center; padding: 64px 0 calc(28px + env(safe-area-inset-bottom, 0px)); font-family: "Archivo", var(--sys); }
+.intro0 { justify-content: flex-start; padding-top: 0; }
+.i0-art { position: relative; flex: none; height: 50%; min-height: 300px; display: grid; place-items: center; overflow: hidden; }
+.i0-light { position: absolute; inset: 0; pointer-events: none; opacity: 0; transition: opacity 2.6s ease .2s; }
+.intro0.lit .i0-light { opacity: 1; }
+.i0-rays { position: absolute; left: var(--lx, 50%); top: var(--ly, 52%); width: 240%; aspect-ratio: 1; translate: -50% -50%; rotate: var(--rot, 0deg); filter: blur(6px);
+  background: repeating-conic-gradient(from 0deg, rgba(255,255,255,0) 0deg 3deg, rgba(255,226,170,.32) 5.5deg 8deg, rgba(255,255,255,0) 10.5deg 14deg, rgba(200,225,255,.22) 16deg 18.5deg, rgba(255,255,255,0) 21deg 26deg);
+  -webkit-mask: radial-gradient(closest-side, #000 6%, rgba(0,0,0,.7) 28%, rgba(0,0,0,.2) 50%, transparent 70%); mask: radial-gradient(closest-side, #000 6%, rgba(0,0,0,.7) 28%, rgba(0,0,0,.2) 50%, transparent 70%); }
+.i0-rays2 { rotate: var(--rot2, 0deg); scale: .8; opacity: .7; }
+.i0-glow { position: absolute; left: var(--lx, 50%); top: var(--ly, 52%); width: 130%; aspect-ratio: 1; translate: -50% -50%;
+  background: radial-gradient(closest-side, #fff8e8, rgba(255,232,190,.8) 12%, rgba(255,214,160,.38) 30%, rgba(140,170,230,.12) 52%, transparent 74%); }
+.i0-img { position: relative; width: min(86%, 340px); height: auto; margin-top: 30px; translate: var(--ix, 0) var(--iy, 0); opacity: 0; scale: .96; transition: opacity 1.4s ease .5s, scale 1.6s cubic-bezier(.2,.7,.3,1) .5s;
+  filter: drop-shadow(0 0 1px rgba(255,255,255,.4)); }
+.intro0.lit .i0-img { opacity: 1; scale: 1; }
+.i0-copy { position: relative; flex: 1; display: flex; flex-direction: column; align-items: center; text-align: center; padding: 6px 26px 0; gap: 10px; }
+.i0-copy > * { opacity: 0; translate: 0 10px; transition: opacity 1s ease var(--d, 0s), translate 1s ease var(--d, 0s); }
+.intro0.lit .i0-copy > * { opacity: 1; translate: 0 0; }
+.i0-h { margin: 0; font: 800 31px/1.04 "Archivo", var(--sys); letter-spacing: -.01em; color: #fff; text-wrap: balance; --d: .9s; }
+.i0-sub { margin: 0; font: 600 17px/1.35 "Archivo", var(--sys); color: var(--pink-1987); --d: 1.3s; }
+.i0-sub span { color: var(--digital); }
+.i0-desc { margin: 2px 0 6px; font: 400 13.5px/1.45 "Archivo", var(--sys); color: rgba(242,244,247,.66); max-width: 30ch; --d: 1.7s; }
+.i0-go { display: inline-flex; align-items: center; gap: 10px; padding: 13px 20px 13px 22px; border-radius: 999px; border: 1px solid rgba(255,217,160,.6); background: rgba(255,217,160,.1); color: #fff; font: 700 15px/1.2 "Archivo", var(--sys); --d: 2.2s; transition: opacity 1s ease var(--d), translate 1s ease var(--d), background .2s; }
+.i0-go:hover { background: rgba(255,217,160,.22); }
+.i0-short { padding: 8px 10px; color: var(--digital); font: 600 13.5px/1 "Archivo", var(--sys); text-decoration: underline; text-underline-offset: 4px; text-decoration-color: rgba(124,200,255,.5); --d: 2.5s; }
+@media (max-height: 700px) { .i0-art { height: 44%; min-height: 240px; } .i0-h { font-size: 27px; } }
 .intro-rays { position: absolute; inset: 0; width: 100%; height: 100%; pointer-events: none; opacity: 0; transition: opacity 3s ease .4s; filter: blur(6px); }
 .intro.lit .intro-rays { opacity: 1; }
 .intro-art { position: relative; flex: none; width: 116%; margin: 0 -8% 4px; aspect-ratio: 1200 / 639; }
@@ -331,6 +355,20 @@ button:focus-visible, a:focus-visible, input:focus-visible, select:focus-visible
 <div class="stage">
 <div class="phone" id="phone">
   <!-- INTRO PAGE 1: the team, lit from behind -->
+  <!-- OPENING PAGE: the title, with two ways in -->
+  <section class="intro intro0" id="intro0" hidden>
+    <div class="i0-art" aria-hidden="true">
+      <div class="i0-light"><div class="i0-rays"></div><div class="i0-rays i0-rays2"></div><div class="i0-glow"></div></div>
+      <img class="i0-img" src="assets/sport-stack.webp?v=e8873812" alt="">
+    </div>
+    <div class="i0-copy">
+      <h1 class="i0-h">Youth Sports New Testament</h1>
+      <p class="i0-sub">From Print to Digital: <span>A Global Opportunity</span></p>
+      <p class="i0-desc">Two Connected Pilots for the Global Strategy Team &mdash; November 2026</p>
+      <button type="button" class="i0-go" id="i0-journey">The Whole Journey from Print to Digital<svg width="16" height="12" viewBox="0 0 16 12" aria-hidden="true"><path d="M1 6h13M9.5 1.5 14 6l-4.5 4.5" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg></button>
+      <button type="button" class="i0-short" id="i0-demo">Shortcut to the YSB Demo &rsaquo;</button>
+    </div>
+  </section>
   <section class="intro" id="intro1" hidden>
     <canvas class="intro-rays" id="intro-rays" aria-hidden="true"></canvas>
     <div class="intro-art">
@@ -388,7 +426,7 @@ button:focus-visible, a:focus-visible, input:focus-visible, select:focus-visible
       <!-- INTRO PAGE 3: same cover, new words, the sport Bibles video behind -->
       <div class="intro-copy copy-b" aria-hidden="true">
         <p class="p3a">This powerful <b class="pk">pink Bible</b> broke new ground and made the way for every sports Bible since &hellip; in many languages, for many sports and often catalyzed by a major sports event.</p>
-        <p class="p3b">The Bible has always been central to the sports movement. Now the sports movement was seeing <b class="pk">sports-themed Bibles across the world</b>.</p>
+        <p class="p3b">The Bible has always been central to the sports movement. Now the sports movement is seeing <b class="pk">sports-themed Bibles across the world</b>.</p>
         <button class="paper-next intro-go" id="intro3-go" type="button" tabindex="-1" aria-label="Continue"><img data-paper alt="" draggable="false"></button>
       </div>
     </div>
@@ -540,7 +578,30 @@ function showIntro() {
 function hideIntro() { intro1.hidden = true; cancelAnimationFrame(introRAF); }
 /* for now the button carries on into the animated title; the next intro page will slot in here */
 // (intro 1's button is wired to page 2 below)
-if (location.hash === '#end') { requestAnimationFrame(() => showStory(STORY.length - 1)); } else showIntro();
+/* ---------- the opening page ---------- */
+const intro0 = $('#intro0'); let i0RAF = 0;
+function showIntro0() {
+  $('#phone').classList.add('no-mark'); intro0.hidden = false; intro0.classList.remove('lit');
+  const still = matchMedia('(prefers-reduced-motion: reduce)').matches, t0 = performance.now(), light = $('.i0-light'), img = $('.i0-img');
+  cancelAnimationFrame(i0RAF);
+  const step = now => {
+    const t = (now - t0) / 1000;
+    /* the light drifts behind the pile, leans with pointer or tilt, and the rays turn slowly */
+    const mx = L.tx + (L.px != null ? L.px * 0.7 : 0), my = L.ty + (L.py != null ? L.py * 0.5 : 0);
+    const lx = 50 + (still ? 0 : Math.sin(t * 0.31) * 9) + mx * 10, ly = 52 + (still ? 0 : Math.sin(t * 0.23 + 1) * 5) + my * 6;
+    light.style.setProperty('--lx', lx + '%'); light.style.setProperty('--ly', ly + '%');
+    light.style.setProperty('--rot', (t * 2.2).toFixed(2) + 'deg'); light.style.setProperty('--rot2', (-t * 1.5).toFixed(2) + 'deg');
+    img.style.setProperty('--ix', (-mx * 6).toFixed(1) + 'px'); img.style.setProperty('--iy', (-my * 4).toFixed(1) + 'px');
+    i0RAF = requestAnimationFrame(step);
+  };
+  i0RAF = requestAnimationFrame(step);
+  requestAnimationFrame(() => requestAnimationFrame(() => intro0.classList.add('lit')));
+}
+function hideIntro0() { intro0.hidden = true; cancelAnimationFrame(i0RAF); }
+$('#i0-journey').onclick = () => { hideIntro0(); showIntro(); };
+$('#i0-demo').onclick = () => goDigital();
+intro0.addEventListener('pointermove', e => { const r = intro0.getBoundingClientRect(); L.px = (e.clientX - r.left) / r.width * 2 - 1; L.py = (e.clientY - r.top) / r.height * 2 - 1; });
+if (location.hash === '#end') { requestAnimationFrame(() => showStory(STORY.length - 1)); } else showIntro0();
 /* ---------- intro page 2: close on the Pan Am logo, pull back to the whole cover ---------- */
 const intro2 = $('#intro2'), cZoom = $('#cover-zoom'), cTilt = $('#cover-tilt'), cBack = $('#cover-back'), cSheen = $('#cover-sheen');
 let intro2RAF = 0, intro2Timer = 0;
@@ -661,7 +722,8 @@ function backToP3() {   /* the "This powerful pink Bible" page */
   $('#intro2-go').onclick();
 }
 BACK.push(
-  { on: () => !intro1.hidden, none: true, fwd: () => $('#intro1-go').click() },
+  { on: () => !intro0.hidden, none: true, fwd: () => $('#i0-journey').click() },
+  { on: () => !intro1.hidden, go: () => { hideIntro(); showIntro0(); }, fwd: () => $('#intro1-go').click() },
   { on: () => !intro2.hidden && intro2.classList.contains('p3'), go: () => {
       intro2.classList.remove('p3'); $('.copy-b').setAttribute('aria-hidden', 'true'); $('.copy-a').removeAttribute('aria-hidden');
       $('#intro2-go').tabIndex = 0; $('#intro3-go').tabIndex = -1; try { $('#intro-video').pause(); } catch (e) {} },
@@ -1132,7 +1194,7 @@ const BOOK_UI = `<div class="book-wrap">
           <button type="button" class="book-btn" id="book-prev" aria-label="Previous page"><svg width="10" height="16" viewBox="0 0 10 16" aria-hidden="true"><path d="M8 2 2 8l6 6" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg></button>
           <span class="book-count" id="book-count"></span>
           <button type="button" class="book-btn" id="book-next" aria-label="Next page"><svg width="10" height="16" viewBox="0 0 10 16" aria-hidden="true"><path d="m2 2 6 6-6 6" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg></button>
-          <button type="button" class="book-btn book-snd" id="book-snd" aria-label="Page sounds on" aria-pressed="true"><svg width="18" height="16" viewBox="0 0 18 16" aria-hidden="true"><path d="M2 6h3l4-3.5v11L5 10H2z" fill="currentColor"/><path class="w" d="M12 5.2a4 4 0 0 1 0 5.6M14.2 3a7 7 0 0 1 0 10" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg></button>
+          <button type="button" class="book-btn book-snd" id="book-snd" hidden aria-label="Page sounds on" aria-pressed="true"><svg width="18" height="16" viewBox="0 0 18 16" aria-hidden="true"><path d="M2 6h3l4-3.5v11L5 10H2z" fill="currentColor"/><path class="w" d="M12 5.2a4 4 0 0 1 0 5.6M14.2 3a7 7 0 0 1 0 10" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg></button>
         </div>
       </div>`;
 const STORY = [
@@ -1245,7 +1307,7 @@ function bookInit(key) {
 /* Page-turn sounds, made on the fly so no two are quite the same: a swish of filtered noise
    that sweeps down as the paper travels, sometimes a little flutter in it, and usually a soft
    tap as the page lands. Quiet on purpose. */
-const PAGE_SND = { on: true, ctx: null, noise: null, last: 0 };
+const PAGE_SND = { on: false,   /* page-turn sounds switched off */ ctx: null, noise: null, last: 0 };
 function pageAudio() {
   try {
     if (!PAGE_SND.ctx) {

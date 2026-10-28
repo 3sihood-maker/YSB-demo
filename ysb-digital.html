@@ -1079,8 +1079,11 @@ const CALLOUTS = [
   { target: () => $('.story-card'), place: 'above', reveal: true, pieces: [
       { paper: 'notebook', w: 318, r: -2, x: -4, pad: '22% 9% 12% 18%',
         html: '<p>The YSB would allow us to link to the <b>27 youth athlete stories</b> and add many more.</p>' },
-      { paper: 'bluecloud', w: 292, r: 2, x: 52, o: -26, center: true, pad: '19% 21% 29% 13%',
-        html: '<p>Plus <b>digital</b> allows us to visualize it in new ways.</p>' } ] }
+      { paper: 'bluecloud', w: 292, r: 2, x: 52, o: -26, center: true, pad: '19% 21% 29% 13%', go: true, gr: '18px', gb: '10px',
+        html: '<p>Plus <b>digital</b> allows us to visualize it in new ways.</p>' } ] },
+  { target: () => $('.story-card'), place: 'below', reveal: true, close: true, pieces: [
+      { paper: 'pinned', w: 300, r: -1.5, x: 10, center: true, pad: '30% 14% 25% 14%', xr: '15%', xt: '30%',
+        html: '<p>That&rsquo;s enough guiding from us.</p><p><b>Scroll down</b> to see what else you can find.</p>' } ] }
 ];
 const coPage = $('.bible-page');
 let coIdx = -1, coEl = null;
@@ -1137,7 +1140,7 @@ function coShow(i) {
   /* only scroll if it would be off screen (call-out 1 sits right under MARK, so the page stays put) */
   const er = el.getBoundingClientRect(), rr = reader.getBoundingClientRect();
   if (c.reveal) {   /* bring the thing it points at fully into view, with the call-out above it */
-    const tr = c.target().getBoundingClientRect();
+    const tr = c.place === 'below' ? er : c.target().getBoundingClientRect();
     reader.scrollBy({ top: tr.bottom - rr.bottom + 50, behavior: 'smooth' });
   } else if (er.top < rr.top + 8 || er.bottom > rr.bottom - 8) reader.scrollBy({ top: (er.top < rr.top + 8 ? er.top - rr.top - 16 : er.bottom - rr.bottom + 24), behavior: 'smooth' });
   if (c.pulse) { const t = c.target(); if (t) t.classList.add('pulse'); }
