@@ -102,14 +102,16 @@ button:focus-visible, a:focus-visible, input:focus-visible, select:focus-visible
 .intro { --pink-1987: #f6a6ab;   /* sampled from the 1987 Pan Am Games New Testament cover */
   position: absolute; inset: 0; z-index: 7; background: #000; color: #f2f4f7; overflow: hidden; display: flex; flex-direction: column; justify-content: center; padding: 64px 0 calc(28px + env(safe-area-inset-bottom, 0px)); font-family: "Archivo", var(--sys); }
 .intro0 { justify-content: flex-start; padding-top: 0; }
-.i0-art { position: relative; flex: none; height: 50%; min-height: 300px; display: grid; place-items: center; overflow: hidden; }
-.i0-light { position: absolute; inset: 0; pointer-events: none; opacity: 0; transition: opacity 2.6s ease .2s; }
+.i0-art { position: relative; flex: none; height: 50%; min-height: 300px; display: grid; place-items: center; }
+.i0-light { position: absolute; inset: 0; pointer-events: none; opacity: 0; transition: opacity 2.6s ease .2s;
+  /* the light carries on under the words, fading away towards the bottom */
+  -webkit-mask: linear-gradient(to bottom, #000 0%, #000 42%, rgba(0,0,0,.55) 66%, rgba(0,0,0,.18) 84%, transparent 100%); mask: linear-gradient(to bottom, #000 0%, #000 42%, rgba(0,0,0,.55) 66%, rgba(0,0,0,.18) 84%, transparent 100%); }
 .intro0.lit .i0-light { opacity: 1; }
-.i0-rays { position: absolute; left: var(--lx, 50%); top: var(--ly, 52%); width: 240%; aspect-ratio: 1; translate: -50% -50%; rotate: var(--rot, 0deg); filter: blur(6px);
+.i0-rays { position: absolute; left: var(--lx, 50%); top: var(--ly, 27%); width: 300%; aspect-ratio: 1; translate: -50% -50%; rotate: var(--rot, 0deg); filter: blur(6px);
   background: repeating-conic-gradient(from 0deg, rgba(255,255,255,0) 0deg 3deg, rgba(255,226,170,.32) 5.5deg 8deg, rgba(255,255,255,0) 10.5deg 14deg, rgba(200,225,255,.22) 16deg 18.5deg, rgba(255,255,255,0) 21deg 26deg);
   -webkit-mask: radial-gradient(closest-side, #000 6%, rgba(0,0,0,.7) 28%, rgba(0,0,0,.2) 50%, transparent 70%); mask: radial-gradient(closest-side, #000 6%, rgba(0,0,0,.7) 28%, rgba(0,0,0,.2) 50%, transparent 70%); }
 .i0-rays2 { rotate: var(--rot2, 0deg); scale: .8; opacity: .7; }
-.i0-glow { position: absolute; left: var(--lx, 50%); top: var(--ly, 52%); width: 130%; aspect-ratio: 1; translate: -50% -50%;
+.i0-glow { position: absolute; left: var(--lx, 50%); top: var(--ly, 27%); width: 150%; aspect-ratio: 1; translate: -50% -50%;
   background: radial-gradient(closest-side, #fff8e8, rgba(255,232,190,.8) 12%, rgba(255,214,160,.38) 30%, rgba(140,170,230,.12) 52%, transparent 74%); }
 .i0-img { position: relative; width: min(86%, 340px); height: auto; margin-top: 30px; translate: var(--ix, 0) var(--iy, 0); opacity: 0; scale: .96; transition: opacity 1.4s ease .5s, scale 1.6s cubic-bezier(.2,.7,.3,1) .5s;
   filter: drop-shadow(0 0 1px rgba(255,255,255,.4)); }
@@ -118,11 +120,16 @@ button:focus-visible, a:focus-visible, input:focus-visible, select:focus-visible
 .i0-copy > * { opacity: 0; translate: 0 10px; transition: opacity 1s ease var(--d, 0s), translate 1s ease var(--d, 0s); }
 .intro0.lit .i0-copy > * { opacity: 1; translate: 0 0; }
 .i0-h { margin: 0; font: 800 31px/1.04 "Archivo", var(--sys); letter-spacing: -.01em; color: #fff; text-wrap: balance; --d: .9s; }
-.i0-sub { margin: 0; font: 600 17px/1.35 "Archivo", var(--sys); color: var(--pink-1987); --d: 1.3s; }
-.i0-sub span { color: var(--digital); }
+.i0-sub { margin: 0; font: 500 17px/1.35 "Archivo", var(--sys); color: #fff; --d: 1.3s; }
+.i0-sub b { font-weight: 800; }
+.i0-sub b.pk { color: var(--pink-1987); }
+.i0-sub b.dg { color: var(--digital); }
 .i0-desc { margin: 2px 0 6px; font: 400 13.5px/1.45 "Archivo", var(--sys); color: rgba(242,244,247,.66); max-width: 30ch; --d: 1.7s; }
 .i0-go { display: inline-flex; align-items: center; gap: 10px; padding: 13px 20px 13px 22px; border-radius: 999px; border: 1px solid rgba(255,217,160,.6); background: rgba(255,217,160,.1); color: #fff; font: 700 15px/1.2 "Archivo", var(--sys); --d: 2.2s; transition: opacity 1s ease var(--d), translate 1s ease var(--d), background .2s; }
 .i0-go:hover { background: rgba(255,217,160,.22); }
+.i0-gl { display: flex; flex-direction: column; align-items: center; gap: 3px; }
+.i0-g1 { font: 800 15px/1.1 "Archivo", var(--sys); letter-spacing: .08em; text-transform: uppercase; }
+.i0-g2 { font: 500 13.5px/1.1 "Archivo", var(--sys); color: rgba(255,255,255,.82); }
 .i0-short { padding: 8px 10px; color: var(--digital); font: 600 13.5px/1 "Archivo", var(--sys); text-decoration: underline; text-underline-offset: 4px; text-decoration-color: rgba(124,200,255,.5); --d: 2.5s; }
 @media (max-height: 700px) { .i0-art { height: 44%; min-height: 240px; } .i0-h { font-size: 27px; } }
 .intro-rays { position: absolute; inset: 0; width: 100%; height: 100%; pointer-events: none; opacity: 0; transition: opacity 3s ease .4s; filter: blur(6px); }
@@ -345,6 +352,21 @@ button:focus-visible, a:focus-visible, input:focus-visible, select:focus-visible
 .book-btn { width: 36px; height: 36px; border-radius: 50%; display: grid; place-items: center; color: #fff; border: 1px solid rgba(255,255,255,.22); background: rgba(255,255,255,.04); }
 .book-btn:hover { background: rgba(255,255,255,.12); }
 .book-snd.off .w { opacity: .2; }
+.book-full { width: auto; padding: 0 13px 0 11px; gap: 7px; display: inline-flex; font: 600 12.5px/1 "Archivo", var(--sys); letter-spacing: .03em; }
+/* the full-page reader */
+.pv { position: absolute; inset: 0; z-index: 12; background: #000; display: flex; flex-direction: column; animation: pvIn .25s ease; }
+@keyframes pvIn { from { opacity: 0; } }
+.pv-top { flex: none; display: flex; align-items: center; justify-content: space-between; padding: calc(14px + env(safe-area-inset-top, 0px)) 14px 8px 18px; }
+.pv-count { font: 600 13px/1 "Archivo", var(--sys); letter-spacing: .06em; color: rgba(255,255,255,.7); }
+.pv-close { display: inline-flex; align-items: center; gap: 8px; padding: 9px 14px 9px 16px; border-radius: 999px; border: 1px solid rgba(255,255,255,.35); background: rgba(255,255,255,.1); color: #fff; font: 700 14px/1 "Archivo", var(--sys); }
+.pv-close span { font-size: 19px; line-height: .8; }
+.pv-close:hover { background: rgba(255,255,255,.2); }
+.pv-stage { position: relative; flex: 1; min-height: 0; overflow: hidden; touch-action: none; cursor: zoom-in; }
+.pv-stage.zoomed { cursor: grab; }
+.pv-img { position: absolute; left: 50%; top: 50%; max-width: calc(100% - 16px); max-height: calc(100% - 8px); translate: -50% -50%; transform-origin: 0 0; user-select: none; -webkit-user-drag: none; box-shadow: 0 10px 30px rgba(0,0,0,.6); }
+.pv-img.anim { transition: transform .25s ease, opacity .2s ease; }
+.pv-bot { flex: none; display: flex; align-items: center; justify-content: space-between; gap: 10px; padding: 10px 18px calc(16px + env(safe-area-inset-bottom, 0px)); }
+.pv-hint { font: 500 12px/1.3 "Archivo", var(--sys); color: rgba(255,255,255,.5); text-align: center; }
 .book-count { min-width: 112px; text-align: center; font: 600 12.5px/1 "Archivo", var(--sys); letter-spacing: .08em; color: rgba(255,255,255,.65); font-variant-numeric: tabular-nums; }
 .story-copy .n27 { color: var(--pink-1987); font-weight: 800; font-size: 1.35em; }
 </style>
@@ -357,15 +379,15 @@ button:focus-visible, a:focus-visible, input:focus-visible, select:focus-visible
   <!-- INTRO PAGE 1: the team, lit from behind -->
   <!-- OPENING PAGE: the title, with two ways in -->
   <section class="intro intro0" id="intro0" hidden>
+    <div class="i0-light" aria-hidden="true"><div class="i0-rays"></div><div class="i0-rays i0-rays2"></div><div class="i0-glow"></div></div>
     <div class="i0-art" aria-hidden="true">
-      <div class="i0-light"><div class="i0-rays"></div><div class="i0-rays i0-rays2"></div><div class="i0-glow"></div></div>
       <img class="i0-img" src="assets/sport-stack.webp?v=e8873812" alt="">
     </div>
     <div class="i0-copy">
       <h1 class="i0-h">Youth Sports New Testament</h1>
-      <p class="i0-sub">From Print to Digital: <span>A Global Opportunity</span></p>
+      <p class="i0-sub">From <b class="pk">Print</b> to <b class="dg">Digital</b>: A Global Opportunity</p>
       <p class="i0-desc">Two Connected Pilots for the Global Strategy Team &mdash; November 2026</p>
-      <button type="button" class="i0-go" id="i0-journey">The Whole Journey from Print to Digital<svg width="16" height="12" viewBox="0 0 16 12" aria-hidden="true"><path d="M1 6h13M9.5 1.5 14 6l-4.5 4.5" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg></button>
+      <button type="button" class="i0-go" id="i0-journey"><span class="i0-gl"><span class="i0-g1">The Whole Journey</span><span class="i0-g2">From Print to Digital</span></span><svg width="16" height="12" viewBox="0 0 16 12" aria-hidden="true"><path d="M1 6h13M9.5 1.5 14 6l-4.5 4.5" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg></button>
       <button type="button" class="i0-short" id="i0-demo">Shortcut to the YSB Demo &rsaquo;</button>
     </div>
   </section>
@@ -444,6 +466,16 @@ button:focus-visible, a:focus-visible, input:focus-visible, select:focus-visible
   <section class="intro story" id="story" hidden>
     <div class="story-scroll"><div class="story-copy" id="story-copy"></div></div>
     <div class="toast-inline" id="story-toast" hidden></div>
+    <!-- full-page reader for the printed pages: zoom, pan and turn pages -->
+    <div class="pv" id="pv" hidden role="dialog" aria-modal="true" aria-label="Full page">
+      <div class="pv-top"><span class="pv-count" id="pv-count"></span><button type="button" class="pv-close" id="pv-close">Close <span aria-hidden="true">&times;</span></button></div>
+      <div class="pv-stage" id="pv-stage"><img class="pv-img" id="pv-img" alt="" draggable="false"></div>
+      <div class="pv-bot">
+        <button type="button" class="book-btn" id="pv-prev" aria-label="Previous page"><svg width="10" height="16" viewBox="0 0 10 16" aria-hidden="true"><path d="M8 2 2 8l6 6" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg></button>
+        <span class="pv-hint" id="pv-hint">Pinch or double-tap to zoom</span>
+        <button type="button" class="book-btn" id="pv-next" aria-label="Next page"><svg width="10" height="16" viewBox="0 0 10 16" aria-hidden="true"><path d="m2 2 6 6-6 6" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg></button>
+      </div>
+    </div>
   </section>
   <button class="back-btn fwd-btn" id="fwd-btn" type="button" hidden aria-label="Skip forward"><svg width="8" height="13" viewBox="0 0 9 15" aria-hidden="true"><path d="M1.5 1.5 7.5 7.5l-6 6" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg></button>
   <button class="back-btn" id="back-btn" type="button" hidden><svg width="8" height="13" viewBox="0 0 9 15" aria-hidden="true"><path d="M7.5 1.5 1.5 7.5l6 6" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>Back</button>
@@ -588,7 +620,7 @@ function showIntro0() {
     const t = (now - t0) / 1000;
     /* the light drifts behind the pile, leans with pointer or tilt, and the rays turn slowly */
     const mx = L.tx + (L.px != null ? L.px * 0.7 : 0), my = L.ty + (L.py != null ? L.py * 0.5 : 0);
-    const lx = 50 + (still ? 0 : Math.sin(t * 0.31) * 9) + mx * 10, ly = 52 + (still ? 0 : Math.sin(t * 0.23 + 1) * 5) + my * 6;
+    const lx = 50 + (still ? 0 : Math.sin(t * 0.31) * 9) + mx * 10, ly = 27 + (still ? 0 : Math.sin(t * 0.23 + 1) * 3) + my * 4;
     light.style.setProperty('--lx', lx + '%'); light.style.setProperty('--ly', ly + '%');
     light.style.setProperty('--rot', (t * 2.2).toFixed(2) + 'deg'); light.style.setProperty('--rot2', (-t * 1.5).toFixed(2) + 'deg');
     img.style.setProperty('--ix', (-mx * 6).toFixed(1) + 'px'); img.style.setProperty('--iy', (-my * 4).toFixed(1) + 'px');
@@ -744,6 +776,7 @@ BACK.push(
         TN_LINES.forEach(ln => { if (ln.g === n) ln.el.classList.add('snapped'); });
         TN.T = n < TN_G0.length - 1 ? TN_PAGES[n].hold + 0.05 : TN_TEND; TN.vT = 0; TN.jump = null; TN.rate = 0.04;
       } else { hideIntro4(); showStory(0); } } },
+  { on: () => !pv.hidden, none: true, go: pvClose },   /* full-page reader has its own controls */
   { on: () => !story.hidden, go: () => {
       if (storyIdx > 0) goStory(storyIdx - 1);
       else { hideStory(); showIntro4(); TN_LINES.forEach(ln => { if (ln.g === TN_PAGES.length - 1) ln.el.classList.add('snapped'); }); TN.T = TN_TEND; TN.z = tnZOf(TN.T); } },
@@ -1194,6 +1227,7 @@ const BOOK_UI = `<div class="book-wrap">
           <button type="button" class="book-btn" id="book-prev" aria-label="Previous page"><svg width="10" height="16" viewBox="0 0 10 16" aria-hidden="true"><path d="M8 2 2 8l6 6" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg></button>
           <span class="book-count" id="book-count"></span>
           <button type="button" class="book-btn" id="book-next" aria-label="Next page"><svg width="10" height="16" viewBox="0 0 10 16" aria-hidden="true"><path d="m2 2 6 6-6 6" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg></button>
+          <button type="button" class="book-btn book-full" id="book-full" aria-label="Read full page"><svg width="16" height="16" viewBox="0 0 16 16" aria-hidden="true"><path d="M1.5 5.5v-4h4M10.5 1.5h4v4M14.5 10.5v4h-4M5.5 14.5h-4v-4" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg><span>Full page</span></button>
           <button type="button" class="book-btn book-snd" id="book-snd" hidden aria-label="Page sounds on" aria-pressed="true"><svg width="18" height="16" viewBox="0 0 18 16" aria-hidden="true"><path d="M2 6h3l4-3.5v11L5 10H2z" fill="currentColor"/><path class="w" d="M12 5.2a4 4 0 0 1 0 5.6M14.2 3a7 7 0 0 1 0 10" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg></button>
         </div>
       </div>`;
@@ -1270,14 +1304,72 @@ function goDigital() {
   try { window.top.location.href = DIGITAL_URL; }                  /* the site, or a page that may navigate */
   catch (e) { window.open(DIGITAL_URL, '_blank', 'noopener'); }   /* inside a sandboxed viewer: a new tab */
 }
-function hideStory() { bookDestroy(); story.hidden = true; $('#story-toast').hidden = true; }
+function hideStory() { pv.hidden = true; bookDestroy(); story.hidden = true; $('#story-toast').hidden = true; }
 /* ---------- page 6b: the printed NT as a page-turning book (booklet pages 19-50) ---------- */
 /* the printed NT as page-turning books: 6b testimonies (printed pages 19-50), 7 the intro
    pages (printed pages 2-18), 7b the Gospel and a way to respond (printed pages 51-56) */
-const BOOKS = {"testimonies": {"pages": ["assets/book/ysb-p19.webp?v=824551cf", "assets/book/ysb-p20.webp?v=87b4c69d", "assets/book/ysb-p21.webp?v=a93c4ad3", "assets/book/ysb-p22.webp?v=8069151e", "assets/book/ysb-p23.webp?v=9fc9ef96", "assets/book/ysb-p24.webp?v=f2800237", "assets/book/ysb-p25.webp?v=98c12ea0", "assets/book/ysb-p26.webp?v=dad5662d", "assets/book/ysb-p27.webp?v=4572997d", "assets/book/ysb-p28.webp?v=7f0a53a1", "assets/book/ysb-p29.webp?v=ea3f876d", "assets/book/ysb-p30.webp?v=80c8f08e", "assets/book/ysb-p31.webp?v=3ed1ae6b", "assets/book/ysb-p32.webp?v=3ba2f6f8", "assets/book/ysb-p33.webp?v=c071cb8f", "assets/book/ysb-p34.webp?v=9cb0812b", "assets/book/ysb-p35.webp?v=adcb3a0b", "assets/book/ysb-p36.webp?v=9e9402d4", "assets/book/ysb-p37.webp?v=9a5c0d2e", "assets/book/ysb-p38.webp?v=8a8f5d1d", "assets/book/ysb-p39.webp?v=922326d8", "assets/book/ysb-p40.webp?v=22bd71d0", "assets/book/ysb-p41.webp?v=eeedd135", "assets/book/ysb-p42.webp?v=f6f495d8", "assets/book/ysb-p43.webp?v=fc05f39d", "assets/book/ysb-p44.webp?v=a068ad21", "assets/book/ysb-p45.webp?v=af150bbe", "assets/book/ysb-p46.webp?v=c9e82286", "assets/book/ysb-p47.webp?v=65c56948", "assets/book/ysb-p48.webp?v=4c690781", "assets/book/ysb-p49.webp?v=fb59275d", "assets/book/ysb-p50.webp?v=0a2662b4"], "first": 19, "last": 50}, "intro": {"pages": ["assets/book/ysb-p2.webp?v=e44ba9e5", "assets/book/ysb-p3.webp?v=198e94cf", "assets/book/ysb-p4.webp?v=1eb6e054", "assets/book/ysb-p5.webp?v=f745ac32", "assets/book/ysb-p6.webp?v=403393e9", "assets/book/ysb-p7.webp?v=64ff70ae", "assets/book/ysb-p8.webp?v=d22f02d3", "assets/book/ysb-p9.webp?v=5232516b", "assets/book/ysb-p10.webp?v=c151a0bf", "assets/book/ysb-p11.webp?v=514db2ca", "assets/book/ysb-p12.webp?v=3fb759be", "assets/book/ysb-p13.webp?v=5cf57015", "assets/book/ysb-p14.webp?v=ab255644", "assets/book/ysb-p15.webp?v=35fdbbe8", "assets/book/ysb-p16.webp?v=bdcc4b13", "assets/book/ysb-p17.webp?v=39f993bc", "assets/book/ysb-p18.webp?v=c9a60090"], "first": 2, "last": 18}, "gospel": {"pages": ["assets/book/ysb-pdf53.webp?v=a4036ec9", "assets/book/ysb-pdf54.webp?v=30604537", "assets/book/ysb-pdf55.webp?v=f9699135", "assets/book/ysb-pdf56.webp?v=e8114d18", "assets/book/ysb-pdf57.webp?v=4c3f415c", "assets/book/ysb-pdf58.webp?v=a33ebcbc"], "first": 51, "last": 56}};
+const BOOKS = {"testimonies": {"pages": ["assets/book/ysb-p19.webp?v=824551cf", "assets/book/ysb-p20.webp?v=87b4c69d", "assets/book/ysb-p21.webp?v=a93c4ad3", "assets/book/ysb-p22.webp?v=8069151e", "assets/book/ysb-p23.webp?v=9fc9ef96", "assets/book/ysb-p24.webp?v=f2800237", "assets/book/ysb-p25.webp?v=98c12ea0", "assets/book/ysb-p26.webp?v=dad5662d", "assets/book/ysb-p27.webp?v=4572997d", "assets/book/ysb-p28.webp?v=7f0a53a1", "assets/book/ysb-p29.webp?v=ea3f876d", "assets/book/ysb-p30.webp?v=80c8f08e", "assets/book/ysb-p31.webp?v=3ed1ae6b", "assets/book/ysb-p32.webp?v=3ba2f6f8", "assets/book/ysb-p33.webp?v=c071cb8f", "assets/book/ysb-p34.webp?v=9cb0812b", "assets/book/ysb-p35.webp?v=adcb3a0b", "assets/book/ysb-p36.webp?v=9e9402d4", "assets/book/ysb-p37.webp?v=9a5c0d2e", "assets/book/ysb-p38.webp?v=8a8f5d1d", "assets/book/ysb-p39.webp?v=922326d8", "assets/book/ysb-p40.webp?v=22bd71d0", "assets/book/ysb-p41.webp?v=eeedd135", "assets/book/ysb-p42.webp?v=f6f495d8", "assets/book/ysb-p43.webp?v=fc05f39d", "assets/book/ysb-p44.webp?v=a068ad21", "assets/book/ysb-p45.webp?v=af150bbe", "assets/book/ysb-p46.webp?v=c9e82286", "assets/book/ysb-p47.webp?v=65c56948", "assets/book/ysb-p48.webp?v=4c690781", "assets/book/ysb-p49.webp?v=fb59275d", "assets/book/ysb-p50.webp?v=0a2662b4"], "first": 19, "last": 50, "hd": ["assets/book-hd/ysb-p19.webp?v=824551cf", "assets/book-hd/ysb-p20.webp?v=87b4c69d", "assets/book-hd/ysb-p21.webp?v=a93c4ad3", "assets/book-hd/ysb-p22.webp?v=8069151e", "assets/book-hd/ysb-p23.webp?v=9fc9ef96", "assets/book-hd/ysb-p24.webp?v=f2800237", "assets/book-hd/ysb-p25.webp?v=98c12ea0", "assets/book-hd/ysb-p26.webp?v=dad5662d", "assets/book-hd/ysb-p27.webp?v=4572997d", "assets/book-hd/ysb-p28.webp?v=7f0a53a1", "assets/book-hd/ysb-p29.webp?v=ea3f876d", "assets/book-hd/ysb-p30.webp?v=80c8f08e", "assets/book-hd/ysb-p31.webp?v=3ed1ae6b", "assets/book-hd/ysb-p32.webp?v=3ba2f6f8", "assets/book-hd/ysb-p33.webp?v=c071cb8f", "assets/book-hd/ysb-p34.webp?v=9cb0812b", "assets/book-hd/ysb-p35.webp?v=adcb3a0b", "assets/book-hd/ysb-p36.webp?v=9e9402d4", "assets/book-hd/ysb-p37.webp?v=9a5c0d2e", "assets/book-hd/ysb-p38.webp?v=8a8f5d1d", "assets/book-hd/ysb-p39.webp?v=922326d8", "assets/book-hd/ysb-p40.webp?v=22bd71d0", "assets/book-hd/ysb-p41.webp?v=eeedd135", "assets/book-hd/ysb-p42.webp?v=f6f495d8", "assets/book-hd/ysb-p43.webp?v=fc05f39d", "assets/book-hd/ysb-p44.webp?v=a068ad21", "assets/book-hd/ysb-p45.webp?v=af150bbe", "assets/book-hd/ysb-p46.webp?v=c9e82286", "assets/book-hd/ysb-p47.webp?v=65c56948", "assets/book-hd/ysb-p48.webp?v=4c690781", "assets/book-hd/ysb-p49.webp?v=fb59275d", "assets/book-hd/ysb-p50.webp?v=0a2662b4"]}, "intro": {"pages": ["assets/book/ysb-p2.webp?v=e44ba9e5", "assets/book/ysb-p3.webp?v=198e94cf", "assets/book/ysb-p4.webp?v=1eb6e054", "assets/book/ysb-p5.webp?v=f745ac32", "assets/book/ysb-p6.webp?v=403393e9", "assets/book/ysb-p7.webp?v=64ff70ae", "assets/book/ysb-p8.webp?v=d22f02d3", "assets/book/ysb-p9.webp?v=5232516b", "assets/book/ysb-p10.webp?v=c151a0bf", "assets/book/ysb-p11.webp?v=514db2ca", "assets/book/ysb-p12.webp?v=3fb759be", "assets/book/ysb-p13.webp?v=5cf57015", "assets/book/ysb-p14.webp?v=ab255644", "assets/book/ysb-p15.webp?v=35fdbbe8", "assets/book/ysb-p16.webp?v=bdcc4b13", "assets/book/ysb-p17.webp?v=39f993bc", "assets/book/ysb-p18.webp?v=c9a60090"], "first": 2, "last": 18, "hd": ["assets/book-hd/ysb-p2.webp?v=e44ba9e5", "assets/book-hd/ysb-p3.webp?v=198e94cf", "assets/book-hd/ysb-p4.webp?v=1eb6e054", "assets/book-hd/ysb-p5.webp?v=f745ac32", "assets/book-hd/ysb-p6.webp?v=403393e9", "assets/book-hd/ysb-p7.webp?v=64ff70ae", "assets/book-hd/ysb-p8.webp?v=d22f02d3", "assets/book-hd/ysb-p9.webp?v=5232516b", "assets/book-hd/ysb-p10.webp?v=c151a0bf", "assets/book-hd/ysb-p11.webp?v=514db2ca", "assets/book-hd/ysb-p12.webp?v=3fb759be", "assets/book-hd/ysb-p13.webp?v=5cf57015", "assets/book-hd/ysb-p14.webp?v=ab255644", "assets/book-hd/ysb-p15.webp?v=35fdbbe8", "assets/book-hd/ysb-p16.webp?v=bdcc4b13", "assets/book-hd/ysb-p17.webp?v=39f993bc", "assets/book-hd/ysb-p18.webp?v=c9a60090"]}, "gospel": {"pages": ["assets/book/ysb-pdf53.webp?v=a4036ec9", "assets/book/ysb-pdf54.webp?v=30604537", "assets/book/ysb-pdf55.webp?v=f9699135", "assets/book/ysb-pdf56.webp?v=e8114d18", "assets/book/ysb-pdf57.webp?v=4c3f415c", "assets/book/ysb-pdf58.webp?v=a33ebcbc"], "first": 51, "last": 56, "hd": ["assets/book-hd/ysb-pdf53.webp?v=a4036ec9", "assets/book-hd/ysb-pdf54.webp?v=30604537", "assets/book-hd/ysb-pdf55.webp?v=f9699135", "assets/book-hd/ysb-pdf56.webp?v=e8114d18", "assets/book-hd/ysb-pdf57.webp?v=4c3f415c", "assets/book-hd/ysb-pdf58.webp?v=a33ebcbc"]}};
 let BOOK = null;
 function bookDestroy() { if (BOOK) { try { BOOK.destroy(); } catch (e) {} BOOK = null; } }
+/* ---------- full-page reader: the printed pages at reading size ---------- */
+const PV = { key: null, i: 0, k: 1, x: 0, y: 0, pts: new Map(), last: null, tap: 0 };
+const pv = $('#pv'), pvImg = $('#pv-img'), pvStage = $('#pv-stage');
+function pvApply(anim) { pvImg.classList.toggle('anim', !!anim); pvImg.style.transform = `translate(${PV.x}px, ${PV.y}px) scale(${PV.k})`; pvStage.classList.toggle('zoomed', PV.k > 1.01); }
+function pvClamp() {
+  const sw = pvStage.clientWidth, sh = pvStage.clientHeight, w = pvImg.offsetWidth * PV.k, h = pvImg.offsetHeight * PV.k;
+  /* the image's own top-left sits at its centre minus half its size; keep it covering the screen when zoomed */
+  const mx = Math.max(0, (w - sw) / 2), my = Math.max(0, (h - sh) / 2), ox = -(pvImg.offsetWidth * (PV.k - 1)) / 2, oy = -(pvImg.offsetHeight * (PV.k - 1)) / 2;
+  PV.x = Math.min(ox + mx, Math.max(ox - mx, PV.x)); PV.y = Math.min(oy + my, Math.max(oy - my, PV.y));
+}
+function pvZoom(k, cx, cy, anim) {   /* zoom about a point on screen */
+  const r = pvImg.getBoundingClientRect(), k0 = PV.k; k = Math.max(1, Math.min(5, k));
+  const px = (cx - r.left) / k0, py = (cy - r.top) / k0;   /* that point, in image pixels */
+  PV.x += px * (k0 - k); PV.y += py * (k0 - k); PV.k = k;
+  if (k === 1) { PV.x = 0; PV.y = 0; } else pvClamp();
+  pvApply(anim);
+}
+function pvShow(i) {
+  const bk = BOOKS[PV.key]; PV.i = Math.max(0, Math.min(bk.pages.length - 1, i)); PV.k = 1; PV.x = 0; PV.y = 0; pvApply(false);
+  pvImg.src = (bk.hd || bk.pages)[PV.i];
+  $('#pv-count').textContent = bk.first ? 'Page ' + (bk.first + PV.i) + ' of ' + bk.last : (PV.i + 1) + ' of ' + bk.pages.length;
+  $('#pv-prev').disabled = PV.i === 0; $('#pv-next').disabled = PV.i === bk.pages.length - 1;
+}
+function pvOpen() {
+  if (!BOOK || !PV.key) return;
+  pv.hidden = false; pvShow(BOOK.getCurrentPageIndex());
+}
+function pvClose() {
+  pv.hidden = true;
+  if (BOOK && BOOK.getCurrentPageIndex() !== PV.i) { try { BOOK.turnToPage(PV.i); } catch (e) {} $('#book-count').textContent = $('#pv-count').textContent; }
+}
+$('#pv-close').onclick = pvClose;
+$('#pv-prev').onclick = () => pvShow(PV.i - 1);
+$('#pv-next').onclick = () => pvShow(PV.i + 1);
+pvStage.addEventListener('wheel', e => { e.preventDefault(); pvZoom(PV.k * Math.exp(-e.deltaY * 0.0022), e.clientX, e.clientY, false); }, { passive: false });
+pvStage.addEventListener('pointerdown', e => {
+  pvStage.setPointerCapture(e.pointerId); PV.pts.set(e.pointerId, { x: e.clientX, y: e.clientY }); PV.down = { x: e.clientX, y: e.clientY, t: performance.now(), k: PV.k };
+  if (PV.pts.size === 2) { const [a, b] = [...PV.pts.values()]; PV.pinch = { d: Math.hypot(a.x - b.x, a.y - b.y), k: PV.k }; }
+});
+pvStage.addEventListener('pointermove', e => {
+  if (!PV.pts.has(e.pointerId)) return;
+  const p = PV.pts.get(e.pointerId), dx = e.clientX - p.x, dy = e.clientY - p.y; PV.pts.set(e.pointerId, { x: e.clientX, y: e.clientY });
+  if (PV.pts.size === 2 && PV.pinch) { const [a, b] = [...PV.pts.values()]; pvZoom(PV.pinch.k * Math.hypot(a.x - b.x, a.y - b.y) / PV.pinch.d, (a.x + b.x) / 2, (a.y + b.y) / 2, false); return; }
+  if (PV.k > 1.01) { PV.x += dx; PV.y += dy; pvClamp(); pvApply(false); }
+});
+const pvUp = e => {
+  if (!PV.pts.has(e.pointerId)) return; PV.pts.delete(e.pointerId); if (PV.pts.size < 2) PV.pinch = null;
+  if (PV.pts.size || !PV.down) return;
+  const d = PV.down, dx = e.clientX - d.x, dy = e.clientY - d.y, dt = performance.now() - d.t; PV.down = null;
+  if (d.k <= 1.01 && Math.abs(dx) > 50 && Math.abs(dx) > Math.abs(dy) * 1.3) { pvShow(PV.i + (dx < 0 ? 1 : -1)); return; }   /* swipe to turn */
+  if (Math.abs(dx) < 8 && Math.abs(dy) < 8 && dt < 300) {   /* double-tap: zoom in, or back out */
+    const now = performance.now();
+    if (now - PV.tap < 320) { PV.tap = 0; pvZoom(PV.k > 1.01 ? 1 : 2.6, e.clientX, e.clientY, true); } else PV.tap = now;
+  }
+};
+pvStage.addEventListener('pointerup', pvUp); pvStage.addEventListener('pointercancel', pvUp);
+addEventListener('keydown', e => { if (pv.hidden) return; if (e.key === 'Escape') pvClose(); else if (e.key === 'ArrowRight') pvShow(PV.i + 1); else if (e.key === 'ArrowLeft') pvShow(PV.i - 1); });
 function bookInit(key) {
+  PV.key = key; { const fb = $('#book-full'); if (fb) fb.onclick = pvOpen; }
   const host = $('#ysb-book'), bk = BOOKS[key]; if (!host || !bk || !window.St) return;
   /* size the page to the room the rest of the page leaves on screen */
   const sc = $('.story-scroll'), box = $('#story-copy');
