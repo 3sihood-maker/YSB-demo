@@ -270,6 +270,8 @@ main { position: relative; flex: 1; min-height: 0; margin: 9.2px 9.2px 0; backgr
 .dt-outer .dt-flag { position: absolute; left: 10px; top: -10px; z-index: 1; padding: 4px 9px 3px; background: #ffe236; color: #1d1a16; rotate: -3deg; font: 700 10.5px/1 "Archivo", var(--sys); letter-spacing: .08em; text-transform: uppercase; box-shadow: 0 2px 4px rgba(0,0,0,.35); pointer-events: none; }
 .linked-page.back-top .linked-back { bottom: auto; top: calc(12px + env(safe-area-inset-top, 0px)); padding: 7px 13px 7px 10px; font-size: 13px; }
 .linked-page.back-mid .linked-back { left: 50%; translate: -50% 0; }
+.linked-page.back-lift .linked-back { bottom: calc(86px + env(safe-area-inset-bottom, 0px)); }   /* bottom left, just above the page's own menu */
+.phone:has(.linked-page.home-nomark:not([hidden])) .watermark { display: none; }
 .dtile { display: block; width: 100%; text-align: left; padding: 0; border-radius: 14px; overflow: hidden; background: var(--surface); border: 1px solid var(--line); box-shadow: 0 8px 18px rgba(0,0,0,.35); transition: transform .2s ease, box-shadow .2s ease; }
 .dtile:hover, .dtile:focus-visible { transform: translateY(-2px); box-shadow: 0 12px 24px rgba(0,0,0,.45), 0 0 0 2px rgba(124,200,255,.5); }
 .dtile img { display: block; width: 100%; height: auto; }
@@ -1194,7 +1196,7 @@ const STORY_CARDS = [
     alt: 'Jessica: knows what it feels like to love sports and still be left out. Click to read her story.', back: 'Mark 1' },
   { after: 'MRK.1.13', kick: 'Word Ball', img: BLOB.WOL_CARD, href: 'word-ball.html', b64: BLOB.WOL_B64,
     alt: 'How are you feeling? God spoke to Jesus about his identity in verse 11. How might God speak to you today through this Bible?', back: 'Mark 1' },
-  { after: 'MRK.1.20', kick: 'Interactive guide', img: BLOB.PPS_CARD, href: 'pray-play-say-guide.html', ext: 'https://claude.ai/artifact/Ro4dGYw52DhvBQH6e9Goj5', top: 'mid', direct: true,
+  { after: 'MRK.1.20', kick: 'Interactive guide', img: BLOB.PPS_CARD, href: 'pray-play-say-guide.html', ext: 'https://claude.ai/artifact/Ro4dGYw52DhvBQH6e9Goj5', lift: true, homeNoMark: true, direct: true,
     alt: 'Pray, Play, Say: an interactive guide to living out your faith in sport, from Colossians 4.', back: 'Mark 1' },
   { after: 'MRK.1.45', kick: 'Reading plan', img: BLOB.GO_CARD, href: 'go.html', ext: 'https://claude.ai/artifact/2QYsBX7zqdLnJ39Y7Bk9dK',
     alt: 'Now you have looked at chapter one of Mark, why not try a reading plan to guide you through? GO! 31-day reading plan from the Gospel of Mark.', back: 'Mark 1' },
@@ -1208,7 +1210,7 @@ STORY_CARDS.forEach(c => {
   a.addEventListener('click', e => {
     coPause(a);
     e.preventDefault();
-    $('#linked-page').classList.toggle('back-top', !!c.top); $('#linked-page').classList.toggle('back-mid', c.top === 'mid');
+    $('#linked-page').classList.toggle('back-top', !!c.top); $('#linked-page').classList.toggle('back-mid', c.top === 'mid'); $('#linked-page').classList.toggle('back-lift', !!c.lift); lpHomeNoMark = !!c.homeNoMark;
     if (TITLE_SRC) openLinked(c.href, c.back, c.direct);   /* the site: its own file */
     else if (c.ext) window.open(c.ext, '_blank', 'noopener');   /* too big to build in: its own demo page, in a new tab */
     else openLinkedHTML(new TextDecoder().decode(Uint8Array.from(atob(c.b64), ch => ch.charCodeAt(0))), c.back);   /* the Claude viewer: built in */
@@ -1283,6 +1285,14 @@ const VERSE_LINKS = [
   { after: () => $$('.vs[data-v="MRK.1.15"]').pop(), ball: 'clipboard', href: 'sofija.html', b64: BLOB.SOFIJA_B64, tip: 'Sofija is a snowboarder who does believe the good news.', back: 'Mark 1', wide: true }
 ];
 function makeBall(el, kind) { const im = new Image(); im.alt = ''; im.src = BALL_ICONS[kind]; el.prepend(im); }
+/* some linked pages (Pray Play Say) hide DEMO ONLY on their own home page: watch their address */
+let lpHomeNoMark = false;
+setInterval(() => {
+  const lp = $('#linked-page'); if (!lp || lp.hidden || !lpHomeNoMark) { if (lp) lp.classList.remove('home-nomark'); return; }
+  let h = '';
+  try { h = $('#linked-frame').contentWindow.location.hash; } catch (e) { h = ''; }
+  lp.classList.toggle('home-nomark', h === '' || h === '#cover');
+}, 250);
 function openLinked(href, back, direct) {
   const page = $('#linked-page'), frame = $('#linked-frame');
   $('#linked-back-label').textContent = back || 'Back';
@@ -1313,7 +1323,7 @@ function coPause(el) {
   coResume = (t === el) ? coIdx + 1 : coIdx;
   coHide(); coIdx = -1;
 }
-$('#linked-back').onclick = () => { $('#linked-page').hidden = true; $('#linked-page').classList.remove('back-top', 'back-mid'); $('#linked-back').hidden = false; const f = $('#linked-frame'); f.removeAttribute('srcdoc'); f.removeAttribute('src');
+$('#linked-back').onclick = () => { $('#linked-page').hidden = true; $('#linked-page').classList.remove('back-top', 'back-mid', 'back-lift', 'home-nomark'); lpHomeNoMark = false; $('#linked-back').hidden = false; const f = $('#linked-frame'); f.removeAttribute('srcdoc'); f.removeAttribute('src');
   if (coResume != null) { const n = coResume; coResume = null; if (n < CALLOUTS.length) setTimeout(() => coShow(n), 450); } };
 /* a new tab (the GO plan in the Claude viewer): carry on when they come back to this one */
 addEventListener('focus', () => { if (coResume != null && $('#linked-page').hidden) { const n = coResume; coResume = null; if (n < CALLOUTS.length) setTimeout(() => coShow(n), 450); } });
@@ -1324,7 +1334,7 @@ function gnPage(k) {
   return html.replace(/~~GNIMG(\d+)~~/g, (m, i) => P.imgs[+i]);
 }
 function goLink(l) {
-  $('#linked-page').classList.toggle('back-top', !!l.top); $('#linked-page').classList.toggle('back-mid', l.top === 'mid');   /* pages with their own bottom bar get the back pill at the top */
+  $('#linked-page').classList.toggle('back-top', !!l.top); $('#linked-page').classList.toggle('back-mid', l.top === 'mid'); $('#linked-page').classList.toggle('back-lift', !!l.lift); lpHomeNoMark = !!l.homeNoMark;   /* pages with their own bottom bar get the back pill at the top */
   if (TITLE_SRC) openLinked(l.href, l.back, l.direct);   /* the site: its own file */
   else if (l.pack && BLOB.GN_PACK) openLinkedHTML(gnPage(l.pack), l.back);   /* the three Good News pages share their pictures */
   else if (l.b64) openLinkedHTML(new TextDecoder().decode(Uint8Array.from(atob(l.b64), ch => ch.charCodeAt(0))), l.back);   /* the Claude viewer: built in */
@@ -1338,7 +1348,7 @@ const PAGES = {
   jessica: { href: 'jessica.html', ext: 'https://claude.ai/artifact/WTcLcLj5yWkPRnxAzs4Ugo', img: BLOB.JESSICA_CARD, kick: 'Athlete story', title: 'Jessica · Audience of One', sub: 'Cricket. Loving sport and still being left out.' },
   wordball:{ href: 'word-ball.html', b64: BLOB.WOL_B64, img: BLOB.WOL_CARD, kick: 'Word Ball', title: 'How are you feeling?', sub: 'Spin the ball and find a verse for how you feel.' },
   sofija:  { href: 'sofija.html', b64: BLOB.SOFIJA_B64, img: BLOB.SOF_CARD, crop: true, kick: 'Athlete story', title: 'Sofija · With me in the snow', sub: 'Snowboarding, perseverance and not comparing.' },
-  pps:     { href: 'pray-play-say-guide.html', ext: 'https://claude.ai/artifact/Ro4dGYw52DhvBQH6e9Goj5', img: BLOB.PPS_CARD, top: 'mid', direct: true, kick: 'Interactive guide', title: 'Pray · Play · Say', sub: 'Living out your faith in sport, from Colossians 4. Linked from Mark 1:20.' },
+  pps:     { href: 'pray-play-say-guide.html', ext: 'https://claude.ai/artifact/Ro4dGYw52DhvBQH6e9Goj5', img: BLOB.PPS_CARD, lift: true, homeNoMark: true, direct: true, kick: 'Interactive guide', title: 'Pray · Play · Say', sub: 'Living out your faith in sport, from Colossians 4. Linked from Mark 1:20.' },
   sizes:   { href: 'bible-sizes.html', ext: 'https://claude.ai/artifact/6PrAsixiKMMUkLyjc2uznD', img: BLOB.BS_CARD, top: true, kick: 'Interactive tool', title: 'Bible Sizes & Sports', sub: 'Noah’s Ark, Goliath and Bible journeys next to sports, in 3D. Linked from Mark 2:17.' },
   go:      { href: 'go.html', ext: 'https://claude.ai/artifact/2QYsBX7zqdLnJ39Y7Bk9dK', img: BLOB.GO_CARD, kick: 'Reading plan', title: 'GO! 31 days through Mark', sub: 'A daily plan to guide you through the Gospel of Mark.' },
   vision:  { href: 'ready-vision.html', ext: 'https://claude.ai/artifact/LHfGa33TfnykRhbRfvahZB', img: BLOB.RV_CARD, tag: 'LMS Sessions', kick: 'ReadySetGO', title: 'Ready: Vision', sub: 'You love Jesus. You love sport. Eight sessions at your own pace.' },
