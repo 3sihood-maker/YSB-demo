@@ -260,6 +260,15 @@ main { position: relative; flex: 1; min-height: 0; margin: 9.2px 9.2px 0; backgr
 .placeholder h2 { margin: 0 0 6px; font: 700 28px/1.2 var(--sys); }
 .placeholder p { margin: 0 0 22px; font: 400 15px/1.5 var(--sys); color: var(--muted); }
 .dlist { display: grid; gap: 18px; }
+.dsec-wrap { overflow: hidden; margin: 0 -22px; padding: 34px 0 40px 28px; }   /* the string runs off the edge of the screen */
+.dsec { position: relative; margin: 0 -42px 0 0; --py: 0px; --pr: 0deg; transform: translateY(var(--py)) rotate(calc(-2.6deg + var(--pr))); transform-origin: 20% 50%; filter: drop-shadow(0 16px 16px rgba(0,0,0,.55)) drop-shadow(0 3px 4px rgba(0,0,0,.35)); will-change: transform; }
+.dsec-tag { display: block; width: 100%; height: auto; }
+.dsec-txt { position: absolute; left: 6.5%; top: 9%; width: 58%; bottom: 9%; display: flex; flex-direction: column; justify-content: center; transform: rotate(-4.2deg) skewX(-2deg); transform-origin: 0 50%; }
+.dsec h3 { margin: 0 0 6px; font: 800 18px/1.1 "Archivo", var(--sys); letter-spacing: .1em; text-transform: uppercase; color: #1d1d1f; }
+.dsec p { margin: 0; font: 500 13px/1.35 "Archivo", var(--sys); color: #4a4036; }
+.dt-outer { position: relative; }
+.dt-outer .dt-flag { position: absolute; left: 10px; top: -10px; z-index: 1; padding: 4px 9px 3px; background: #ffe236; color: #1d1a16; rotate: -3deg; font: 700 10.5px/1 "Archivo", var(--sys); letter-spacing: .08em; text-transform: uppercase; box-shadow: 0 2px 4px rgba(0,0,0,.35); pointer-events: none; }
+.linked-page.back-top .linked-back { bottom: auto; top: calc(12px + env(safe-area-inset-top, 0px)); padding: 7px 13px 7px 10px; font-size: 13px; }
 .dtile { display: block; width: 100%; text-align: left; padding: 0; border-radius: 14px; overflow: hidden; background: var(--surface); border: 1px solid var(--line); box-shadow: 0 8px 18px rgba(0,0,0,.35); transition: transform .2s ease, box-shadow .2s ease; }
 .dtile:hover, .dtile:focus-visible { transform: translateY(-2px); box-shadow: 0 12px 24px rgba(0,0,0,.45), 0 0 0 2px rgba(124,200,255,.5); }
 .dtile img { display: block; width: 100%; height: auto; }
@@ -543,7 +552,7 @@ main { position: relative; flex: 1; min-height: 0; margin: 9.2px 9.2px 0; backgr
 
     <!-- PLACEHOLDER TABS -->
     <div class="view" id="tab-discover" hidden><div class="placeholder"><h2>Discover</h2><p>Stories, games and things to explore alongside Mark.</p><div class="dlist" id="discover-list"></div></div></div>
-    <div class="view" id="tab-plans" hidden><div class="placeholder"><h2>Plans</h2><p>Reading plans to guide you through the Bible.</p><div class="dlist" id="plans-list"></div></div></div>
+    <div class="view" id="tab-plans" hidden><div class="placeholder"><h2>Plans</h2><p>Reading plans to guide you through the Bible.</p><div class="dlist" id="plans-list"></div><div class="dsec-wrap"><div class="dsec"><img class="dsec-tag" alt="" src="assets/tools-tag.webp?v=7d1f94f9"><div class="dsec-txt"><h3>Other possible tools</h3><p>Imagine what else might be useful to add to the YSB from the sport movement resources?</p></div></div></div><div class="dlist" id="tools-list"></div></div></div>
     <div class="view" id="tab-saves" hidden><div class="placeholder"><h2>Saves</h2><p id="saves-empty">Verses you save from Mark show up here. Tap a verse, then Save.</p><ul class="saved-list" id="saved-list"></ul></div></div>
     <div class="view" id="tab-settings" hidden><div class="placeholder"><h2>Settings</h2><p>Mock-up screen for text size, theme and account.</p><div class="slot">Settings</div></div></div>
 
@@ -1172,7 +1181,12 @@ const BLOB = {
   WOL_CARD: 'assets/wol-card.webp?v=adb124a3',
   GO_CARD: 'assets/go-card.webp?v=a0d6e92c',
   GNT_CARD: 'assets/gnt-card.webp?v=1f42c5dc',
-  SOF_CARD: 'assets/sof-card.webp?v=b559fa38'
+  SOF_CARD: 'assets/sof-card.webp?v=b559fa38',
+  RV_B64: '',
+  RV_CARD: 'assets/rv-card.webp?v=0f447a95',
+  FF_CARD: 'assets/ff-card.webp?v=3d3b9ab9',
+  BS_B64: '',
+  BS_CARD: 'assets/bs-card.webp?v=0e9c110e'
 };
 /* ---------- athlete story cards placed between verses ---------- */
 const STORY_CARDS = [
@@ -1181,15 +1195,18 @@ const STORY_CARDS = [
   { after: 'MRK.1.13', kick: 'Word Ball', img: BLOB.WOL_CARD, href: 'word-ball.html', b64: BLOB.WOL_B64,
     alt: 'How are you feeling? God spoke to Jesus about his identity in verse 11. How might God speak to you today through this Bible?', back: 'Mark 1' },
   { after: 'MRK.1.45', kick: 'Reading plan', img: BLOB.GO_CARD, href: 'go.html', ext: 'https://claude.ai/artifact/2QYsBX7zqdLnJ39Y7Bk9dK',
-    alt: 'Now you have looked at chapter one of Mark, why not try a reading plan to guide you through? GO! 31-day reading plan from the Gospel of Mark.', back: 'Mark 1' }
+    alt: 'Now you have looked at chapter one of Mark, why not try a reading plan to guide you through? GO! 31-day reading plan from the Gospel of Mark.', back: 'Mark 1' },
+  { after: 'MRK.2.17', kick: 'Interactive tool', img: BLOB.BS_CARD, href: 'bible-sizes.html', b64: BLOB.BS_B64, top: true,
+    alt: 'How big was Noah’s Ark next to a soccer pitch? Compare the Bible to sports in 3D: Bible Sizes and Sports.', back: 'Mark 2' }
 ];
 STORY_CARDS.forEach(c => {
   const v = $$(`.vs[data-v="${c.before || c.after}"]`).pop(); if (!v) return;
   const a = document.createElement('a'); a.className = 'story-card'; a.href = c.href; a.target = '_blank'; a.rel = 'noopener';
   a.innerHTML = `<span class="sc-kick">${c.kick || 'Athlete story'}</span><img alt="" src="${c.img}">`; a.setAttribute('aria-label', c.alt);
   a.addEventListener('click', e => {
-    if (coIdx >= 0) { coHide(); coIdx = -1; }
+    coPause(a);
     e.preventDefault();
+    $('#linked-page').classList.toggle('back-top', !!c.top);
     if (TITLE_SRC) openLinked(c.href, c.back);   /* the site: its own file */
     else if (c.ext) window.open(c.ext, '_blank', 'noopener');   /* too big to build in: its own demo page, in a new tab */
     else openLinkedHTML(new TextDecoder().decode(Uint8Array.from(atob(c.b64), ch => ch.charCodeAt(0))), c.back);   /* the Claude viewer: built in */
@@ -1284,7 +1301,19 @@ addEventListener('message', e => {
   if (d.ysb === 'own-nav') $('#linked-back').hidden = true;
   if (d.ysb === 'close') $('#linked-back').click();
 });
-$('#linked-back').onclick = () => { $('#linked-page').hidden = true; $('#linked-back').hidden = false; const f = $('#linked-frame'); f.removeAttribute('srcdoc'); f.removeAttribute('src'); };
+/* visiting an aside mid walk-through: put the call-out away, and pick the run-through up again on return.
+   If the aside was the thing the call-out pointed at, carry on to the next call-out; otherwise show the same one again. */
+let coResume = null;
+function coPause(el) {
+  if (coIdx < 0) { coResume = null; return; }
+  const t = CALLOUTS[coIdx].target && CALLOUTS[coIdx].target();
+  coResume = (t === el) ? coIdx + 1 : coIdx;
+  coHide(); coIdx = -1;
+}
+$('#linked-back').onclick = () => { $('#linked-page').hidden = true; $('#linked-page').classList.remove('back-top'); $('#linked-back').hidden = false; const f = $('#linked-frame'); f.removeAttribute('srcdoc'); f.removeAttribute('src');
+  if (coResume != null) { const n = coResume; coResume = null; if (n < CALLOUTS.length) setTimeout(() => coShow(n), 450); } };
+/* a new tab (the GO plan in the Claude viewer): carry on when they come back to this one */
+addEventListener('focus', () => { if (coResume != null && $('#linked-page').hidden) { const n = coResume; coResume = null; if (n < CALLOUTS.length) setTimeout(() => coShow(n), 450); } });
 const touchOnly = matchMedia('(hover: none)').matches;
 /* the site opens the page's own file; the Claude viewer uses the copy built into this page */
 function gnPage(k) {
@@ -1292,6 +1321,7 @@ function gnPage(k) {
   return html.replace(/~~GNIMG(\d+)~~/g, (m, i) => P.imgs[+i]);
 }
 function goLink(l) {
+  $('#linked-page').classList.toggle('back-top', !!l.top);   /* pages with their own bottom bar get the back pill at the top */
   if (TITLE_SRC) openLinked(l.href, l.back);   /* the site: its own file */
   else if (l.pack && BLOB.GN_PACK) openLinkedHTML(gnPage(l.pack), l.back);   /* the three Good News pages share their pictures */
   else if (l.b64) openLinkedHTML(new TextDecoder().decode(Uint8Array.from(atob(l.b64), ch => ch.charCodeAt(0))), l.back);   /* the Claude viewer: built in */
@@ -1305,7 +1335,10 @@ const PAGES = {
   jessica: { href: 'jessica.html', b64: BLOB.JESSICA_B64, img: BLOB.JESSICA_CARD, kick: 'Athlete story', title: 'Jessica · Audience of One', sub: 'Cricket. Loving sport and still being left out.' },
   wordball:{ href: 'word-ball.html', b64: BLOB.WOL_B64, img: BLOB.WOL_CARD, kick: 'Word Ball', title: 'How are you feeling?', sub: 'Spin the ball and find a verse for how you feel.' },
   sofija:  { href: 'sofija.html', b64: BLOB.SOFIJA_B64, img: BLOB.SOF_CARD, crop: true, kick: 'Athlete story', title: 'Sofija · With me in the snow', sub: 'Snowboarding, perseverance and not comparing.' },
-  go:      { href: 'go.html', ext: 'https://claude.ai/artifact/2QYsBX7zqdLnJ39Y7Bk9dK', img: BLOB.GO_CARD, kick: 'Reading plan', title: 'GO! 31 days through Mark', sub: 'A daily plan to guide you through the Gospel of Mark.' }
+  sizes:   { href: 'bible-sizes.html', b64: BLOB.BS_B64, img: BLOB.BS_CARD, top: true, kick: 'Interactive tool', title: 'Bible Sizes & Sports', sub: 'Noah’s Ark, Goliath and Bible journeys next to sports, in 3D. Linked from Mark 2:17.' },
+  go:      { href: 'go.html', ext: 'https://claude.ai/artifact/2QYsBX7zqdLnJ39Y7Bk9dK', img: BLOB.GO_CARD, kick: 'Reading plan', title: 'GO! 31 days through Mark', sub: 'A daily plan to guide you through the Gospel of Mark.' },
+  vision:  { href: 'ready-vision.html', b64: BLOB.RV_B64, img: BLOB.RV_CARD, tag: 'LMS Sessions', kick: 'ReadySetGO', title: 'Ready: Vision', sub: 'You love Jesus. You love sport. Eight sessions at your own pace.' },
+  ff:      { href: 'https://familyfit-test.netlify.app', ext: 'https://familyfit-test.netlify.app', top: true, tag: 'GO Tools', img: BLOB.FF_CARD, kick: 'Family.Fit', title: 'Fitness, faith and fun for your family', sub: 'Move together, open the Bible together, play together.' }
 };
 function tile(key, back) {
   const pg = PAGES[key], w = document.createElement('div'); w.className = 'dtile-wrap';
@@ -1321,8 +1354,28 @@ function tile(key, back) {
   }
   return w;
 }
-['gnt', 'jessica', 'wordball', 'sofija'].forEach(k => $('#discover-list').append(tile(k, 'Discover')));
+['gnt', 'jessica', 'wordball', 'sofija', 'sizes'].forEach(k => $('#discover-list').append(tile(k, 'Discover')));
 $('#plans-list').append(tile('go', 'Plans'));
+['vision', 'ff'].forEach(k => {   /* the tools wear a yellow label, like the athlete story cards in Mark */
+  const o = document.createElement('div'); o.className = 'dt-outer';
+  const f = document.createElement('span'); f.className = 'dt-flag'; f.textContent = PAGES[k].tag;
+  o.append(tile(k, 'Plans'), f); $('#tools-list').append(o);
+});
+/* the paper tag floats: it drifts slower than the page as you scroll, and sways a little */
+(function tagFloat() {
+  const view = $('#tab-plans'), tag = $('.dsec'), t0 = performance.now();
+  const tick = now => {
+    if (!view.hidden) {
+      const v = view.getBoundingClientRect(), r = tag.getBoundingClientRect();
+      const d = ((r.top + r.height / 2) - (v.top + v.height / 2)) / v.height;   /* about -0.5 .. 0.5 across the screen */
+      const t = (now - t0) / 1000;
+      tag.style.setProperty('--py', (d * -46).toFixed(1) + 'px');
+      tag.style.setProperty('--pr', (d * 3 + Math.sin(t * 0.9) * 0.6).toFixed(2) + 'deg');
+    }
+    requestAnimationFrame(tick);
+  };
+  requestAnimationFrame(tick);
+})();
 VERSE_LINKS.forEach(l => {
   const anchor = typeof l.after === 'function' ? l.after() : $(l.after); if (!anchor) return;
   const a = document.createElement('a');
@@ -1330,7 +1383,7 @@ VERSE_LINKS.forEach(l => {
   a.innerHTML = '<span class="ball-tip"></span>'; a.firstChild.textContent = l.tip; if (l.wide) a.classList.add('tip-wide');
   a.addEventListener('click', e => {
     e.preventDefault(); e.stopPropagation();
-    if (coIdx >= 0) { coHide(); coIdx = -1; }
+    coPause(a);
     if (touchOnly && !a.classList.contains('tip')) { a.classList.add('tip'); setTimeout(() => { a.classList.remove('tip'); goLink(l); }, 900); return; }
     goLink(l);
   });
