@@ -125,12 +125,12 @@ button:focus-visible, a:focus-visible, input:focus-visible, select:focus-visible
 .i0-sub b.pk { color: var(--pink-1987); }
 .i0-sub b.dg { color: var(--digital); }
 .i0-desc { margin: 2px 0 6px; font: 400 13.5px/1.45 "Archivo", var(--sys); color: rgba(242,244,247,.66); max-width: 30ch; --d: 1.7s; }
-.i0-go { display: inline-flex; align-items: center; gap: 10px; padding: 13px 20px 13px 22px; border-radius: 999px; border: 1px solid rgba(255,217,160,.6); background: rgba(255,217,160,.1); color: #fff; font: 700 15px/1.2 "Archivo", var(--sys); --d: 2.2s; transition: opacity 1s ease var(--d), translate 1s ease var(--d), background .2s; }
+.i0-go { display: inline-flex; align-items: center; gap: 10px; padding: 13px 20px 13px 22px; border-radius: 999px; border: 1px solid rgba(255,217,160,.75); background: rgba(255,217,160,.14); box-shadow: 0 0 26px rgba(255,217,160,.18); margin-top: 6px; color: #fff; font: 700 15px/1.2 "Archivo", var(--sys); --d: 2.2s; transition: opacity 1s ease var(--d), translate 1s ease var(--d), background .2s; }
 .i0-go:hover { background: rgba(255,217,160,.22); }
 .i0-gl { display: flex; flex-direction: column; align-items: center; gap: 3px; }
 .i0-g1 { font: 800 15px/1.1 "Archivo", var(--sys); letter-spacing: .08em; text-transform: uppercase; }
 .i0-g2 { font: 500 13.5px/1.1 "Archivo", var(--sys); color: rgba(255,255,255,.82); }
-.i0-short { padding: 8px 10px; color: var(--digital); font: 600 13.5px/1 "Archivo", var(--sys); text-decoration: underline; text-underline-offset: 4px; text-decoration-color: rgba(124,200,255,.5); --d: 2.5s; }
+.i0-short { margin-top: auto; margin-bottom: calc(26px + env(safe-area-inset-bottom, 0px)); padding: 8px 10px; color: rgba(124,200,255,.8); font: 600 12.5px/1 "Archivo", var(--sys); text-decoration: underline; text-underline-offset: 4px; text-decoration-color: rgba(124,200,255,.5); --d: 2.5s; }
 @media (max-height: 700px) { .i0-art { height: 44%; min-height: 240px; } .i0-h { font-size: 27px; } }
 .intro-rays { position: absolute; inset: 0; width: 100%; height: 100%; pointer-events: none; opacity: 0; transition: opacity 3s ease .4s; filter: blur(6px); }
 .intro.lit .intro-rays { opacity: 1; }
@@ -159,6 +159,12 @@ button:focus-visible, a:focus-visible, input:focus-visible, select:focus-visible
 .intro-go:hover svg { transform: translateX(3px); }
 .intro.lit .intro-copy p, .intro.lit .intro-go { opacity: 1; transform: none; }
 .intro.lit .intro-copy .rule { opacity: 1; }
+/* page 2: the first line comes up straight away, and the rest follows on from it */
+#intro1 .intro-copy .lead { transition-delay: .15s; }
+#intro1 .intro-copy .rule { transition-delay: .75s; }
+#intro1 .intro-copy .sub { transition-delay: .95s; }
+#intro1 .intro-copy .pink { transition-delay: 3.25s, 3.25s; }
+#intro1 .intro-go { transition-delay: 4.45s, 4.45s, 0s, 0s; }
 @media (max-height: 640px) { .intro { padding-top: 48px; } .intro-copy { gap: 14px; } .intro-copy .lead { font-size: 18px; } .intro-copy .sub { font-size: 14.5px; } }
 @media (prefers-reduced-motion: reduce) { .intro-glow, .intro-art .team, .intro-copy p, .intro-copy .rule, .intro-go { transition: none; } }
 
@@ -360,6 +366,7 @@ button:focus-visible, a:focus-visible, input:focus-visible, select:focus-visible
 .pv-count { font: 600 13px/1 "Archivo", var(--sys); letter-spacing: .06em; color: rgba(255,255,255,.7); }
 .pv-close { display: inline-flex; align-items: center; gap: 8px; padding: 9px 14px 9px 16px; border-radius: 999px; border: 1px solid rgba(255,255,255,.35); background: rgba(255,255,255,.1); color: #fff; font: 700 14px/1 "Archivo", var(--sys); }
 .pv-close span { font-size: 19px; line-height: .8; }
+.dv-frame { flex: 1; min-height: 0; width: 100%; border: 0; display: block; background: #07080b; }
 .pv-close:hover { background: rgba(255,255,255,.2); }
 .pv-stage { position: relative; flex: 1; min-height: 0; overflow: hidden; touch-action: none; cursor: zoom-in; }
 .pv-stage.zoomed { cursor: grab; }
@@ -475,6 +482,11 @@ button:focus-visible, a:focus-visible, input:focus-visible, select:focus-visible
         <span class="pv-hint" id="pv-hint">Pinch or double-tap to zoom</span>
         <button type="button" class="book-btn" id="pv-next" aria-label="Next page"><svg width="10" height="16" viewBox="0 0 10 16" aria-hidden="true"><path d="m2 2 6 6-6 6" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg></button>
       </div>
+    </div>
+    <!-- the data on Bibles: its own page, over the story -->
+    <div class="pv dv" id="dv" hidden role="dialog" aria-modal="true" aria-label="See the numbers">
+      <div class="pv-top"><span class="pv-count">See the numbers</span><button type="button" class="pv-close" id="dv-close">Close <span aria-hidden="true">&times;</span></button></div>
+      <iframe class="dv-frame" id="dv-frame" title="See the numbers"></iframe>
     </div>
   </section>
   <button class="back-btn fwd-btn" id="fwd-btn" type="button" hidden aria-label="Skip forward"><svg width="8" height="13" viewBox="0 0 9 15" aria-hidden="true"><path d="M1.5 1.5 7.5 7.5l-6 6" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg></button>
@@ -776,6 +788,7 @@ BACK.push(
         TN_LINES.forEach(ln => { if (ln.g === n) ln.el.classList.add('snapped'); });
         TN.T = n < TN_G0.length - 1 ? TN_PAGES[n].hold + 0.05 : TN_TEND; TN.vT = 0; TN.jump = null; TN.rate = 0.04;
       } else { hideIntro4(); showStory(0); } } },
+  { on: () => !dv.hidden, go: () => dvClose() },   /* the data page: Back closes it */
   { on: () => !pv.hidden, none: true, go: pvClose },   /* full-page reader has its own controls */
   { on: () => !story.hidden, go: () => {
       if (storyIdx > 0) goStory(storyIdx - 1);
@@ -1251,7 +1264,7 @@ const STORY = [
       <p class="stack"><b class="dg">agile,</b><br><b class="dg">digital,</b><br><b class="dg">resilient</b><br><b class="dg">and unlimited.</b></p>`,
     buttons: [{ label: 'Continue', next: true }] },
   { id: '9', html: `<p class="lead">We all know the power of the <b>printed Word of God</b>. We also are seeing the spread of the <b class="dg">digital Word of God</b> on phones worldwide.</p>
-      <p class="story-link-row"><button type="button" class="story-link" data-toast="The stats page is coming soon">See the data on Bibles</button></p>
+      <p class="story-link-row"><button type="button" class="story-link" id="see-data">See the data on Bibles</button></p>
       <p>Imagine the possibility of a <b class="dg">global sports Bible</b>, driven and developed by the sports movement, in many languages, free to use and interactive in ways that we have never seen before.</p>
       <p class="blueline">Rather than imagine it &hellip;</p>`,
     after: `<p class="small">This is a prototype and demo, developed over recent weeks. It is not a fully functioning version, but rather a taste of what is possible. Try it now!</p>`,
@@ -1279,6 +1292,7 @@ function renderStory(i) {
   });
   box.append(btns);
   /* links placed inside the words themselves */
+  { const sd = $('#see-data', box); if (sd) sd.onclick = dvOpen; }
   $$('.story-link[data-toast]', box).forEach(b => b.onclick = () => { const t = $('#story-toast'); t.textContent = b.dataset.toast; t.hidden = false; clearTimeout(storyToastT); storyToastT = setTimeout(() => t.hidden = true, 2200); });
   if (pg.after) box.insertAdjacentHTML('beforeend', pg.after);
   /* stagger the fade-in, one line after another */
@@ -1314,6 +1328,15 @@ function bookDestroy() { if (BOOK) { try { BOOK.destroy(); } catch (e) {} BOOK =
 /* ---------- full-page reader: the printed pages at reading size ---------- */
 const PV = { key: null, i: 0, k: 1, x: 0, y: 0, pts: new Map(), last: null, tap: 0 };
 const pv = $('#pv'), pvImg = $('#pv-img'), pvStage = $('#pv-stage');
+/* "See the data on Bibles": Si's numbers page, in a frame over the story */
+const NUMBERS_B64 = "", dv = $('#dv'), dvFrame = $('#dv-frame');
+function dvOpen() {
+  if (NUMBERS_B64) dvFrame.srcdoc = new TextDecoder().decode(Uint8Array.from(atob(NUMBERS_B64), c => c.charCodeAt(0)));
+  else dvFrame.src = 'ysb-numbers.html';
+  dv.hidden = false;
+}
+function dvClose() { dv.hidden = true; dvFrame.removeAttribute('srcdoc'); dvFrame.src = 'about:blank'; }
+$('#dv-close').onclick = dvClose;
 function pvApply(anim) { pvImg.classList.toggle('anim', !!anim); pvImg.style.transform = `translate(${PV.x}px, ${PV.y}px) scale(${PV.k})`; pvStage.classList.toggle('zoomed', PV.k > 1.01); }
 function pvClamp() {
   const sw = pvStage.clientWidth, sh = pvStage.clientHeight, w = pvImg.offsetWidth * PV.k, h = pvImg.offsetHeight * PV.k;

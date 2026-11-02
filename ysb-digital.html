@@ -271,7 +271,7 @@ main { position: relative; flex: 1; min-height: 0; margin: 9.2px 9.2px 0; backgr
 .linked-page.back-top .linked-back { bottom: auto; top: calc(12px + env(safe-area-inset-top, 0px)); padding: 7px 13px 7px 10px; font-size: 13px; }
 .linked-page.back-mid .linked-back { left: 50%; translate: -50% 0; }
 .linked-page.back-lift .linked-back { bottom: calc(86px + env(safe-area-inset-bottom, 0px)); }   /* bottom left, just above the page's own menu */
-.phone:has(.linked-page.home-nomark:not([hidden])) .watermark { display: none; }
+.phone:has(.linked-page.home-nomark:not([hidden])) .watermark, .phone:has(.linked-page.nomark:not([hidden])) .watermark { display: none; }   /* the games fill the screen */
 .dtile { display: block; width: 100%; text-align: left; padding: 0; border-radius: 14px; overflow: hidden; background: var(--surface); border: 1px solid var(--line); box-shadow: 0 8px 18px rgba(0,0,0,.35); transition: transform .2s ease, box-shadow .2s ease; }
 .dtile:hover, .dtile:focus-visible { transform: translateY(-2px); box-shadow: 0 12px 24px rgba(0,0,0,.45), 0 0 0 2px rgba(124,200,255,.5); }
 .dtile img { display: block; width: 100%; height: auto; }
@@ -608,7 +608,7 @@ main { position: relative; flex: 1; min-height: 0; margin: 9.2px 9.2px 0; backgr
         <img class="tt-people" id="tt-people" src="assets/tt-teens.webp?v=8b90bfe7" alt="Two young athletes in silhouette, one holding a basketball and one a soccer ball, lit from behind">
         <div class="tt-hand" id="tt-hand">
           <img class="tt-screen" src="assets/tt-screen.webp?v=3c73cc4e" alt="The Youth Sports Bible on a phone screen">
-          <img class="tt-screen tt-screen-mark" src="assets/tt-screen-mark.webp?v=6a8008af" alt="The book of Mark open in the Youth Sports Bible">
+          <img class="tt-screen tt-screen-mark" src="assets/tt-screen-mark.webp?v=3b8f89a8" alt="The book of Mark open in the Youth Sports Bible">
           <img class="tt-handimg" src="assets/tt-hand.webp?v=c0afef31" alt="">
           <div class="tt-sheen" aria-hidden="true"></div>
         </div>
@@ -1032,7 +1032,7 @@ BACK.push(
   { on: () => !titleScreen.hidden, fwd: () => $('#enter').onclick(), go: () => { try { window.top.location.href = PILOT_URL; } catch (e) { window.open(PILOT_URL, '_blank', 'noopener'); } } },
   { on: () => true, lift: () => $('#bible-nav').hidden ? $('#main-nav').getBoundingClientRect().top : $('#bible-nav').getBoundingClientRect().top,
     fwdOk: () => !!$('.co-start') || coIdx >= 0,
-    fwd: () => { if ($('.co-start')) coStart(); else if (coIdx >= 0) { if (coIdx < CALLOUTS.length - 1) coShow(coIdx + 1); else { coHide(); coIdx = -1; } } },
+    fwd: () => { if ($('.co-start')) coStart(); else if (coIdx >= 0) coNext(); },
     go: () => {
       if (coIdx > 0) { coShow(coIdx - 1); return; }     /* back one piece of paper */
       if (coIdx === 0) { coHide(); coIdx = -1; coStartArrow(0); return; }   /* back to the start arrow */
@@ -1085,10 +1085,10 @@ const CALLOUTS = [
     anchor: () => { const r = $('.hl-good').getClientRects()[0]; return r.left + 38; }, tail: 0.86, pieces: [
       { paper: 'pinkoval', w: 292, r: 1.5, mirror: true, center: true, pad: '15% 13% 35% 13%', go: true, gr: '22px', gb: '34px',
         html: '<p>Imagine a young person is reading <b>Mark 1</b> and sees a reference to the <b>Good News</b>.</p>' } ] },
-  { target: () => $('.ball-link'), place: 'below', pulse: true, pieces: [
+  { target: () => $('.ball-link'), place: 'below', pulse: true, aside: true, pieces: [
       { paper: 'green', w: 336, r: 1.5, x: -6, pad: '13% 12% 16% 18%', xr: '12px', xt: '8px', go: true, gr: '4px', gb: '-14px',
         html: '<p>They would be able to click on a link to find out more about this good news. <b>Click on it to see!</b></p>' } ] },
-  { target: () => $('.story-card'), place: 'above', reveal: true, pieces: [
+  { target: () => $('.story-card'), place: 'above', reveal: true, aside: true, pieces: [
       { paper: 'notebook', w: 318, r: -2, x: -4, pad: '22% 9% 12% 18%',
         html: '<p>The YSB would allow us to link to the <b>27 youth athlete stories</b> and add many more.</p>' },
       { paper: 'bluecloud', w: 292, r: 2, x: 52, o: -26, center: true, pad: '19% 21% 29% 13%', go: true, gr: '18px', gb: '10px',
@@ -1121,7 +1121,7 @@ function fitPiece(el, base) {
   let h = base; while (!fits() && h < base * 1.22) { h += 4; el.style.setProperty('--h', h + 'px'); }
 }
 function coShow(i) {
-  coHide(); coIdx = i; if (i >= CALLOUTS.length) { coIdx = -1; return; }
+  coHide(); coIdx = i; coResume = null; if (i >= CALLOUTS.length) { coIdx = -1; return; }
   $$('.co-start, .co-start-tag').forEach(x => x.remove());
   const c = CALLOUTS[i], el = document.createElement('div');
   el.className = 'callout scrap ' + c.place; el.setAttribute('role', 'note');
@@ -1140,7 +1140,7 @@ function coShow(i) {
       + (pc.go ? `<button type="button" class="co-go paper-next" aria-label="Next">${PAPER_IMG}</button>` : '')
       + (c.close && k === c.pieces.length - 1 ? '<button type="button" class="co-x" aria-label="Close">&times;</button>' : '');
     el.append(d); fitPiece(d, h);
-    const g = d.querySelector('.co-go'); if (g) g.onclick = e => { e.stopPropagation(); coShow(i + 1); };
+    const g = d.querySelector('.co-go'); if (g) g.onclick = e => { e.stopPropagation(); coNext(); };
     const x = d.querySelector('.co-x'); if (x) x.onclick = e => { e.stopPropagation(); coHide(); coIdx = -1; };
     if (c.clip && k === c.pieces.length - 1) {   /* the bigger 3D clipboard, sitting on this paper */
       const bc = document.createElement('div'); bc.className = 'co-clip'; bc.setAttribute('aria-hidden', 'true');
@@ -1172,6 +1172,13 @@ function coStartArrow(delay) {
   tag.style.setProperty('--strip', `url(${PAPERS.strip})`); tag.style.top = (parseFloat(b.style.top) + 54) + 'px'; tag.onclick = b.onclick; coPage.append(tag);
   setTimeout(() => { if (b.isConnected) { b.hidden = false; tag.hidden = false; } }, delay);
 }
+/* moving on from a call-out: if it points at an aside, the arrow opens that aside (so it's never skipped);
+   the run-through then carries on with the next call-out when they come back */
+function coNext() {
+  const c = CALLOUTS[coIdx]; if (!c) return;
+  if (c.aside) { const t = c.target(); if (t) { t.classList.add('tip'); t.click(); setTimeout(() => t.classList.remove('tip'), 1200); return; } }
+  if (coIdx < CALLOUTS.length - 1) coShow(coIdx + 1); else { coHide(); coIdx = -1; }
+}
 function coStart() { $$('.co-start, .co-start-tag').forEach(x => x.remove()); coShow(0); }
 function startWalkthrough() { coStartArrow(1000); }
 /* the linked pages and their thumbnails, each held once */
@@ -1188,7 +1195,11 @@ const BLOB = {
   RV_CARD: 'assets/rv-card.webp?v=0f447a95',
   FF_CARD: 'assets/ff-card.webp?v=3d3b9ab9',
   BS_CARD: 'assets/bs-card.webp?v=0e9c110e',
-  PPS_CARD: 'assets/pps-card.webp?v=aef2c1fc'
+  PPS_CARD: 'assets/pps-card.webp?v=aef2c1fc',
+  VS_B64: '',
+  VSN_B64: '',
+  VS_CARD: 'assets/vs-card.webp?v=93c8fb2d',
+  VSN_CARD: 'assets/vsn-card.webp?v=e4926e38'
 };
 /* ---------- athlete story cards placed between verses ---------- */
 const STORY_CARDS = [
@@ -1318,12 +1329,12 @@ addEventListener('message', e => {
    If the aside was the thing the call-out pointed at, carry on to the next call-out; otherwise show the same one again. */
 let coResume = null;
 function coPause(el) {
-  if (coIdx < 0) { coResume = null; return; }
+  if (coIdx < 0) return;   /* already paused (e.g. a second tap): keep the place */
   const t = CALLOUTS[coIdx].target && CALLOUTS[coIdx].target();
   coResume = (t === el) ? coIdx + 1 : coIdx;
   coHide(); coIdx = -1;
 }
-$('#linked-back').onclick = () => { $('#linked-page').hidden = true; $('#linked-page').classList.remove('back-top', 'back-mid', 'back-lift', 'home-nomark'); lpHomeNoMark = false; $('#linked-back').hidden = false; const f = $('#linked-frame'); f.removeAttribute('srcdoc'); f.removeAttribute('src');
+$('#linked-back').onclick = () => { $('#linked-page').hidden = true; $('#linked-page').classList.remove('back-top', 'back-mid', 'back-lift', 'home-nomark', 'nomark'); lpHomeNoMark = false; $('#linked-back').hidden = false; const f = $('#linked-frame'); f.removeAttribute('srcdoc'); f.removeAttribute('src');
   if (coResume != null) { const n = coResume; coResume = null; if (n < CALLOUTS.length) setTimeout(() => coShow(n), 450); } };
 /* a new tab (the GO plan in the Claude viewer): carry on when they come back to this one */
 addEventListener('focus', () => { if (coResume != null && $('#linked-page').hidden) { const n = coResume; coResume = null; if (n < CALLOUTS.length) setTimeout(() => coShow(n), 450); } });
@@ -1334,7 +1345,7 @@ function gnPage(k) {
   return html.replace(/~~GNIMG(\d+)~~/g, (m, i) => P.imgs[+i]);
 }
 function goLink(l) {
-  $('#linked-page').classList.toggle('back-top', !!l.top); $('#linked-page').classList.toggle('back-mid', l.top === 'mid'); $('#linked-page').classList.toggle('back-lift', !!l.lift); lpHomeNoMark = !!l.homeNoMark;   /* pages with their own bottom bar get the back pill at the top */
+  $('#linked-page').classList.toggle('back-top', !!l.top); $('#linked-page').classList.toggle('back-mid', l.top === 'mid'); $('#linked-page').classList.toggle('back-lift', !!l.lift); $('#linked-page').classList.toggle('nomark', !!l.nomark); lpHomeNoMark = !!l.homeNoMark;   /* pages with their own bottom bar get the back pill at the top */
   if (TITLE_SRC) openLinked(l.href, l.back, l.direct);   /* the site: its own file */
   else if (l.pack && BLOB.GN_PACK) openLinkedHTML(gnPage(l.pack), l.back);   /* the three Good News pages share their pictures */
   else if (l.b64) openLinkedHTML(new TextDecoder().decode(Uint8Array.from(atob(l.b64), ch => ch.charCodeAt(0))), l.back);   /* the Claude viewer: built in */
@@ -1349,6 +1360,8 @@ const PAGES = {
   wordball:{ href: 'word-ball.html', b64: BLOB.WOL_B64, img: BLOB.WOL_CARD, kick: 'Word Ball', title: 'How are you feeling?', sub: 'Spin the ball and find a verse for how you feel.' },
   sofija:  { href: 'sofija.html', b64: BLOB.SOFIJA_B64, img: BLOB.SOF_CARD, crop: true, kick: 'Athlete story', title: 'Sofija · With me in the snow', sub: 'Snowboarding, perseverance and not comparing.' },
   pps:     { href: 'pray-play-say-guide.html', ext: 'https://claude.ai/artifact/Ro4dGYw52DhvBQH6e9Goj5', img: BLOB.PPS_CARD, lift: true, homeNoMark: true, direct: true, kick: 'Interactive guide', title: 'Pray · Play · Say', sub: 'Living out your faith in sport, from Colossians 4. Linked from Mark 1:20.' },
+  vs:      { href: 'verse-strike.html', b64: BLOB.VS_B64, img: BLOB.VS_CARD, nomark: true, tag: 'Bible game', kick: 'Game', title: 'Verse Strike', sub: 'Take a penalty and score to reveal words from the Bible.' },
+  vsn:     { href: 'verse-strike-nowords.html', b64: BLOB.VSN_B64, img: BLOB.VSN_CARD, nomark: true, tag: 'Experiment', kick: 'Game · no words', title: 'Verse Strike: No Translation Experiment', sub: 'The same game explained with pictures only, so anyone can play in any language.' },
   sizes:   { href: 'bible-sizes.html', ext: 'https://claude.ai/artifact/6PrAsixiKMMUkLyjc2uznD', img: BLOB.BS_CARD, top: true, kick: 'Interactive tool', title: 'Bible Sizes & Sports', sub: 'Noah’s Ark, Goliath and Bible journeys next to sports, in 3D. Linked from Mark 2:17.' },
   go:      { href: 'go.html', ext: 'https://claude.ai/artifact/2QYsBX7zqdLnJ39Y7Bk9dK', img: BLOB.GO_CARD, kick: 'Reading plan', title: 'GO! 31 days through Mark', sub: 'A daily plan to guide you through the Gospel of Mark.' },
   vision:  { href: 'ready-vision.html', ext: 'https://claude.ai/artifact/LHfGa33TfnykRhbRfvahZB', img: BLOB.RV_CARD, tag: 'LMS Sessions', kick: 'ReadySetGO', title: 'Ready: Vision', sub: 'You love Jesus. You love sport. Eight sessions at your own pace.' },
@@ -1370,7 +1383,7 @@ function tile(key, back) {
 }
 ['gnt', 'jessica', 'pps', 'wordball', 'sofija', 'sizes'].forEach(k => $('#discover-list').append(tile(k, 'Discover')));
 $('#plans-list').append(tile('go', 'Plans'), tile('pps', 'Plans'));
-['vision', 'ff'].forEach(k => {   /* the tools wear a yellow label, like the athlete story cards in Mark */
+['vision', 'ff', 'vs', 'vsn'].forEach(k => {   /* the tools wear a yellow label, like the athlete story cards in Mark */
   const o = document.createElement('div'); o.className = 'dt-outer';
   const f = document.createElement('span'); f.className = 'dt-flag'; f.textContent = PAGES[k].tag;
   o.append(tile(k, 'Plans'), f); $('#tools-list').append(o);

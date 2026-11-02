@@ -1,0 +1,354 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>YSB See the Numbers</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<style>
+/* Layout: one phone-shaped column; full screen on phones, inside a phone frame on wider screens.
+   YSB palette: pink = print, blue = digital, gold = accents, on black. */
+:root{
+  --ink:#07080b;
+  --panel:rgba(255,255,255,.055);
+  --line:rgba(255,255,255,.12);
+  --text:#eef0f4;
+  --muted:#9aa1ad;
+  --print:#f6a6ab;
+  --digital:#7cc8ff;
+  --gold:#ffd9a0;
+  --display:Georgia,"Times New Roman",serif;
+  --body:Arial,"Helvetica Neue",Helvetica,sans-serif;
+  color-scheme:dark;
+}
+*{box-sizing:border-box}
+html,body{background:var(--ink);color:var(--text)}
+body{font-family:var(--body);font-size:16px;line-height:1.5;-webkit-font-smoothing:antialiased}
+body::before{content:"";position:fixed;inset:0 0 auto;height:env(safe-area-inset-top,0px);z-index:10;background:var(--ink)}
+a{color:inherit}
+.phone{position:relative;width:100%;min-height:100%;background:var(--ink);overflow:hidden}
+.screen{position:relative}
+@media (min-width:520px){
+  html,body{height:100%}
+  body{display:flex;align-items:center;justify-content:center;padding-block:24px;
+    background:radial-gradient(60% 50% at 50% 40%,#151821 0%,var(--ink) 70%)}
+  .phone{width:400px;height:min(860px,calc(100vh - 48px));min-height:0;border-radius:46px;
+    border:10px solid #1b1e26;box-shadow:0 0 0 1px #2a2e38,0 30px 80px rgba(0,0,0,.7)}
+  .screen{height:100%;overflow-y:auto;scrollbar-width:none}
+  .screen::-webkit-scrollbar{display:none}
+}
+/* light from behind */
+.glow{position:absolute;inset:0 0 auto;height:520px;pointer-events:none;
+  background:radial-gradient(55% 60% at 20% 0%,rgba(246,166,171,.22),transparent 70%),
+             radial-gradient(55% 60% at 85% 5%,rgba(124,200,255,.22),transparent 70%)}
+.wrap{position:relative;padding-left:max(18px,env(safe-area-inset-left,0px));padding-right:max(18px,env(safe-area-inset-right,0px))}
+
+/* sticky bar */
+.bar{position:sticky;top:env(safe-area-inset-top,0px);z-index:5;padding-block:12px 10px;
+  background:linear-gradient(rgba(7,8,11,0),rgba(7,8,11,0));transition:background .25s}
+.bar.stuck{background:linear-gradient(var(--ink) 70%,rgba(7,8,11,0))}
+.tabs{display:flex;gap:8px}
+.tab{flex:1;font:700 13px/1 var(--body);letter-spacing:.12em;text-transform:uppercase;padding:11px 0;border-radius:999px;
+  background:rgba(255,255,255,.07);color:var(--c);border:1.5px solid var(--c);cursor:pointer;transition:background .2s,color .2s}
+.tab:hover{background:rgba(255,255,255,.14)}
+.tab[data-go="print"]{--c:var(--print)}
+.tab[data-go="digital"]{--c:var(--digital)}
+.tab[data-go="big"]{--c:var(--gold)}
+.tab.on{color:var(--ink);background:var(--c);border-color:var(--c)}
+.tab:focus-visible{outline:2px solid var(--c);outline-offset:2px}
+
+header.hero{padding-block:28px 6px}
+.eyebrow{font:700 12px/1 var(--body);letter-spacing:.2em;text-transform:uppercase;color:var(--gold)}
+h1{font:700 40px/1.05 var(--display);margin:10px 0 14px;text-wrap:balance}
+h1 em{font-style:italic;color:var(--print)}
+h1 b{color:var(--digital);font-weight:700}
+.lead{font-size:17px;color:#d6d9e0;margin:0}
+.lead strong{color:var(--text)}
+
+section{padding-block:34px 4px;scroll-margin-top:64px}
+.sec-head{display:flex;flex-direction:column;gap:6px;margin-bottom:18px}
+.sec-tag{font:700 12px/1 var(--body);letter-spacing:.2em;text-transform:uppercase;color:var(--c)}
+h2{font:700 28px/1.12 var(--display);margin:0;text-wrap:balance}
+.sec-sub{margin:0;color:var(--muted);font-style:italic;font-family:var(--display);font-size:17px}
+#big{--c:var(--gold)} #print{--c:var(--print)} #digital{--c:var(--digital)}
+
+/* big picture grid */
+.grid{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.mini{background:var(--panel);border:1px solid var(--line);border-radius:16px;padding:14px 14px 12px;min-width:0;display:flex;flex-direction:column;gap:6px}
+.mini .n{font:700 30px/1 var(--display);color:var(--gold);font-variant-numeric:tabular-nums}
+.mini p{margin:0;font-size:13.5px;line-height:1.4;color:#d6d9e0}
+.mini .src{margin-top:auto}
+
+/* idea cards */
+.ideas{display:flex;flex-direction:column;gap:14px;list-style:none;margin:0;padding:0}
+.idea{position:relative;background:var(--panel);border:1px solid var(--line);border-left:3px solid var(--c);
+  border-radius:6px 18px 18px 6px;padding:18px 18px 14px;
+  backdrop-filter:blur(6px);-webkit-backdrop-filter:blur(6px)}
+.idea .n{font:700 46px/1 var(--display);color:var(--c);font-variant-numeric:tabular-nums;letter-spacing:-.01em}
+.idea .n small{font-size:.5em;letter-spacing:0;margin-left:4px}
+.idea h3{font:700 17px/1.3 var(--body);margin:6px 0 8px}
+.idea p{margin:0 0 10px;color:#d6d9e0;font-size:15.5px}
+.idea q{display:block;font:italic 15.5px/1.45 var(--display);color:var(--text);margin:0 0 10px;padding-left:12px;border-left:1px solid var(--line)}
+.idea q::before,.idea q::after{content:none}
+.meta{display:flex;flex-wrap:wrap;align-items:center;gap:6px 10px}
+.where{font:700 10.5px/1 var(--body);letter-spacing:.14em;text-transform:uppercase;color:var(--c);border:1px solid currentColor;border-radius:999px;padding:4px 8px;opacity:.85}
+.src{font-size:12px;color:var(--muted);text-decoration:none;border-bottom:1px dotted rgba(154,161,173,.6);cursor:pointer;background:none;border-top:0;border-left:0;border-right:0;padding:0;font-family:var(--body);text-align:left}
+.src:hover,.src:focus-visible{color:var(--text);outline:none}
+
+/* both / and */
+.both{margin-top:38px;padding:26px 20px;border-radius:22px;text-align:left;
+  background:linear-gradient(135deg,rgba(246,166,171,.16),rgba(124,200,255,.16));border:1px solid var(--line)}
+.both h2 span:first-child{color:var(--print)} .both h2 span:last-child{color:var(--digital)}
+.both p{margin:12px 0 0;color:#d6d9e0;font-size:16px}
+.both .imagine{font:italic 18px/1.4 var(--display);color:var(--text)}
+
+/* sources */
+.sources{padding-block:34px 40px}
+.sources h2{font-size:22px;margin-bottom:6px}
+.sources .note{color:var(--muted);font-size:13px;margin:0 0 14px}
+.sources ol{margin:0;padding-left:22px;display:flex;flex-direction:column;gap:10px;font-size:13px;color:#c3c8d1}
+.sources li{padding-left:4px}
+.sources li a{color:var(--text);text-decoration:underline;text-decoration-color:rgba(255,255,255,.3);text-underline-offset:2px;overflow-wrap:anywhere}
+.sources li.flash{animation:flash 1.6s ease}
+@keyframes flash{0%,40%{background:rgba(255,217,160,.18)}100%{background:transparent}}
+.top{display:inline-block;margin-top:22px;font:700 13px/1 var(--body);letter-spacing:.1em;text-transform:uppercase;color:var(--ink);
+  background:var(--print);border:0;border-radius:999px;padding:13px 20px;cursor:pointer}
+
+/* gentle arrival */
+.rise{animation:rise .7s ease both}
+@keyframes rise{from{transform:translateY(12px);opacity:.0}to{transform:none;opacity:1}}
+@media (prefers-reduced-motion:reduce){.rise,.sources li.flash{animation:none}}
+</style>
+
+</head>
+<body>
+<div class="phone">
+<div class="screen" id="screen">
+  <div class="glow" aria-hidden="true"></div>
+  <div class="wrap">
+
+    <header class="hero rise">
+      <div class="eyebrow">See the numbers</div>
+      <h1><em>Printed</em> or <b>digital?</b></h1>
+      <p class="lead">We don't think it's one or the other. <strong>Young people need both.</strong> Here are the numbers behind each.</p>
+    </header>
+
+    <nav class="bar" aria-label="Jump to section">
+      <div class="tabs">
+        <button class="tab on" data-go="big">World</button>
+        <button class="tab" data-go="print">Print</button>
+        <button class="tab" data-go="digital">Digital</button>
+      </div>
+    </nav>
+
+    <!-- BIG PICTURE -->
+    <section id="big">
+      <div class="sec-head">
+        <span class="sec-tag">The big picture</span>
+        <h2>A huge generation, and a hungry one</h2>
+      </div>
+      <div class="grid">
+        <div class="mini">
+          <span class="n" data-count="2" data-fmt="bn+">2bn+</span>
+          <p>Gen Alpha (born 2010–2024). The largest generation the world has ever seen.</p>
+          <button class="src" data-s="1">McCrindle</button>
+        </div>
+        <div class="mini">
+          <span class="n" data-count="49" data-fmt="%">49%</span>
+          <p>of Gen Z adults in the US now read the Bible weekly. Up from 30% a year earlier!</p>
+          <button class="src" data-s="2">Barna, 2025</button>
+        </div>
+        <div class="mini">
+          <span class="n" data-count="78" data-fmt="%">78%</span>
+          <p>of Christian teens read or listen to Scripture weekly in Kenya. In France it's 8%. Gen Alpha isn't the same everywhere.</p>
+          <button class="src" data-s="3">OneHope, 2026</button>
+        </div>
+        <div class="mini">
+          <span class="n" data-count="99" data-fmt="%+">99%+</span>
+          <p>of the world's people now have some Scripture in their own language. 544 languages are still waiting.</p>
+          <button class="src" data-s="4">Wycliffe, 2025</button>
+        </div>
+      </div>
+    </section>
+
+    <!-- PRINT -->
+    <section id="print">
+      <div class="sec-head">
+        <span class="sec-tag">Print</span>
+        <h2>A Bible you can hold</h2>
+        <p class="sec-sub">Something to carry, mark, keep and give away.</p>
+      </div>
+      <ol class="ideas">
+        <li class="idea">
+          <div class="n" data-count="19" data-fmt=" million">19<small>million</small></div>
+          <h3>Bibles sold in the US in 2025</h3>
+          <p>That's a 21-year high, and double the number sold in 2019. The UK is seeing it too, with Bible sales up 106% since 2019.</p>
+          <div class="meta"><span class="where">US · UK</span><button class="src" data-s="5">Circana BookScan</button><button class="src" data-s="6">SPCK Group</button></div>
+        </li>
+        <li class="idea">
+          <div class="n" data-count="69" data-fmt="%">69%</div>
+          <h3>of Bible users read a printed Bible</h3>
+          <p>In a typical month, compared with 48% who used a Bible app. Even among adults under 58, print still came out on top (69% to 53%).</p>
+          <div class="meta"><span class="where">US · 2022</span><button class="src" data-s="7">American Bible Society</button></div>
+        </li>
+        <li class="idea">
+          <div class="n" data-count="54" data-fmt=" studies">54<small>studies</small></div>
+          <h3>say paper helps us understand</h3>
+          <p>Across 54 studies and more than 171,000 readers, people understood more when they read on paper than on a screen. And that gap has been growing.</p>
+          <div class="meta"><span class="where">Global research</span><button class="src" data-s="8">Delgado et al., 2018</button></div>
+        </li>
+        <li class="idea">
+          <div class="n">148.3<small>million</small></div>
+          <h3>printed Scriptures shared in 2025</h3>
+          <p>Bible Societies gave out 22.4 million full Bibles, 10 million New Testaments and nearly 116 million Portions last year. Paper still carries the Word a long way.</p>
+          <div class="meta"><span class="where">Worldwide</span><button class="src" data-s="9">United Bible Societies</button></div>
+        </li>
+        <li class="idea">
+          <div class="n" data-count="74" data-fmt="%">74%</div>
+          <h3>of teens online 6+ hours a day feel lonely</h3>
+          <p>That's in Kenya, compared with 57% of teens online less than three hours a day (a link, not proof of cause). A printed Bible has no notifications. It's a quiet place to meet with God.</p>
+          <q>"I have a Bible app, but I feel like most of my faith things are in person." <span style="font-style:normal;color:var(--muted);font-size:13px;font-family:var(--body)">– US teen</span></q>
+          <div class="meta"><span class="where">Kenya · US</span><button class="src" data-s="3">OneHope</button><button class="src" data-s="10">Fuller Youth Institute</button></div>
+        </li>
+      </ol>
+    </section>
+
+    <!-- DIGITAL -->
+    <section id="digital">
+      <div class="sec-head">
+        <span class="sec-tag">Digital</span>
+        <h2>A Bible in their pocket</h2>
+        <p class="sec-sub">Meeting young people where they already are, every day.</p>
+      </div>
+      <ol class="ideas">
+        <li class="idea">
+          <div class="n">4.7<small>billion</small></div>
+          <h3>people use mobile internet</h3>
+          <p>That's 58% of the world, on a phone or device of their own. The Bible can be right there with them.</p>
+          <div class="meta"><span class="where">Worldwide</span><button class="src" data-s="11">GSMA, 2025</button></div>
+        </li>
+        <li class="idea">
+          <div class="n" data-count="82" data-fmt="%">82%</div>
+          <h3>of 15–24 year olds are online</h3>
+          <p>Young people are the most connected age group on the planet (72% for everyone else). In the poorest countries they're almost twice as likely to be online as older people.</p>
+          <div class="meta"><span class="where">Worldwide</span><button class="src" data-s="12">ITU, 2025</button></div>
+        </li>
+        <li class="idea">
+          <div class="n" data-count="1" data-fmt=" billion">1<small>billion</small></div>
+          <h3>Bible App installs</h3>
+          <p>YouVersion passed one billion device installs in 2025. That's a lot of pockets with a Bible in them!</p>
+          <div class="meta"><span class="where">Worldwide</span><button class="src" data-s="13">YouVersion, 2025</button></div>
+        </li>
+        <li class="idea">
+          <div class="n">32.2<small>billion</small></div>
+          <h3>Bible chapters viewed on screens in 2025</h3>
+          <p>Up 13.8% in just one year, and audio Scripture was played 1.4 billion times. People are opening the Bible digitally all over the world.</p>
+          <div class="meta"><span class="where">Worldwide</span><button class="src" data-s="9">United Bible Societies</button></div>
+        </li>
+        <li class="idea">
+          <div class="n">1 in 3</div>
+          <h3>teens learn about faith mostly online</h3>
+          <p>And 1 in 4 say their faith has changed because of something they learned or someone they met online. Among the most engaged Christian teens, 61% have recently used a Bible app. Digital space can be sacred space.</p>
+          <div class="meta"><span class="where">US · ages 13–17</span><button class="src" data-s="10">Fuller Youth Institute, 2026</button></div>
+        </li>
+      </ol>
+    </section>
+
+    <!-- BOTH / AND -->
+    <div class="both">
+      <h2><span>Hold it.</span> <span>Carry it.</span></h2>
+      <p>Print puts the Word in their hands. Digital keeps it with them all week, wherever they go.</p>
+      <p class="imagine">Imagine a Youth Sports Bible that does both, in your language and with a sports focus!</p>
+    </div>
+
+    <!-- SOURCES -->
+    <section class="sources" id="sources">
+      <h2>Sources</h2>
+      <p class="note">Checked November 2026. Studies that only cover one country are marked on each card.</p>
+      <ol>
+        <li id="s1">McCrindle, <a href="https://mccrindle.com.au/app/uploads/infographics/Generation-Alpha-Infographic-2023.pdf" target="_blank" rel="noopener">Generation Alpha infographic</a> (2023). Born 2010–2024; more than 2 billion once all are born.</li>
+        <li id="s2">Barna Group, <a href="https://www.barna.com/trends/bible-reading-trends/" target="_blank" rel="noopener">How Millennials and Gen Z are driving a Bible reading comeback</a> (2025). US adults, 12,116 interviews Jan–Oct 2025.</li>
+        <li id="s3">OneHope, <a href="https://stories.onehope.net/is-gen-alpha-really-the-same-around-the-world/" target="_blank" rel="noopener">Is Gen Alpha really the same around the world?</a> (2026). 3,300 internet-connected 11–15 year olds in seven countries.</li>
+        <li id="s4">Wycliffe Global Alliance, <a href="https://wycliffe.net/2025/08/25/2025-scripture-access-statistics/" target="_blank" rel="noopener">2025 Scripture Access Statistics</a> (Aug 2025).</li>
+        <li id="s5">Publishers Weekly, <a href="https://www.publishersweekly.com/pw/by-topic/industry-news/religion/article/99415-bible-sales-hit-records-in-us-and-uk.html" target="_blank" rel="noopener">Bible sales hit records in US and UK</a>, quoting Circana BookScan 2025 data (about 19 million units, up 12% on 2024).</li>
+        <li id="s6">Evangelical Focus, <a href="https://evangelicalfocus.com/europe/33539/bible-sales-increase-by-106-in-the-uk-in-six-years-reports-show-younger-generations-most-outspoken-about-faith" target="_blank" rel="noopener">Bible sales up by 106% in the UK in 6 years</a>, quoting SPCK Group research (£2.69m in 2019 to £6.3m in 2025).</li>
+        <li id="s7">American Bible Society, State of the Bible 2022, reported in <a href="https://www.baptistpress.com/resource-library/news/state-of-the-bible-printed-bibles-more-popular-than-apps/" target="_blank" rel="noopener">State of the Bible: printed Bibles more popular than apps</a> (Baptist Press, Oct 2022). Formats used in the past month by US Bible users; "younger adults" means 18–57.</li>
+        <li id="s8">Delgado, Vargas, Ackerman &amp; Salmerón, <a href="https://cris.haifa.ac.il/en/publications/dont-throw-away-your-printed-books-a-meta-analysis-on-the-effects/" target="_blank" rel="noopener">Don't throw away your printed books</a>, Educational Research Review 25 (2018). 54 studies, 171,055 participants.</li>
+        <li id="s9">United Bible Societies, <a href="https://unitedbiblesocieties.org/25-billion-scriptures-distributed-in-80-years-ubs-distribution-statistics-report-2025/" target="_blank" rel="noopener">Distribution Statistics Report 2025</a> (Jul 2026). 148.3m printed Scriptures; 32.2bn digital chapter views.</li>
+        <li id="s10">Fuller Youth Institute, <a href="https://fulleryouthinstitute.org/gen-alpha" target="_blank" rel="noopener">The FYI Report on Gen Alpha &amp; Faith, Part 1</a> (2026). 2,783 US teens aged 13–17 plus 30 interviews.</li>
+        <li id="s11">GSMA, <a href="https://www.gsma.com/somic/" target="_blank" rel="noopener">The State of Mobile Internet Connectivity 2025</a>. Figures for the end of 2024.</li>
+        <li id="s12">ITU, <a href="https://www.itu.int/itu-d/reports/statistics/2025/10/15/ff25-youth-internet-use/" target="_blank" rel="noopener">Facts and Figures 2025: youth Internet use</a> (Oct 2025).</li>
+        <li id="s13">Tech-ish, <a href="https://tech-ish.com/2025/11/05/youversion-bible-app-one-billion-installs/" target="_blank" rel="noopener">YouVersion Bible App passes one billion installs</a> (5 Nov 2025).</li>
+      </ol>
+      <button class="top" id="toTop">Back to the top</button>
+    </section>
+
+  </div>
+</div>
+</div>
+
+<script>
+(function(){
+  var screenEl = document.getElementById('screen');
+  var framed = function(){ return window.matchMedia('(min-width:520px)').matches; };
+  var reduce = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+  function goTo(el){
+    if(!el) return;
+    el.scrollIntoView({behavior: reduce ? 'auto' : 'smooth', block:'start'});
+  }
+
+  // tabs
+  var tabs = Array.prototype.slice.call(document.querySelectorAll('.tab'));
+  tabs.forEach(function(t){
+    t.addEventListener('click', function(){ goTo(document.getElementById(t.dataset.go)); });
+  });
+  var secs = ['big','print','digital'].map(function(id){ return document.getElementById(id); });
+  function onScroll(){
+    var barEl = document.querySelector('.bar');
+    barEl.classList.toggle('stuck', document.querySelector('.hero').getBoundingClientRect().bottom < 4);
+    var bar = barEl.getBoundingClientRect().bottom + 30;
+    var cur = 'big';
+    secs.forEach(function(s){ if(s.getBoundingClientRect().top <= bar) cur = s.id; });
+    tabs.forEach(function(t){ t.classList.toggle('on', t.dataset.go === cur); });
+  }
+  screenEl.addEventListener('scroll', onScroll, {passive:true});
+  window.addEventListener('scroll', onScroll, {passive:true});
+
+  // source chips jump to the list and flash the entry
+  document.querySelectorAll('.src[data-s]').forEach(function(b){
+    b.addEventListener('click', function(){
+      var li = document.getElementById('s' + b.dataset.s);
+      goTo(li);
+      li.classList.remove('flash'); void li.offsetWidth; li.classList.add('flash');
+    });
+  });
+  document.getElementById('toTop').addEventListener('click', function(){
+    if(framed()) screenEl.scrollTo({top:0, behavior: reduce?'auto':'smooth'});
+    else window.scrollTo({top:0, behavior: reduce?'auto':'smooth'});
+  });
+
+  // numbers count up as they arrive (final values are already in the page)
+  if(reduce || !('IntersectionObserver' in window)) return;
+  var io = new IntersectionObserver(function(entries){
+    entries.forEach(function(e){
+      if(!e.isIntersecting) return;
+      io.unobserve(e.target);
+      var el = e.target, end = +el.dataset.count, fmt = el.dataset.fmt || '';
+      var html = el.innerHTML, t0 = null, dur = 900;
+      function frame(t){
+        if(!t0) t0 = t;
+        var k = Math.min(1, (t - t0) / dur), v = Math.round(end * (1 - Math.pow(1 - k, 3)));
+        if(fmt.charAt(0) === ' ') el.innerHTML = v + '<small>' + fmt.trim() + '</small>';
+        else el.textContent = v + fmt;
+        if(k < 1) requestAnimationFrame(frame); else el.innerHTML = html;
+      }
+      requestAnimationFrame(frame);
+    });
+  }, {root: framed() ? screenEl : null, threshold: .6});
+  document.querySelectorAll('[data-count]').forEach(function(el){ io.observe(el); });
+})();
+</script>
+
+</body>
+</html>
