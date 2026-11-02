@@ -387,8 +387,9 @@ function play(){
   Object.keys(BALLS).forEach(function(k){BALLS[k].busy=false;});
 
   /* the splatter settles first */
-  if(!reduce)bgw.animate([{transform:'scale('+(kBg*1.10)+')',filter:'blur(9px)',opacity:.2},
-                          {transform:'scale('+kBg+')',filter:'blur(0px)',opacity:1}],
+  /* no blur here: blurring a layer this size makes iPhones redraw it in tiles on the first run (the glitch) */
+  if(!reduce)bgw.animate([{transform:'scale('+(kBg*1.08)+')',opacity:0},
+                          {transform:'scale('+kBg+')',opacity:1}],
                          {duration:1250,easing:'cubic-bezier(.2,.85,.25,1)'});
   at(120,function(){S.riser();});
   /* the paper stack builds up */
@@ -503,7 +504,17 @@ function autoKick(){
 }
 var _play=play;
 play=function(){ autoReady=0; autoDone={}; _play(); autoReady=performance.now()+2400+3000; lastKick=0; };
-fit(); loop(); play(); autoKick();
+/* start only once every picture is decoded and the page has its real size, so nothing pops in half-way */
+stage.style.opacity=0;
+(function start(){
+  var imgs=[].slice.call(document.images), done=false;
+  function go(){ if(done) return; done=true;
+    requestAnimationFrame(function(){ fit(); stage.style.opacity=1; loop(); play(); autoKick(); }); }
+  Promise.all(imgs.map(function(i){ return i.decode ? i.decode().catch(function(){}) : Promise.resolve(); })).then(function(){
+    if(innerWidth && innerHeight) go(); else { addEventListener('resize', function r(){ if(innerWidth&&innerHeight){ removeEventListener('resize',r); go(); } }); setTimeout(go,1500); }
+  });
+  setTimeout(go, 2500);   /* never wait longer than this */
+})();
 </script>
 </body>
 </html>
