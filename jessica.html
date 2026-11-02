@@ -1,3 +1,4 @@
+<!doctype html><html><head><meta charset=utf8><meta name=viewport content="width=device-width,initial-scale=1,viewport-fit=cover"><style>:root{color-scheme:light;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}html{scroll-padding-top:env(safe-area-inset-top,0px)}body{margin:0;padding:0;font:14px -apple-system,BlinkMacSystemFont,sans-serif;background:#fff;color:#000}img{max-width:100%}[hidden]:not([hidden=until-found i]){display:none!important}</style></head><body>
 <!doctype html>
 <html lang="en">
 <head>
@@ -50,10 +51,15 @@
   #toMark{ left:12px; padding:0 14px 0 10px; }
   #toX{ right:12px; width:38px; justify-content:center; font-size:18px; }
   /* a quiet nudge: scroll or tap to move on */
-  #down{ position:fixed; left:50%; bottom:max(12px, env(safe-area-inset-bottom)); z-index:55; transform:translateX(-50%); width:34px; height:34px; display:grid; place-items:center;
-    color:rgba(244,236,224,.7); opacity:0; transition:opacity .5s ease; pointer-events:none; }
-  #down.show{ opacity:1; animation:bob 1.8s ease-in-out infinite; }
-  @keyframes bob{ 0%,100%{ translate:0 0 } 50%{ translate:0 5px } }
+  /* on-screen buttons as well as swipes, so it works on every phone */
+  #down{ position:fixed; left:50%; bottom:max(14px, env(safe-area-inset-bottom)); z-index:55; transform:translateX(-50%); display:flex; gap:8px;
+    opacity:0; transition:opacity .5s ease; pointer-events:none; }
+  #down.show{ opacity:1; pointer-events:auto; }
+  .navbtn{ height:40px; min-width:40px; border-radius:999px; display:inline-flex; align-items:center; justify-content:center; gap:8px; padding:0 14px;
+    background:rgba(16,12,9,.72); border:1px solid rgba(244,236,224,.28); color:var(--ink); font:700 14px/1 inherit; cursor:pointer;
+    -webkit-backdrop-filter:blur(6px); backdrop-filter:blur(6px); touch-action:manipulation; }
+  .navbtn.next{ padding:0 18px; }
+  .navbtn:active{ background:rgba(60,46,34,.9); }
   #tip{ position:fixed; left:50%; bottom:max(14px, env(safe-area-inset-bottom)); transform:translateX(-50%); z-index:55; white-space:nowrap;
     font:600 11px/1 inherit; letter-spacing:.12em; text-transform:uppercase; color:rgba(244,236,224,.8); background:rgba(14,10,8,.7);
     border:1px solid rgba(244,236,224,.16); padding:8px 14px; border-radius:999px; opacity:0; transition:opacity .5s ease; pointer-events:none; }
@@ -120,7 +126,7 @@
 </div>
 <button class="topbtn" id="toMark" type="button"><svg width="9" height="15" viewBox="0 0 9 15" aria-hidden="true"><path d="M7.5 1.5 1.5 7.5l6 6" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>Mark</button>
 <button class="topbtn" id="toX" type="button" aria-label="Close and go back to Mark">&times;</button>
-<div id="down" aria-hidden="true"><svg width="22" height="14" viewBox="0 0 22 14"><path d="M2 2l9 9 9-9" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
+<div id="down"><button type="button" class="navbtn" id="navPrev" aria-label="Back one"><svg width="14" height="9" viewBox="0 0 22 14" aria-hidden="true"><path d="M2 12l9-9 9 9" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"/></svg></button><button type="button" class="navbtn next" id="navNext">Next <svg width="14" height="9" viewBox="0 0 22 14" aria-hidden="true"><path d="M2 2l9 9 9-9" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"/></svg></button></div>
 <div id="tip" role="status">Tap any paper to read it</div>
 <script>
 (function(){
@@ -381,7 +387,7 @@
     if(n < reads.length){
       var el = reads[n]; aim(el);
       (BRINGS[el.id] || []).forEach(function(k, j){ trigger(k, 380 + j*420); });
-      down.classList.add('show'); tip.classList.remove('show');
+      down.classList.add('show'); tip.classList.remove('show'); document.getElementById('navPrev').hidden = (n === 0);
     } else {
       SEQ.forEach(function(s, j){ trigger(s.k, 200 + j*120); });   /* anything not yet torn in */
       whole(); down.classList.remove('show');
@@ -395,7 +401,7 @@
   addEventListener('resize', function(){ sizeFx(); if(step < reads.length) aim(reads[step]); else if(zoomed >= 0) aim(reads[zoomed]); });
   /* ---------- input: tap or scroll down to move on; scroll up to go back ---------- */
   var downAt = null, lastWheel = 0;
-  function chrome(t){ return !!t.closest('.topbtn'); }
+  function chrome(t){ return !!(t.closest && t.closest('.topbtn, .navbtn')); }
   /* pointer and touch both feed the same handler: some phone browsers cancel the pointer mid-swipe
      (pointercancel) and never send pointerup, so the touch events are the backup. */
   var lastEnd = 0;
@@ -437,6 +443,8 @@
     if(history.length > 1) history.back();
   }
   document.getElementById('toMark').addEventListener('click', back);
+  document.getElementById('navNext').addEventListener('click', function(e){ e.stopPropagation(); next(); });
+  document.getElementById('navPrev').addEventListener('click', function(e){ e.stopPropagation(); prev(); });
   document.getElementById('toX').addEventListener('click', back);
   try{ if(window.parent !== window) window.parent.postMessage({ ysb:'own-nav' }, '*'); }catch(err){}
   document.getElementById('room').style.backgroundImage = 'url("' + document.getElementById('rug').src + '")';
@@ -448,3 +456,5 @@
 </script>
 </body>
 </html>
+
+</body></html>
