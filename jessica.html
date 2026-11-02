@@ -1,3 +1,4 @@
+<!doctype html><html><head><meta charset=utf8><meta name=viewport content="width=device-width,initial-scale=1,viewport-fit=cover"><style>:root{color-scheme:light;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}html{scroll-padding-top:env(safe-area-inset-top,0px)}body{margin:0;padding:0;font:14px -apple-system,BlinkMacSystemFont,sans-serif;background:#fff;color:#000}img{max-width:100%}[hidden]:not([hidden=until-found i]){display:none!important}</style></head><body>
 <!doctype html>
 <html lang="en">
 <head>
@@ -48,6 +49,8 @@
   .reading .piece.dim{ filter:brightness(.38) saturate(.5); }
   .reading #rug, .reading #rugx{ filter:brightness(.34) saturate(.45); transition:filter 420ms ease; }
   .overview .piece[data-read]{ cursor:zoom-in; }
+  #table, .piece[data-read]{ cursor:pointer; }   /* iOS only sends taps (clicks) to things that look clickable */
+  .overview .piece[data-read]{ cursor:pointer; }
   /* top bar: back to Mark, and a close */
   .topbtn{ position:fixed; top:max(12px, env(safe-area-inset-top)); z-index:60; height:38px; border-radius:999px; display:inline-flex; align-items:center; gap:6px;
     background:rgba(16,12,9,.62); border:1px solid rgba(244,236,224,.22); color:var(--ink); font:600 14px/1 inherit; cursor:pointer;
@@ -430,49 +433,63 @@
   function prev(){ if(step === STEPS - 1 && zoomed >= 0){ zoomed = -1; whole(); return; } go(step - 1); }
   addEventListener('resize', function(){ sizeFx(); if(step < reads.length) aim(reads[step]); else if(zoomed >= 0) aim(reads[zoomed]); });
   /* ---------- input: tap or scroll down to move on; scroll up to go back ---------- */
-  var downAt = null, lastWheel = 0;
-  function chrome(t){ return !!(t.closest && t.closest('.topbtn, .navbtn')); }
-  /* pointer and touch both feed the same handler: some phone browsers cancel the pointer mid-swipe
-     (pointercancel) and never send pointerup, so the touch events are the backup. */
-  var lastEnd = 0;
-  function startAt(x, y, t){ if(chrome(t)) return; downAt = {x:x, y:y}; audio(); }
-  function endAt(x, y, t){
-    if(!downAt) return; var now = performance.now(); if(now - lastEnd < 350){ downAt = null; return; } lastEnd = now;
-    var e = {target:t}; var dx = x - downAt.x, dy = y - downAt.y; downAt = null;
-    if(Math.abs(dy) > 40 && Math.abs(dy) > Math.abs(dx)){ if(dy < 0) next(); else prev(); return; }   /* swipe up = on, down = back */
-    if(Math.abs(dx) > 40){ if(dx < 0) next(); else prev(); return; }
+  var downAt = null, lastWheel = 0, lastEnd = 0;
+  function chrome(t){ return !!(t && t.closest && t.closest('.topbtn, .navbtn')); }
+  /* ---------- one tap/swipe handler, fed by every kind of input a phone might send ----------
+     Touch events, pointer events and plain clicks all arrive here; whichever comes first wins and the
+     others are ignored for a moment, so one gesture is only ever one step. If the browser cancels a
+     gesture part-way (iOS does this), the last known finger position still decides what it was. */
+  function startAt(x, y, t){ if(chrome(t)){ downAt = null; return; } downAt = {x:x, y:y, lx:x, ly:y, t:t}; try{ audio(); }catch(err){} }
+  function moveTo(x, y){ if(downAt){ downAt.lx = x; downAt.ly = y; } }
+  function tapAt(x, y, t){
     if(step === STEPS - 1){
       if(zoomed >= 0){ zoomed = -1; whole(); return; }          /* any tap while zoomed: back to the whole page */
-      var piece = pieceAt(x, y, e.target);
-      if(piece) zoomTo(reads.indexOf(piece)); return;
+      var piece = pieceAt(x, y, t);
+      if(piece) zoomTo(reads.indexOf(piece));
+      return;
     }
     next();
   }
-  /* which paper is under the finger: look through everything at that point, not just the top layer
-     (a sheen, a shadow or the video can sit on top of a paper on some browsers) */
+  function endAt(x, y, cancelled){
+    if(!downAt) return; var d = downAt; downAt = null;
+    var now = performance.now(); if(now - lastEnd < 400) return; lastEnd = now;
+    if(x == null){ x = d.lx; y = d.ly; }
+    var dx = x - d.x, dy = y - d.y;
+    if(Math.abs(dy) > 40 && Math.abs(dy) > Math.abs(dx)){ if(dy < 0) next(); else prev(); return; }   /* swipe up = on, down = back */
+    if(Math.abs(dx) > 40){ if(dx < 0) next(); else prev(); return; }
+    if(cancelled){ lastEnd = 0; return; }   /* a cancelled gesture that never really moved: not a tap */
+    tapAt(x, y, d.t);
+  }
+  /* which paper is under the finger: look through everything at that point, not just the top layer */
   function pieceAt(x, y, t){
     var p = t && t.closest ? t.closest('.piece[data-read]') : null; if(p) return p;
     var els = document.elementsFromPoint ? document.elementsFromPoint(x, y) : [];
     for(var i = 0; i < els.length; i++){ var q = els[i].closest && els[i].closest('.piece[data-read]'); if(q) return q; }
     return null;
   }
-  /* a plain click as a backstop: if no touch or pointer event dealt with this tap, the click does */
-  addEventListener('click', function(e){
-    if(chrome(e.target) || performance.now() - lastEnd < 700) return;
-    lastEnd = performance.now(); downAt = null;
-    if(step === STEPS - 1){
-      if(zoomed >= 0){ zoomed = -1; whole(); return; }
-      var piece = pieceAt(e.clientX, e.clientY, e.target);
-      if(piece) zoomTo(reads.indexOf(piece)); return;
-    }
-    next();
-  });
-  addEventListener('pointerdown', function(e){ if(e.pointerType !== 'touch') startAt(e.clientX, e.clientY, e.target); });
-  addEventListener('pointerup', function(e){ if(e.pointerType !== 'touch') endAt(e.clientX, e.clientY, e.target); });
-  addEventListener('touchstart', function(e){ var p = e.changedTouches[0]; startAt(p.clientX, p.clientY, e.target); }, {passive:true});
-  addEventListener('touchmove', function(e){ if(!chrome(e.target)) e.preventDefault(); }, {passive:false});   /* no page bounce / pull-to-refresh */
-  addEventListener('touchend', function(e){ var p = e.changedTouches[0]; endAt(p.clientX, p.clientY, e.target); }, {passive:true});
-  addEventListener('touchcancel', function(){ downAt = null; }, {passive:true});
+  // touch
+  addEventListener('touchstart', function(e){ var p = e.changedTouches[0]; if(p) startAt(p.clientX, p.clientY, e.target); }, {passive:true});
+  addEventListener('touchmove', function(e){ var p = e.changedTouches[0]; if(p) moveTo(p.clientX, p.clientY); if(!chrome(e.target) && e.cancelable) e.preventDefault(); }, {passive:false});
+  addEventListener('touchend', function(e){ var p = e.changedTouches[0]; endAt(p ? p.clientX : null, p ? p.clientY : null); }, {passive:true});
+  addEventListener('touchcancel', function(){ endAt(null, null, true); }, {passive:true});
+  // pointer (mouse, pen and touch alike: whichever of touch/pointer reports first does the step)
+  addEventListener('pointerdown', function(e){ if(!downAt) startAt(e.clientX, e.clientY, e.target); });
+  addEventListener('pointermove', function(e){ moveTo(e.clientX, e.clientY); });
+  addEventListener('pointerup', function(e){ endAt(e.clientX, e.clientY); });
+  addEventListener('pointercancel', function(){ endAt(null, null, true); });
+  addEventListener('dragstart', function(e){ e.preventDefault(); });   /* a native image drag swallows the gesture */
+  // click: the backstop. iOS only sends clicks to things that look clickable, so the papers and the page say they are.
+  function clicked(e){
+    if(chrome(e.target)) return;
+    var now = performance.now(); if(now - lastEnd < 700) return; lastEnd = now; downAt = null;
+    tapAt(e.clientX, e.clientY, e.target);
+  }
+  document.addEventListener('click', clicked);
+  reads.forEach(function(p){ p.addEventListener('click', function(e){
+    e.stopPropagation();
+    var now = performance.now(); if(now - lastEnd < 700) return; lastEnd = now; downAt = null;
+    if(step === STEPS - 1){ if(zoomed >= 0){ zoomed = -1; whole(); } else zoomTo(reads.indexOf(p)); } else next();
+  }); });
   /* wheel: add up small steps (trackpads, Firefox's line units) until it's a real scroll */
   var wheelSum = 0, wheelT = 0;
   addEventListener('wheel', function(e){
@@ -503,5 +520,26 @@
   requestAnimationFrame(frame);
 })();
 </script>
+
+<div id="dbg" style="position:fixed;left:6px;right:6px;top:58px;z-index:99;pointer-events:none;font:600 11px/1.35 ui-monospace,Menlo,monospace;color:#0f0;background:rgba(0,0,0,.78);padding:6px 8px;border-radius:8px;white-space:pre-wrap;max-height:40vh;overflow:hidden"></div>
+<script>
+(function(){
+  var box=document.getElementById('dbg'), lines=[], n=0;
+  function log(t){ n++; lines.unshift(n+' '+t); lines=lines.slice(0,14); box.textContent='TOUCH TEST  '+navigator.userAgent.replace(/.*(iPhone OS [\d_]+).*?(CriOS\/[\d.]+|Version\/[\d.]+).*/,'$1 $2')+'\n'+lines.join('\n'); }
+  ['touchstart','touchmove','touchend','touchcancel','pointerdown','pointerup','pointercancel','click'].forEach(function(t){
+    var last=0;
+    window.addEventListener(t,function(e){
+      if(t==='touchmove'){ var now=performance.now(); if(now-last<250) return; last=now; }
+      var tg=e.target, nm=tg&&tg.id?('#'+tg.id):(tg&&tg.className&&typeof tg.className==='string'?'.'+tg.className.split(' ')[0]:(tg&&tg.tagName));
+      var pt=e.changedTouches&&e.changedTouches[0]||e; log(t+(e.pointerType?'('+e.pointerType+')':'')+' '+Math.round(pt.clientX||0)+','+Math.round(pt.clientY||0)+' '+nm);
+    },{capture:true,passive:true});
+  });
+  var st=document.getElementById('stage'); var lastT='';
+  var moving=false;setInterval(function(){ var t=getComputedStyle(st).transform; if(t!==lastT){ lastT=t; if(!moving){ moving=true; log('>> PAGE MOVED'); } } else moving=false; },300);
+  window.addEventListener('error',function(e){ log('ERROR '+e.message); });
+})();
+</script>
 </body>
 </html>
+
+</body></html>
