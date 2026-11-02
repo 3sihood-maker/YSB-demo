@@ -136,6 +136,16 @@ main { position: relative; flex: 1; min-height: 0; margin: 9.2px 9.2px 0; backgr
 .scrap .piece .pt.mid { text-align: center; }
 .scrap .piece .pt p { margin: 0 0 6px; } .scrap .piece .pt p:last-child { margin-bottom: 0; }
 .scrap b { color: #14306e; }
+/* torn-paper notes at the end of a chapter: the paper stretches to fit the words */
+.ch-note { margin: 30px 0 34px; display: flex; flex-direction: column; align-items: center; }
+.ch-note .piece { height: auto; min-height: 120px; width: min(var(--w), 100%); }
+.ch-note .piece .pt { position: relative; inset: auto; padding: var(--pad); font-size: 15.5px; line-height: 1.42; color: #1d1a16; }
+.ch-note .piece .pt b { color: #14306e; }
+.fb-btn { display: inline-flex; align-items: center; gap: 10px; margin-top: 22px; padding: 13px 22px; border-radius: 999px; background: #ffd84a; color: #1d1a16; font: 800 15px/1 "Archivo", var(--sys);
+  letter-spacing: .04em; text-decoration: none; box-shadow: 0 6px 16px rgba(0,0,0,.4); rotate: -1.5deg; }
+.fb-btn:hover { background: #ffe57a; }
+.ch-note .fb-alt { margin: 26px 0 0; font: 400 13px/1.4 "Archivo", var(--sys); color: var(--muted, #9aa1ad); text-align: center; }
+.fb-alt button { color: var(--link, #7cc8ff); text-decoration: underline; text-underline-offset: 3px; font: inherit; }
 .co-start { position: absolute; left: 50%; margin-left: -32px; width: 64px; height: 50px; z-index: 5; }
 .co-start-tag { position: absolute; left: 50%; z-index: 5; width: 170px; height: 36px; margin-left: -85px; white-space: nowrap; display: grid; place-items: center; cursor: pointer; rotate: -2deg;
   font: 700 11.5px/1 "Archivo", var(--sys); letter-spacing: .06em; text-transform: uppercase; color: #0b1f45; filter: drop-shadow(0 4px 6px rgba(0,0,0,.5)); animation: tagIn .5s ease .35s both; }
@@ -147,6 +157,10 @@ main { position: relative; flex: 1; min-height: 0; margin: 9.2px 9.2px 0; backgr
 .story-card:hover, .story-card:focus-visible { rotate: 0deg; scale: 1.025; filter: drop-shadow(0 14px 18px rgba(0,0,0,.55)) drop-shadow(0 0 10px rgba(124,200,255,.45)); }
 .story-card .sc-kick { position: absolute; left: 10px; top: -10px; z-index: 1; padding: 4px 9px 3px; background: #ffe236; color: #1d1a16; rotate: -3deg; font: 700 10.5px/1 "Archivo", var(--sys); letter-spacing: .08em; text-transform: uppercase; box-shadow: 0 2px 4px rgba(0,0,0,.35); }
 .scrap .co-go { position: absolute; right: var(--gr, -8px); bottom: var(--gb, -16px); width: 50px; height: 39px; z-index: 3; }
+/* arrows that point at the thing to click: placed on the paper's edge nearest it, turned to face it */
+.scrap .co-go.at-tl { right: auto; bottom: auto; left: 6px; top: -22px; }
+.scrap .co-go.at-b { right: auto; left: 50%; margin-left: -25px; bottom: -6px; }
+.scrap .co-go.aimed { transition: rotate .3s ease; }
 .scrap .co-x { top: var(--xt, 6px); right: var(--xr, 8px); color: rgba(29,26,22,.65); z-index: 3; }
 .scrap .co-clip { width: 112px; height: 128px; right: auto; left: var(--cx, 60%); top: var(--cy, -70px); }
 .callout.paper { background: none; box-shadow: none; border-radius: 0; padding: 0; width: var(--pw, 290px); max-width: calc(100% - 16px); color: #1d1a16;
@@ -268,9 +282,6 @@ main { position: relative; flex: 1; min-height: 0; margin: 9.2px 9.2px 0; backgr
 .dsec p { margin: 0; font: 500 13px/1.35 "Archivo", var(--sys); color: #4a4036; }
 .dt-outer { position: relative; }
 .dt-outer .dt-flag { position: absolute; left: 10px; top: -10px; z-index: 1; padding: 4px 9px 3px; background: #ffe236; color: #1d1a16; rotate: -3deg; font: 700 10.5px/1 "Archivo", var(--sys); letter-spacing: .08em; text-transform: uppercase; box-shadow: 0 2px 4px rgba(0,0,0,.35); pointer-events: none; }
-.linked-page.back-top .linked-back { bottom: auto; top: calc(12px + env(safe-area-inset-top, 0px)); padding: 7px 13px 7px 10px; font-size: 13px; }
-.linked-page.back-mid .linked-back { left: 50%; translate: -50% 0; }
-.linked-page.back-lift .linked-back { bottom: calc(86px + env(safe-area-inset-bottom, 0px)); }   /* bottom left, just above the page's own menu */
 .phone:has(.linked-page.home-nomark:not([hidden])) .watermark, .phone:has(.linked-page.nomark:not([hidden])) .watermark { display: none; }   /* the games fill the screen */
 .dtile { display: block; width: 100%; text-align: left; padding: 0; border-radius: 14px; overflow: hidden; background: var(--surface); border: 1px solid var(--line); box-shadow: 0 8px 18px rgba(0,0,0,.35); transition: transform .2s ease, box-shadow .2s ease; }
 .dtile:hover, .dtile:focus-visible { transform: translateY(-2px); box-shadow: 0 12px 24px rgba(0,0,0,.45), 0 0 0 2px rgba(124,200,255,.5); }
@@ -327,8 +338,18 @@ main { position: relative; flex: 1; min-height: 0; margin: 9.2px 9.2px 0; backgr
 
 /* a linked page opened inside the phone */
 .linked-page { position: absolute; inset: 0; z-index: 7; background: #0b1830; animation: up .22s ease-out; }
-.linked-page iframe { position: absolute; inset: 0; width: 100%; height: 100%; border: 0; display: block; }
-.linked-back { position: absolute; left: 14px; bottom: calc(18px + env(safe-area-inset-bottom, 0px)); z-index: 2; display: flex; align-items: center; gap: 6px; padding: 10px 16px 10px 12px; border-radius: 999px; background: rgba(8,18,34,.72); border: 1px solid rgba(255,255,255,.22); color: #fff; font: 600 14px/1 var(--sys); backdrop-filter: blur(8px); -webkit-backdrop-filter: blur(8px); }
+.linked-page { display: flex; flex-direction: column; }
+/* every aside: the same bar on top: Back (to where they were) at the top left in blue, and an X at the top right that does the same */
+.lp-bar { flex: none; position: relative; z-index: 2; display: flex; align-items: center; justify-content: space-between; gap: 10px;
+  padding: calc(8px + env(safe-area-inset-top, 0px)) 12px 8px; background: #0b1220; border-bottom: 1px solid rgba(255,255,255,.1); }
+.linked-page iframe { position: relative; flex: 1; min-height: 0; width: 100%; border: 0; display: block; }
+.lp-mark { position: absolute; left: 50%; translate: -50% 0; font: 800 11px/1 var(--sys); letter-spacing: .3em; padding-left: .3em; text-transform: uppercase; color: rgba(255,255,255,.32); pointer-events: none; white-space: nowrap; }
+.lp-x { width: 38px; height: 38px; border-radius: 50%; display: grid; place-items: center; background: #2f6fe0; color: #fff; font: 400 24px/1 var(--sys); padding-bottom: 2px; }
+.lp-x:hover { background: #4682f0; }
+.phone:has(> .linked-page:not([hidden])) > .watermark { display: none; }   /* the bar says "Demo only" instead */
+.linked-back { position: relative; display: flex; align-items: center; gap: 7px; height: 38px; padding: 0 16px 0 12px; border-radius: 999px; background: #2f6fe0; border: 0; color: #fff; font: 700 14px/1 var(--sys); }
+.linked-back:hover { background: #4682f0; }
+.linked-back[hidden] { display: flex !important; }
 @media (prefers-reduced-motion: reduce) { .ball-link::after { animation: none; } }
 
 
@@ -622,14 +643,18 @@ main { position: relative; flex: 1; min-height: 0; margin: 9.2px 9.2px 0; backgr
       <button class="tt-line tt-go" id="tt-go" type="button">Open the Bible<svg width="14" height="11" viewBox="0 0 16 12" aria-hidden="true"><path d="M1 6h13M9.5 1.5 14 6l-4.5 4.5" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg></button>
     </div>
     <div class="tt-copy tt-b" aria-hidden="true">
-      <p class="tt-line lead">The YSB is a <b>complete Bible</b> in many languages and versions. What we&rsquo;ll take you through is how it might work as you look at a book like <b>Mark</b>.</p>
+      <p class="tt-line lead">The YSB is designed to be a <b>complete Bible</b> in many languages and versions. What we&rsquo;ll take you through is how it might work as you look at a book like <b>Mark</b>.</p>
       <button class="paper-next tt-line tt-go" id="tt-next" type="button" tabindex="-1" aria-label="Next"><img data-paper alt="" draggable="false"></button>
     </div>
     </div>
   </section>
   <div class="linked-page" id="linked-page" hidden>
-    <iframe id="linked-frame" title="Linked page" allow="autoplay; fullscreen"></iframe>
+    <div class="lp-bar">
     <button class="linked-back" id="linked-back" type="button"><svg width="9" height="15" viewBox="0 0 9 15" aria-hidden="true"><path d="M7.5 1.5 1.5 7.5l6 6" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg><span id="linked-back-label">Mark 1</span></button>
+      <span class="lp-mark" aria-hidden="true">Demo only</span>
+      <button class="lp-x" id="linked-x" type="button" aria-label="Close and go back">&times;</button>
+    </div>
+    <iframe id="linked-frame" title="Linked page" allow="autoplay; fullscreen"></iframe>
   </div>
   <div class="watermark" aria-hidden="true">DEMO ONLY</div>
   <button class="back-btn fwd-btn" id="fwd-btn" type="button" hidden aria-label="Skip forward"><svg width="8" height="13" viewBox="0 0 9 15" aria-hidden="true"><path d="M1.5 1.5 7.5 7.5l-6 6" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg></button>
@@ -906,7 +931,7 @@ const GRUNGE_B64 = "", GRUNGE_SRC = "assets/mark-collage.html?v=d30237f8";
 })();
 /* ---------- animated title screen ---------- */
 const TITLE_B64 = "";      /* the title page built in (Claude demo link) ... */
-const TITLE_SRC = "assets/ysb-title.html?v=53ff4ceb";  /* ... or as its own file next to the site's index.html */
+const TITLE_SRC = "assets/ysb-title.html?v=744ea686";  /* ... or as its own file next to the site's index.html */
 const titleScreen = $('#title-screen'), titleFrame = $('#title-frame');
 const titleHTML = TITLE_B64 ? new TextDecoder().decode(Uint8Array.from(atob(TITLE_B64), c => c.charCodeAt(0))) : '';
 function showTitle() {
@@ -1086,12 +1111,12 @@ const CALLOUTS = [
       { paper: 'pinkoval', w: 292, r: 1.5, mirror: true, center: true, pad: '15% 13% 35% 13%', go: true, gr: '22px', gb: '34px',
         html: '<p>Imagine a young person is reading <b>Mark 1</b> and sees a reference to the <b>Good News</b>.</p>' } ] },
   { target: () => $('.ball-link'), place: 'below', pulse: true, aside: true, pieces: [
-      { paper: 'green', w: 336, r: 1.5, x: -6, pad: '13% 12% 16% 18%', xr: '12px', xt: '8px', go: true, gr: '4px', gb: '-14px',
+      { paper: 'green', w: 336, r: 1.5, x: -6, pad: '13% 12% 16% 18%', xr: '12px', xt: '8px', go: true, at: 'tl', aim: true,
         html: '<p>They would be able to click on a link to find out more about this good news. <b>Click on it to see!</b></p>' } ] },
   { target: () => $('.story-card'), place: 'above', reveal: true, aside: true, pieces: [
       { paper: 'notebook', w: 318, r: -2, x: -4, pad: '22% 9% 12% 18%',
         html: '<p>The YSB would allow us to link to the <b>27 youth athlete stories</b> and add many more.</p>' },
-      { paper: 'bluecloud', w: 292, r: 2, x: 52, o: -26, center: true, pad: '19% 21% 29% 13%', go: true, gr: '18px', gb: '10px',
+      { paper: 'bluecloud', w: 292, r: 2, x: 52, o: -26, center: true, pad: '19% 21% 29% 13%', go: true, at: 'b', aim: true,
         html: '<p>Plus <b>digital</b> allows us to visualize it in new ways.</p>' } ] },
   { target: () => $('.story-card'), place: 'below', reveal: true, close: true, pieces: [
       { paper: 'pinned', w: 300, r: -1.5, x: 10, center: true, pad: '30% 14% 25% 14%', xr: '15%', xt: '30%',
@@ -1137,7 +1162,7 @@ function coShow(i) {
     const d = document.createElement('div'); d.className = 'piece';
     d.style.cssText = `--w:${w}px;--h:${h}px;--r:${pc.r || 0}deg;--x:${pc.x || 0}px;--pad:${pc.pad}` + (pc.o != null ? `;--o:${pc.o}px` : '') + (pc.gr ? `;--gr:${pc.gr};--gb:${pc.gb}` : '') + (pc.xr ? `;--xr:${pc.xr};--xt:${pc.xt}` : '');
     d.innerHTML = `<img class="pp${pc.mirror ? ' flip' : ''}" alt="" src="${PAPERS[pc.paper]}"><div class="pt${pc.center ? ' mid' : ''}">${pc.html}</div>`
-      + (pc.go ? `<button type="button" class="co-go paper-next" aria-label="Next">${PAPER_IMG}</button>` : '')
+      + (pc.go ? `<button type="button" class="co-go paper-next${pc.at ? ' at-' + pc.at : ''}${pc.aim ? ' aim' : ''}" aria-label="Next">${PAPER_IMG}</button>` : '')
       + (c.close && k === c.pieces.length - 1 ? '<button type="button" class="co-x" aria-label="Close">&times;</button>' : '');
     el.append(d); fitPiece(d, h);
     const g = d.querySelector('.co-go'); if (g) g.onclick = e => { e.stopPropagation(); coNext(); };
@@ -1148,7 +1173,7 @@ function coShow(i) {
       if (!makeClip(bc)) bc.remove(); else bc.onclick = e => { e.stopPropagation(); bc.classList.toggle('big'); };   /* no link: a tap just enlarges it */
     }
   });
-  coPlace();
+  coPlace(); [60, 400, 900].forEach(ms => setTimeout(coAim, ms));
   /* only scroll if it would be off screen (call-out 1 sits right under MARK, so the page stays put) */
   const er = el.getBoundingClientRect(), rr = reader.getBoundingClientRect();
   if (c.reveal) {   /* bring the thing it points at fully into view, with the call-out above it */
@@ -1159,6 +1184,55 @@ function coShow(i) {
   requestAnimationFrame(() => requestAnimationFrame(() => el.classList.add('show')));
 }
 addEventListener('resize', coPlace);
+/* notes at the end of chapters 3 and 4, and the feedback button */
+const FB_MAIL = 'YSBDemo@logosdor.com,3sihood@gmail.com';
+function fbHref() {
+  const sub = 'YSB demo feedback', body = 'Hi YSB team,\n\nMy feedback on the Youth Sports Bible demo:\n\n\n\n---\nSent from the YSB digital demo';
+  return 'mailto:' + FB_MAIL + '?subject=' + encodeURIComponent(sub) + '&body=' + encodeURIComponent(body);
+}
+function chNote(ch, paper, w, pad, rot, html, extra) {
+  const sec = $('#mark' + ch); if (!sec) return;
+  const d = document.createElement('div'); d.className = 'scrap ch-note';
+  d.innerHTML = `<div class="piece" style="--w:${w}px;--r:${rot}deg;--pad:${pad}"><img class="pp" alt="" src="${PAPERS[paper]}"><div class="pt mid">${html}</div></div>` + (extra || '');
+  sec.append(d);
+  return d;
+}
+chNote(3, 'notebook', 330, '34px 30px 40px 52px', -1.5,
+  '<p>Look below in the <b>Discover</b> and <b>Plans</b> section for more &lsquo;asides&rsquo; and possibilities that might be good to have in the YSB.</p>');
+{
+  const d = chNote(4, 'kraft', 350, '60px 64px 92px 60px', 1.2,
+    '<p>This is just a demo and we have only included <b>4 chapters of Mark</b>.</p><p>A small team have been experimenting with all different types of Bible engagement tools and this demo has just given you a few of them.</p><p><b>Any ideas and feedback would be gratefully accepted!</b></p>',
+    `<a class="fb-btn" id="fb-send" href="${fbHref()}" target="_top" rel="noopener">Send feedback <svg width="18" height="14" viewBox="0 0 18 14" aria-hidden="true"><path d="M1 1h16v12H1zM1 1l8 6 8-6" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"/></svg></a>
+     <p class="fb-alt">or <button type="button" id="fb-copy">copy the email addresses</button></p>`);
+  if (d) {
+    /* the link opens their own mail app (phone, tablet or computer). If the page is shut inside a frame that
+       blocks it, try the top window, then a new window, and say where to write to. */
+    $('#fb-send', d).addEventListener('click', e => {
+      e.preventDefault(); const h = fbHref();
+      try { window.top.location.href = h; return; } catch (err) {}
+      try { const w = window.open(h, '_blank'); if (w) return; } catch (err) {}
+      location.href = h;
+    });
+    $('#fb-copy', d).addEventListener('click', () => {
+      const done = () => { const b = $('#fb-copy', d); const t = b.textContent; b.textContent = 'Copied ✓'; setTimeout(() => b.textContent = t, 1600); };
+      if (navigator.clipboard && navigator.clipboard.writeText) navigator.clipboard.writeText(FB_MAIL.split(',').join(', ')).then(done, () => { location.href = fbHref(); });
+      else location.href = fbHref();
+    });
+  }
+}
+/* turn an aiming arrow to face what its call-out points at (the arrow art points right) */
+function coAim() {
+  if (!coEl || coIdx < 0) return;
+  const t = CALLOUTS[coIdx].target && CALLOUTS[coIdx].target(); if (!t) return;
+  const tr = (t.getClientRects()[0] || t.getBoundingClientRect());
+  $$('.co-go.aim', coEl).forEach(g => {
+    g.style.rotate = '0deg';
+    const gr = g.getBoundingClientRect();
+    const a = Math.atan2((tr.top + tr.height / 2) - (gr.top + gr.height / 2), (tr.left + tr.width / 2) - (gr.left + gr.width / 2)) * 180 / Math.PI;
+    g.classList.add('aimed'); g.style.rotate = a.toFixed(1) + 'deg';
+  });
+}
+addEventListener('resize', () => setTimeout(coAim, 50));
 /* the walk-through starts after "Next" on the teens page: settle on MARK, glide down to verse 1, then the first call-out */
 /* the walk-through waits for a paper arrow under MARK, so people can look at the Bible first */
 function coStartArrow(delay) {
@@ -1322,7 +1396,6 @@ function openLinkedHTML(html, back) {
 /* a linked page with its own way back (Jessica's) says so, and asks to close */
 addEventListener('message', e => {
   const d = e.data || {}, lp = $('#linked-page'); if (lp.hidden) return;
-  if (d.ysb === 'own-nav') $('#linked-back').hidden = true;
   if (d.ysb === 'close') $('#linked-back').click();
 });
 /* visiting an aside mid walk-through: put the call-out away, and pick the run-through up again on return.
@@ -1338,6 +1411,17 @@ $('#linked-back').onclick = () => { $('#linked-page').hidden = true; $('#linked-
   if (coResume != null) { const n = coResume; coResume = null; if (n < CALLOUTS.length) setTimeout(() => coShow(n), 450); } };
 /* a new tab (the GO plan in the Claude viewer): carry on when they come back to this one */
 addEventListener('focus', () => { if (coResume != null && $('#linked-page').hidden) { const n = coResume; coResume = null; if (n < CALLOUTS.length) setTimeout(() => coShow(n), 450); } });
+$('#linked-x').onclick = () => $('#linked-back').click();
+/* the asides' own "‹ Mark" and "×" buttons are tucked away: the bar above does that job, the same on every one */
+$('#linked-frame').addEventListener('load', () => {
+  try {
+    const d = $('#linked-frame').contentDocument; if (!d || !d.head) return;
+    const st = d.createElement('style');
+    st.textContent = '#toMark,#toX,#ysbMark,#ysbX,#topbar{display:none!important}';
+    d.head.append(st);
+    if (d.body) d.body.classList.remove('framed');   /* Verse Strike: drop its own back bar and the space it kept */
+  } catch (e) {}   /* another site (Family.Fit): nothing to tuck away */
+});
 const touchOnly = matchMedia('(hover: none)').matches;
 /* the site opens the page's own file; the Claude viewer uses the copy built into this page */
 function gnPage(k) {

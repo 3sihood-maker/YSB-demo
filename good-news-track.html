@@ -459,9 +459,18 @@ const FINISH_S = COURSE, FINISH_BACK = 19;
 /* You run flat out and only slow as the picture ahead starts coming up out of
    the track: the rise is driven by the distance left, and the speed cap comes
    in later and falls away with it, so the two land together. */
-const RUN_SPEED = 9.5;
-const ARRIVE = 18;                                    // the picture starts rising here
-const EASE_FROM = 13;                                 // and you start easing off here
+/* a bit quicker than it was (9.5), and a little faster again on every run between pictures */
+const RUN_BASE = 11.5, RUN_STEP = 0.07, RUN_MAX = 15.5;
+let RUN_SPEED = RUN_BASE, legs = 0;
+const BRAKE = 3.2;                                    // v = BRAKE*sqrt(distance left): the easing-off curve
+let ARRIVE = 18;                                      // the picture starts rising here
+let EASE_FROM = 13;                                   // and you start easing off here
+function setPace(){
+  RUN_SPEED = Math.min(RUN_MAX, RUN_BASE*(1 + RUN_STEP*legs));
+  EASE_FROM = Math.max(13, Math.pow(RUN_SPEED/BRAKE, 2) + 0.5);   // room to slow down from this speed
+  ARRIVE = Math.max(18, EASE_FROM + 4);
+}
+setPace();
 const SETTLE = 1.9;                                   // the last metre, exponentially
 
 // position, tangent and outward normal at s metres along the inner edge
@@ -1353,6 +1362,7 @@ hit.addEventListener('keydown', e => {
 });
 
 function setRunning(v){
+  if (v && !running){ legs++; setPace(); }   // each new run is a touch faster
   running = v;
   runBtn.setAttribute('aria-pressed', v ? 'true' : 'false');
   runBtn.textContent = v ? 'Stop' : 'Run';
@@ -1475,7 +1485,7 @@ document.getElementById('finAgain').addEventListener('click', () => {
   stations.forEach(st => { boardReset(st); setUp(st, 0); st.armed = true; st.laid = false; });
   document.querySelectorAll('.pip').forEach(p => p.classList.remove('done'));
   titleReset(startTitle);
-  s = START_S; speed = 0; yaw = 0; pitch = pitchAim = -0.02;
+  s = START_S; speed = 0; yaw = 0; pitch = pitchAim = -0.02; legs = 0; setPace();
   phase = 'go'; current = null; anim = null; puffT = -1; settleTo = null;
   setRunning(false);
 });
@@ -1907,7 +1917,7 @@ function tick(now){
          of a 12 m approach a third of a metre is a three per cent jump in the
          size of the picture, in one frame. */
       if (left < EASE_FROM){
-        speed = Math.min(speed, Math.min(2.5*Math.sqrt(Math.max(0, left)),
+        speed = Math.min(speed, Math.min(BRAKE*Math.sqrt(Math.max(0, left)),
                                          left*SETTLE + 0.02));
       }
 
@@ -1919,7 +1929,7 @@ function tick(now){
       }
     }
 
-    speed = Math.max(-9, Math.min(14, speed));
+    speed = Math.max(-9, Math.min(Math.max(14, RUN_MAX + 0.5), speed));
     s += speed*dt;
     if (s < START_S - 24){ s = START_S - 24; speed = 0; }
   }

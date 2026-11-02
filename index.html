@@ -366,6 +366,10 @@ button:focus-visible, a:focus-visible, input:focus-visible, select:focus-visible
 .pv-count { font: 600 13px/1 "Archivo", var(--sys); letter-spacing: .06em; color: rgba(255,255,255,.7); }
 .pv-close { display: inline-flex; align-items: center; gap: 8px; padding: 9px 14px 9px 16px; border-radius: 999px; border: 1px solid rgba(255,255,255,.35); background: rgba(255,255,255,.1); color: #fff; font: 700 14px/1 "Archivo", var(--sys); }
 .pv-close span { font-size: 19px; line-height: .8; }
+.dv-top { background: #0b1220; border-bottom: 1px solid rgba(255,255,255,.1); padding: calc(8px + env(safe-area-inset-top, 0px)) 12px 8px; }
+.dv-back { display: flex; align-items: center; gap: 7px; height: 38px; padding: 0 16px 0 12px; border-radius: 999px; background: #2f6fe0; color: #fff; font: 700 14px/1 "Archivo", var(--sys); }
+.dv-x { width: 38px; height: 38px; border-radius: 50%; display: grid; place-items: center; background: #2f6fe0; color: #fff; font: 400 24px/1 var(--sys); padding-bottom: 2px; }
+.dv-back:hover, .dv-x:hover { background: #4682f0; }
 .dv-frame { flex: 1; min-height: 0; width: 100%; border: 0; display: block; background: #07080b; }
 .pv-close:hover { background: rgba(255,255,255,.2); }
 .pv-stage { position: relative; flex: 1; min-height: 0; overflow: hidden; touch-action: none; cursor: zoom-in; }
@@ -463,7 +467,7 @@ button:focus-visible, a:focus-visible, input:focus-visible, select:focus-visible
   <!-- INTRO PAGE 4: run the tunnel through time, 1987 to today -->
   <section class="intro tunnel" id="intro4" hidden>
     <canvas class="tn-gl" id="tn-gl" aria-label="A players' tunnel lined with sport Bible covers from 1987 to 2026. Drag up or down to move through the years."></canvas>
-    <div class="tn-head" aria-live="polite"><div class="tn-kicker">Sport Bibles since 1987</div><div class="tn-year" id="tn-year">1987</div><div class="tn-count" id="tn-count">1 of 64</div></div>
+    <div class="tn-head" aria-live="polite"><div class="tn-kicker">Some of the Sport Bibles Across the World</div><div class="tn-year" id="tn-year">1987</div><div class="tn-count" id="tn-count">1 of 64</div></div>
     <div class="tn-progress" aria-hidden="true"><i id="tn-prog"></i></div>
     <div class="tn-hint" id="tn-hint">Swipe up to go faster</div>
     <div class="tn-card" id="tn-card" hidden><button class="tn-cx" id="tn-cx" type="button" aria-label="Close">&times;</button><div class="tn-cy" id="tn-cy"></div><div class="tn-ct" id="tn-ct"></div><div class="tn-cm" id="tn-cm"></div></div>
@@ -485,7 +489,7 @@ button:focus-visible, a:focus-visible, input:focus-visible, select:focus-visible
     </div>
     <!-- the data on Bibles: its own page, over the story -->
     <div class="pv dv" id="dv" hidden role="dialog" aria-modal="true" aria-label="See the numbers">
-      <div class="pv-top"><span class="pv-count">See the numbers</span><button type="button" class="pv-close" id="dv-close">Close <span aria-hidden="true">&times;</span></button></div>
+      <div class="pv-top dv-top"><button type="button" class="dv-back" id="dv-back"><svg width="9" height="15" viewBox="0 0 9 15" aria-hidden="true"><path d="M7.5 1.5 1.5 7.5l6 6" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>Back</button><button type="button" class="dv-x" id="dv-close" aria-label="Close and go back">&times;</button></div>
       <iframe class="dv-frame" id="dv-frame" title="See the numbers"></iframe>
     </div>
   </section>
@@ -788,7 +792,7 @@ BACK.push(
         TN_LINES.forEach(ln => { if (ln.g === n) ln.el.classList.add('snapped'); });
         TN.T = n < TN_G0.length - 1 ? TN_PAGES[n].hold + 0.05 : TN_TEND; TN.vT = 0; TN.jump = null; TN.rate = 0.04;
       } else { hideIntro4(); showStory(0); } } },
-  { on: () => !dv.hidden, go: () => dvClose() },   /* the data page: Back closes it */
+  { on: () => !dv.hidden, none: true },   /* the data page has its own Back and X at the top */   /* the data page: Back closes it */
   { on: () => !pv.hidden, none: true, go: pvClose },   /* full-page reader has its own controls */
   { on: () => !story.hidden, go: () => {
       if (storyIdx > 0) goStory(storyIdx - 1);
@@ -979,8 +983,19 @@ function tnBuild() {
     camera.setViewOffset(r.width, r.height, 0, Math.round(r.height * (0.5 - 0.37)), r.width, r.height); camera.updateProjectionMatrix();
     /* how far back to stand so both covers sit fully inside the screen, in its upper part */
     const tv = Math.tan(camera.fov * Math.PI / 360), th = tv * camera.aspect;
-    TN.stopD = Math.max(2.4, (TN.pairW / 2 * 1.16) / th, (TN.FH / 2) / (tv * 0.42));
-    TN.liftY = 0;                                        /* the view offset already puts the cover centre 37% from the top */
+    /* the two covers sit in the space above the closing words, never behind them: measure the words,
+       then size the covers (no bigger than 42% of the screen) and lift them so their bottom edge clears the text */
+    const H = r.height, last = $$('#tn-story .tn-group'); const g = last[last.length - 1];
+    let textTop = H * 0.62;
+    if (g) { const cs = getComputedStyle(g), ph = parseFloat(cs.paddingTop) || 0;
+      const kids = [...g.children].reduce((a, k) => a + k.offsetHeight + (parseFloat(getComputedStyle(k).marginTop) || 0) + (parseFloat(getComputedStyle(k).marginBottom) || 0), 0);
+      const pb = parseFloat(cs.paddingBottom) || 0; textTop = H - pb - kids - 22; }
+    const topM = 54, room = Math.max(H * 0.18, textTop - topM);
+    const half = Math.min(H * 0.21, room / 2);           /* cover half-height in px */
+    const centre = Math.min(0.37 * H, textTop - half) / H;
+    TN.stopD = Math.max(2.4, (TN.pairW / 2 * 1.16) / th, (TN.FH / 2) / (tv * (half / (H / 2))));
+    /* with the view offset the cover centre sits 37% down; lifting the camera's aim moves it up to 'centre' */
+    TN.liftY = (0.37 - Math.max(centre, (topM + half) / H)) * 2 * tv * TN.stopD;
     TN.tv = tv; TN.th = th;
   };
   TN.size = size;
@@ -1195,6 +1210,7 @@ function tnLoop(t0) {
     if (TN.focus) TN.lastFocus = TN.focus;
     cam.position.set(px, py, pz);
     cam.rotation.set(TN.pitch * (1 - fe * 0.7), TN.yaw * (1 - fe * 0.7), 0, 'YXZ');
+    if ((fe > 0.4) !== intro4.classList.contains('finale') && fe > 0.4 && TN.size) TN.size();   /* re-measure the words as the finale arrives */
     intro4.classList.toggle('finale', fe > 0.4);
     intro4.classList.toggle('focused', TN.fz > 0.2);
     TN.scene.children[0].material.uniforms.uTime.value = t;
@@ -1256,7 +1272,7 @@ const STORY = [
   { id: '7b', book: 'gospel', html: `<p class="lead">It also gives an overview of the <b>Gospel</b> and a way to respond.</p>
       ${BOOK_UI}`,
     buttons: [{ label: 'Continue', next: true }] },
-  { id: '8', html: `<p class="lead">And guess what? All of this <b>in the palm of your hand</b>. The book of life, and relevant tools inviting you and your team to be part of an amazing adventure in the Scriptures&hellip;</p>
+  { id: '8', html: `<p class="lead">And guess what? All of this <b>in the palm of your hand</b>. The words of life, and relevant tools inviting you and your team to be part of an amazing adventure in the Scriptures&hellip;</p>
       <span class="rule" aria-hidden="true"></span>
       <p>This pilot aims to make a sports-themed, printed Word of God accessible in <b>more languages</b> and in <b>more countries</b>.</p>
       <p>It&rsquo;s a pilot with huge potential as the sports movement partners with Bible agencies.</p>
@@ -1336,7 +1352,7 @@ function dvOpen() {
   dv.hidden = false;
 }
 function dvClose() { dv.hidden = true; dvFrame.removeAttribute('srcdoc'); dvFrame.src = 'about:blank'; }
-$('#dv-close').onclick = dvClose;
+$('#dv-close').onclick = dvClose; $('#dv-back').onclick = dvClose;
 function pvApply(anim) { pvImg.classList.toggle('anim', !!anim); pvImg.style.transform = `translate(${PV.x}px, ${PV.y}px) scale(${PV.k})`; pvStage.classList.toggle('zoomed', PV.k > 1.01); }
 function pvClamp() {
   const sw = pvStage.clientWidth, sh = pvStage.clientHeight, w = pvImg.offsetWidth * PV.k, h = pvImg.offsetHeight * PV.k;
