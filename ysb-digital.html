@@ -613,7 +613,7 @@ main { position: relative; flex: 1; min-height: 0; margin: 9.2px 9.2px 0; backgr
     <button class="enter paper-next" id="enter" type="button" aria-label="Show me!"><img data-paper alt="" draggable="false"></button>
   </div>
   <section class="ysb-why" id="ysb-why" hidden>
-    <video class="why-photo" id="why-video" muted playsinline preload="auto" poster="assets/ysb-track-poster.jpg?v=0e42dd49" src="assets/ysb-track.mp4?v=992b2d02" aria-label="Youth Sports New Testaments and phones showing the Youth Sports Bible, beside a kit bag, ball and whistle on a running track at night, with athletes training under floodlights"></video>
+    <video class="why-photo" id="why-video" muted playsinline preload="none" poster="assets/ysb-track-poster.jpg?v=0e42dd49" src="assets/ysb-track.mp4?v=992b2d02" aria-label="Youth Sports New Testaments and phones showing the Youth Sports Bible, beside a kit bag, ball and whistle on a running track at night, with athletes training under floodlights"></video>
     <div class="why-shade" id="why-shade" aria-hidden="true"></div>
     <div class="why-boxes">
       <p class="why-box lead">These two pilots of a <b class="pk">printed New Testament</b> and a <b>digital Bible</b> work together to serve sport ministry worldwide.</p>
@@ -680,6 +680,10 @@ function backUpdate() {
 backBtn.onclick = () => { const sc = BACK.find(b => b.on()); if (sc && sc.go) sc.go(); requestAnimationFrame(backUpdate); };
 fwdBtn.onclick = () => { const sc = BACK.find(b => b.on()); if (sc && sc.fwd) sc.fwd(); requestAnimationFrame(backUpdate); };
 setInterval(backUpdate, 250);
+/* opening fast on a phone: the big videos start downloading only after the first screen is up and settled */
+addEventListener('load', () => setTimeout(() => {
+  ['#intro-video', '#why-video'].forEach(id => { const v = $(id); if (v && v.preload === 'none' && v.paused && !v.currentTime) { v.preload = 'auto'; try { v.load(); } catch (e) {} } });
+}, 2500));
 const PAPER_SRC = "assets/paper-arrow.webp?v=14e9879f";
 const PAPER_IMG = '<img data-paper alt="" draggable="false" src="' + PAPER_SRC + '">';
 $$('img[data-paper]').forEach(i => { i.src = PAPER_SRC; });
@@ -924,11 +928,14 @@ const h = (location.hash || '').match(/^#mark([1-4])$/);
 if (h) requestAnimationFrame(() => goTo(+h[1], true));
 /* ---------- the MARK title's background: Si's grunge collage (its own page, in an iframe) ---------- */
 const GRUNGE_B64 = "", GRUNGE_SRC = "assets/mark-collage.html?v=d30237f8";
-(function () {
+let collageOn = false;
+function loadCollage() {   /* the collage is heavy (64 cut-outs): build it once the title has had the phone to itself */
+  if (collageOn) return; collageOn = true;
   const f = $('#bt-bg'); if (!f) return;
   if (GRUNGE_SRC) f.src = GRUNGE_SRC;
   else f.srcdoc = new TextDecoder().decode(Uint8Array.from(atob(GRUNGE_B64), c => c.charCodeAt(0)));
-})();
+}
+addEventListener('load', () => setTimeout(loadCollage, 4000));
 /* ---------- animated title screen ---------- */
 const TITLE_B64 = "";      /* the title page built in (Claude demo link) ... */
 const TITLE_SRC = "assets/ysb-title.html?v=744ea686";  /* ... or as its own file next to the site's index.html */
@@ -940,6 +947,7 @@ function showTitle() {
   titleScreen.hidden = false; closeSheet(); closeIndex();
 }
 function hideTitle() {
+  setTimeout(loadCollage, 300);
   titleScreen.hidden = true;
   if (TITLE_SRC) titleFrame.src = 'about:blank'; else titleFrame.srcdoc = '';
   $('#enter').blur();
@@ -1291,7 +1299,7 @@ const STORY_CARDS = [
 STORY_CARDS.forEach(c => {
   const v = $$(`.vs[data-v="${c.before || c.after}"]`).pop(); if (!v) return;
   const a = document.createElement('a'); a.className = 'story-card'; a.href = c.href; a.target = '_blank'; a.rel = 'noopener';
-  a.innerHTML = `<span class="sc-kick">${c.kick || 'Athlete story'}</span><img alt="" src="${c.img}">`; a.setAttribute('aria-label', c.alt);
+  a.innerHTML = `<span class="sc-kick">${c.kick || 'Athlete story'}</span><img alt="" loading="lazy" decoding="async" src="${c.img}">`; a.setAttribute('aria-label', c.alt);
   a.addEventListener('click', e => {
     coPause(a);
     e.preventDefault();
@@ -1454,7 +1462,7 @@ const PAGES = {
 function tile(key, back) {
   const pg = PAGES[key], w = document.createElement('div'); w.className = 'dtile-wrap';
   const b = document.createElement('button'); b.type = 'button'; b.className = 'dtile';
-  b.innerHTML = `<img alt="" class="${pg.crop ? 'crop' : ''}" src="${pg.img}"><span class="dt-txt"><span class="dt-kick"></span><span class="dt-title"></span><span class="dt-sub"></span></span>`;
+  b.innerHTML = `<img alt="" loading="lazy" decoding="async" class="${pg.crop ? 'crop' : ''}" src="${pg.img}"><span class="dt-txt"><span class="dt-kick"></span><span class="dt-title"></span><span class="dt-sub"></span></span>`;
   b.querySelector('.dt-kick').textContent = pg.kick; b.querySelector('.dt-title').textContent = pg.title; b.querySelector('.dt-sub').textContent = pg.sub;
   b.onclick = () => goLink(Object.assign({ back }, pg));
   w.append(b);

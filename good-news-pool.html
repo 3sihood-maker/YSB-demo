@@ -1511,7 +1511,7 @@ function fillCard(st){
   document.getElementById('pTitle').textContent = st.story.title;
   document.getElementById('pRef').textContent = st.story.ref;
   document.getElementById('pBody').textContent = st.story.body;
-  panel.hidden = false;
+  clearTimeout(closeT); panel.hidden = false;
 }
 
 function layoutStop(st){
@@ -1567,10 +1567,11 @@ function openCard(st){
   document.body.classList.add('stopped');
   document.querySelectorAll('.pip')[st.i].classList.add('done');
 }
+let closeT = 0;   /* the next stop's words must not be hidden by the last one closing */
 function closeCard(){
   panel.classList.remove('open');
   document.body.classList.remove('stopped');
-  setTimeout(() => { if (!panel.classList.contains('open')) panel.hidden = true; }, 360);
+  clearTimeout(closeT); closeT = setTimeout(() => { if (!panel.classList.contains('open')) panel.hidden = true; }, 360);
 }
 
 /* Keep running: the picture stays where it is and you go through it. */
@@ -2045,6 +2046,7 @@ function tick(now){
       // the distance left, so it is rising while you are still at full speed
       if (aim && left < ARRIVE){
         if (!aim.laid){ fillCard(aim); layoutStop(aim); aim.laid = true; }
+        if (aim.laid && left < 5 && !panel.classList.contains('open')) panel.classList.add('open');   /* the words come up as you arrive, not after you stop */
         /* Smoothstep, not ease-out: coming up out of water wants to start
            slowly and settle slowly. Ease-out had it clear the surface in the
            first half metre and then hang there while you swam the rest. */

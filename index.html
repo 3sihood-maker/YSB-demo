@@ -186,12 +186,12 @@ button:focus-visible, a:focus-visible, input:focus-visible, select:focus-visible
 .intro2.out .cover-sheen { opacity: .9; transition-delay: 2s; }
 .intro2 .intro-copy { gap: 14px; padding-top: 26px; }
 .intro2 .intro-copy p { transform: translateY(10px); }
-.intro2 .lead2 { font: 500 17px/1.5 "Archivo", var(--sys); color: rgba(242,244,247,.92); max-width: 32ch; transition-delay: 2.3s; }
+.intro2 .lead2 { font: 500 17px/1.5 "Archivo", var(--sys); color: rgba(242,244,247,.92); max-width: 32ch; transition-delay: .5s; }   /* comes up while the Bible zooms back into place */
 .intro2 .lead2 b { font-weight: 700; color: #fff; }
-.intro2 .simple { font: italic 600 22px/1.2 "Archivo", var(--sys); color: var(--pink-1987); transition-delay: 3.1s; }
-.intro2 .never { font: 400 15.5px/1.55 "Archivo", var(--sys); color: rgba(242,244,247,.7); max-width: 31ch; transition-delay: 3.8s; }
+.intro2 .simple { font: italic 600 22px/1.2 "Archivo", var(--sys); color: var(--pink-1987); transition-delay: 2.1s; }
+.intro2 .never { font: 400 15.5px/1.55 "Archivo", var(--sys); color: rgba(242,244,247,.7); max-width: 31ch; transition-delay: 3.0s; }
 .intro2 .never b { font-weight: 700; color: var(--pink-1987); }
-.intro2 .intro-go { transition-delay: 4.5s, 4.5s, 0s, 0s; }
+.intro2 .intro-go { transition-delay: 3.7s, 3.7s, 0s, 0s; }
 .intro2.out .intro-copy p, .intro2.out .intro-go { opacity: 1; transform: none; }
 @media (max-height: 680px) { .intro2 { padding-top: 56px; } .cover-scene { height: 36%; } .intro2 .lead2 { font-size: 15.5px; } .intro2 .simple { font-size: 19px; } .intro2 .never { font-size: 14px; } }
 
@@ -311,8 +311,9 @@ button:focus-visible, a:focus-visible, input:focus-visible, select:focus-visible
 .hl-test button small { display: block; margin-top: 2px; font-weight: 400; font-size: 11.5px; color: #9aa0a8; }
 @media (max-width: 519px) { .hl-test { display: none !important; } }
 /* ---------- story pages on black (6b, 7, 8, 9) ---------- */
-.story { justify-content: center; padding: 64px 0 calc(28px + env(safe-area-inset-bottom, 0px)); }
-.story-scroll { flex: 1; min-height: 0; overflow-y: auto; display: flex; flex-direction: column; scrollbar-width: none; }
+.story { justify-content: center; padding: 0 0 calc(28px + env(safe-area-inset-bottom, 0px)); }
+.story .story-scroll { padding-top: 64px; }   /* the space at the top is inside the scroll, so the light can run up to the screen edge */
+.story-scroll { flex: 1; min-height: 0; overflow-y: auto; overflow-x: hidden; display: flex; flex-direction: column; scrollbar-width: none; }
 .story-scroll::-webkit-scrollbar { display: none; }
 .story-copy { margin: auto 0; padding: 10px 30px 16px; display: flex; flex-direction: column; align-items: center; gap: 16px; text-align: center; }
 .story-copy > * { opacity: 0; transform: translateY(10px); transition: opacity .9s ease var(--d, 0s), transform .9s ease var(--d, 0s); }
@@ -328,6 +329,45 @@ button:focus-visible, a:focus-visible, input:focus-visible, select:focus-visible
 .intro { --digital: #7cc8ff; }
 .story-copy b.dg { color: var(--digital); }
 .story-copy p.blueline { font: italic 600 19px/1.3 "Archivo", var(--sys); color: var(--digital); }
+.story-copy .st-art { position: relative; width: 100%; display: grid; place-items: center; margin: 2px 0; }
+.story-copy .st-art img { position: relative; width: min(100%, var(--aw)); height: auto; display: block; filter: drop-shadow(0 6px 18px rgba(0,0,0,.6)); }
+.story-copy .st-hands { --aw: 300px; } .story-copy .st-team { --aw: 230px; margin-top: -22px; }
+/* the light behind: the same uneven, blurred shafts as the opening page, two sets turning against each other, over a warm glow */
+.st-art .st-glow { position: absolute; left: 50%; top: 52%; width: 130%; aspect-ratio: 1.4; translate: -50% -50%;
+  background: radial-gradient(closest-side, rgba(255,248,232,.95), rgba(255,232,190,.7) 22%, rgba(255,214,160,.34) 46%, rgba(140,170,230,.1) 68%, transparent 86%);
+  animation: stGlow 6s ease-in-out infinite; }
+.st-art .st-rays { position: absolute; left: 50%; top: 52%; width: 175%; aspect-ratio: 1; translate: -50% -50%; filter: blur(6px);
+  background: repeating-conic-gradient(from 0deg, rgba(255,255,255,0) 0deg 3deg, rgba(255,226,170,.34) 5.5deg 8deg, rgba(255,255,255,0) 10.5deg 14deg, rgba(200,225,255,.24) 16deg 18.5deg, rgba(255,255,255,0) 21deg 26deg);
+  -webkit-mask: radial-gradient(closest-side, #000 10%, rgba(0,0,0,.7) 32%, rgba(0,0,0,.22) 56%, transparent 80%); mask: radial-gradient(closest-side, #000 10%, rgba(0,0,0,.7) 32%, rgba(0,0,0,.22) 56%, transparent 80%);
+  animation: stRays 70s linear infinite; }
+.st-art .st-rays2 { scale: .8; opacity: .7; animation: stRays2 95s linear infinite; }
+@keyframes stGlow { 50% { opacity: .82; scale: 1.05; } }
+@keyframes stRays { to { rotate: 360deg; } }
+@keyframes stRays2 { from { rotate: 11deg; } to { rotate: -349deg; } }
+@media (prefers-reduced-motion: reduce) { .st-art .st-glow, .st-art .st-rays { animation: none; } }
+/* the athletes: lit like a ground at night, two floodlight towers high on either side throwing soft beams down onto them */
+.st-team { overflow: visible; }
+.st-team .st-fl { position: absolute; top: -78px; width: 150%; aspect-ratio: 1; pointer-events: none; filter: blur(7px);
+  background: conic-gradient(from var(--from) at 50% 0%, transparent 0deg, rgba(255,246,226,.22) 14deg, rgba(255,250,236,.46) 28deg, rgba(220,232,255,.28) 42deg, rgba(255,246,226,.16) 52deg, transparent 64deg);
+  -webkit-mask: radial-gradient(farthest-side at 50% 0%, #000 0%, rgba(0,0,0,.75) 45%, transparent 100%); mask: radial-gradient(farthest-side at 50% 0%, #000 0%, rgba(0,0,0,.75) 45%, transparent 100%);
+  animation: stFl 7s ease-in-out infinite; }
+.st-team .st-fl-l { left: -80%; --from: 110deg; }   /* aimed down and in, at the bench */
+.st-team .st-fl-r { right: -80%; --from: 188deg; animation-delay: -3.5s; }
+/* the lamp heads themselves: a bright bloom at the top of each beam */
+.st-team .st-fl::before { content: ""; position: absolute; left: 50%; top: 0; width: 34%; aspect-ratio: 2.2; translate: -50% -50%; border-radius: 50%;
+  background: radial-gradient(closest-side, #fff, rgba(255,246,226,.85) 30%, rgba(255,230,190,.3) 62%, transparent); }
+/* where the beams land: a pool of light on the ground under the bench */
+.st-team .st-pool { position: absolute; left: 50%; bottom: -4%; width: 130%; aspect-ratio: 4; translate: -50% 0;
+  background: radial-gradient(closest-side, rgba(255,246,226,.62), rgba(255,226,180,.28) 45%, transparent); }
+/* and the haze they light up behind the players */
+.st-team .st-pool::before { content: ""; position: absolute; left: 50%; bottom: 120%; width: 70%; aspect-ratio: 1.5; translate: -50% 0; background: radial-gradient(closest-side, rgba(255,244,222,.34), rgba(220,230,255,.1) 60%, transparent); }
+/* a glow all round the players, as if the floodlights light up the air behind them */
+.st-team .st-halo { position: absolute; left: 50%; top: 50%; width: 118%; aspect-ratio: 1.45; translate: -50% -50%;
+  background: radial-gradient(closest-side, rgba(255,248,232,.62), rgba(255,236,206,.42) 38%, rgba(220,232,255,.16) 66%, transparent); filter: blur(4px); }
+.story-copy .st-team img { filter: drop-shadow(0 0 10px rgba(255,244,222,.55)) drop-shadow(0 0 26px rgba(255,236,206,.35)); }
+@keyframes stFl { 50% { opacity: .82; } }
+@media (prefers-reduced-motion: reduce) { .st-team .st-fl { animation: none; } }
+@media (max-height: 700px) { .story-copy .st-hands { --aw: 240px; } .story-copy .st-team { --aw: 190px; } }
 .story-copy .rule { width: 36px; height: 2px; border-radius: 2px; background: rgba(255,217,160,.55); }
 .story-copy ul { list-style: none; margin: 0; padding: 0; display: grid; gap: 8px; }
 .story-copy li { font: 600 16px/1.3 "Archivo", var(--sys); color: #fff; }
@@ -436,7 +476,7 @@ button:focus-visible, a:focus-visible, input:focus-visible, select:focus-visible
   </section>
   <!-- INTRO PAGE 2: the world's first Sport Bible (1987) -->
   <section class="intro intro2" id="intro2" hidden>
-    <video class="intro-video" id="intro-video" muted playsinline loop preload="auto" aria-hidden="true" src="assets/sport-bibles.mp4?v=b51d8729"></video>
+    <video class="intro-video" id="intro-video" muted playsinline loop preload="none" aria-hidden="true" src="assets/sport-bibles.mp4?v=b51d8729"></video>
     <div class="intro-video-shade" aria-hidden="true"></div>
     <div class="p3-year">1987</div>
     <div class="cover-scene" id="cover-scene">
@@ -467,7 +507,7 @@ button:focus-visible, a:focus-visible, input:focus-visible, select:focus-visible
   <!-- INTRO PAGE 4: run the tunnel through time, 1987 to today -->
   <section class="intro tunnel" id="intro4" hidden>
     <canvas class="tn-gl" id="tn-gl" aria-label="A players' tunnel lined with sport Bible covers from 1987 to 2026. Drag up or down to move through the years."></canvas>
-    <div class="tn-head" aria-live="polite"><div class="tn-kicker">Some of the Sport Bibles Across the World</div><div class="tn-year" id="tn-year">1987</div><div class="tn-count" id="tn-count">1 of 64</div></div>
+    <div class="tn-head" aria-live="polite"><div class="tn-kicker">Some of the Sports Bibles</div><div class="tn-year" id="tn-year">1987</div><div class="tn-count" id="tn-count">1 of 64</div></div>
     <div class="tn-progress" aria-hidden="true"><i id="tn-prog"></i></div>
     <div class="tn-hint" id="tn-hint">Swipe up to go faster</div>
     <div class="tn-card" id="tn-card" hidden><button class="tn-cx" id="tn-cx" type="button" aria-label="Close">&times;</button><div class="tn-cy" id="tn-cy"></div><div class="tn-ct" id="tn-ct"></div><div class="tn-cm" id="tn-cm"></div></div>
@@ -517,6 +557,10 @@ function backUpdate() {
 backBtn.onclick = () => { const sc = BACK.find(b => b.on()); if (sc && sc.go) sc.go(); requestAnimationFrame(backUpdate); };
 fwdBtn.onclick = () => { const sc = BACK.find(b => b.on()); if (sc && sc.fwd) sc.fwd(); requestAnimationFrame(backUpdate); };
 setInterval(backUpdate, 250);
+/* opening fast on a phone: the big videos start downloading only after the first screen is up and settled */
+addEventListener('load', () => setTimeout(() => {
+  ['#intro-video', '#why-video'].forEach(id => { const v = $(id); if (v && v.preload === 'none' && v.paused && !v.currentTime) { v.preload = 'auto'; try { v.load(); } catch (e) {} } });
+}, 2500));
 const PAPER_SRC = "assets/paper-arrow.webp?v=14e9879f";
 const PAPER_IMG = '<img data-paper alt="" draggable="false" src="' + PAPER_SRC + '">';
 $$('img[data-paper]').forEach(i => { i.src = PAPER_SRC; });
@@ -805,6 +849,7 @@ BACK.push(
    it (with momentum), the wheel works too, it drifts forward on its own when left alone, and
    the view leans with the pointer or the phone's tilt. Tap a cover to read what it is. */
 const TN_COVERS = [{"id": "video-pink-1987", "src": "assets/covers/video-pink-1987.webp?v=d1a43441", "t": "Nuevo Testamento / New Testament", "e": "Pan American Games, Indianapolis 1987", "l": "Spanish / English", "y": 1987, "s": 1987, "w": 422, "h": 640}, {"id": "video-on-the-winning-side", "src": "assets/covers/video-on-the-winning-side.webp?v=1331f91a", "t": "On the Winning Side", "e": "Cricket", "l": "English", "y": null, "s": 1990, "w": 435, "h": 640}, {"id": "video-winner", "src": "assets/covers/video-winner.webp?v=800ee3d5", "t": "How to Be a Winner", "e": "Athletics", "l": "English", "y": null, "s": 1990.5, "w": 422, "h": 640}, {"id": "video-winning-the-face-off-of-life", "src": "assets/covers/video-winning-the-face-off-of-life.webp?v=5feb4175", "t": "Winning the Face-Off of Life", "e": "Ice hockey", "l": "English", "y": null, "s": 1991, "w": 435, "h": 640}, {"id": "video-the-prize", "src": "assets/covers/video-the-prize.webp?v=6e30f850", "t": "The Prize", "e": "Multi-sport", "l": "English", "y": null, "s": 1992, "w": 435, "h": 640}, {"id": "video-victory-through-competition", "src": "assets/covers/video-victory-through-competition.webp?v=e20cc205", "t": "Victory Through Competition", "e": "Basketball", "l": "English", "y": null, "s": 1993, "w": 435, "h": 640}, {"id": "video-lifes-ultimate-goal", "src": "assets/covers/video-lifes-ultimate-goal.webp?v=bca79ca9", "t": "Life's Ultimate Goal", "e": "Football", "l": "English", "y": null, "s": 1994, "w": 435, "h": 640}, {"id": "video-arabic-the-prize", "src": "assets/covers/video-arabic-the-prize.webp?v=ad8e6879", "t": "Al-Ja'iza (The Prize)", "e": "Football", "l": "Arabic", "y": null, "s": 1994.3, "w": 435, "h": 640}, {"id": "video-champions-of-life", "src": "assets/covers/video-champions-of-life.webp?v=728bf674", "t": "Champions of Life", "e": "Football", "l": "English", "y": null, "s": 1994.6, "w": 435, "h": 640}, {"id": "video-towards-the-goal", "src": "assets/covers/video-towards-the-goal.webp?v=eae93184", "t": "Towards the Goal", "e": "Basketball", "l": "English", "y": null, "s": 1995, "w": 384, "h": 640}, {"id": "video-gods-game-plan", "src": "assets/covers/video-gods-game-plan.webp?v=f7df2b14", "t": "God's Game Plan – The Athletes' Bible", "e": "All sports", "l": "English", "y": null, "s": 1996, "w": 435, "h": 640}, {"id": "video-coachs-bible", "src": "assets/covers/video-coachs-bible.webp?v=4d5d0801", "t": "The Coach's Bible", "e": "All sports", "l": "English", "y": null, "s": 1996.2, "w": 435, "h": 640}, {"id": "video-mit-vollem-einsatz", "src": "assets/covers/video-mit-vollem-einsatz.webp?v=0da90113", "t": "Mit vollem Einsatz (With Full Commitment)", "e": "All sports", "l": "German", "y": null, "s": 1996.4, "w": 435, "h": 640}, {"id": "video-victoria-final", "src": "assets/covers/video-victoria-final.webp?v=8cda4b69", "t": "La Victoria Final (The Final Victory)", "e": "Baseball / football", "l": "Spanish", "y": null, "s": 1996.6, "w": 701, "h": 640}, {"id": "video-put-k-pobede", "src": "assets/covers/video-put-k-pobede.webp?v=473ccb4c", "t": "Put' k pobede (Path to Victory)", "e": "Multi-sport", "l": "Russian", "y": null, "s": 1996.8, "w": 435, "h": 640}, {"id": "video-more-than-gold-pocket-guide", "src": "assets/covers/video-more-than-gold-pocket-guide.webp?v=a66a6e35", "t": "More Than Gold – Pocket Guide to the Olympics", "e": "Olympics", "l": "English", "y": null, "s": 1996.9, "w": 352, "h": 640}, {"id": "video-path-to-victory-cycling", "src": "assets/covers/video-path-to-victory-cycling.webp?v=b004fc04", "t": "Path to Victory (cycling cover)", "e": "Cycling", "l": "English", "y": null, "s": 1997, "w": 435, "h": 640}, {"id": "video-bangkok-1998", "src": "assets/covers/video-bangkok-1998.webp?v=d06c1ee3", "t": "Bangkok Games 1998 Scripture leaflet", "e": "Asian Games, Bangkok 1998", "l": "Thai", "y": 1998, "s": 1998, "w": 268, "h": 640}, {"id": "video-byt-nejlepsi-1998", "src": "assets/covers/video-byt-nejlepsi-1998.webp?v=67fa663b", "t": "Být nejlepší – Světový pohár 98 (To Be the Best – World Cup 98)", "e": "FIFA World Cup 1998", "l": "Czech", "y": 1998, "s": 1998, "w": 435, "h": 640}, {"id": "video-france-98", "src": "assets/covers/video-france-98.webp?v=cfc496b5", "t": "France 98", "e": "FIFA World Cup 1998", "l": "French", "y": 1998, "s": 1998, "w": 435, "h": 640}, {"id": "video-malaysia-more-than-gold", "src": "assets/covers/video-malaysia-more-than-gold.webp?v=52ce98b1", "t": "More Than Gold (Malaysia)", "e": "Multi-sport", "l": "English", "y": null, "s": 1998.6, "w": 896, "h": 640}, {"id": "video-jesus-sports-edition", "src": "assets/covers/video-jesus-sports-edition.webp?v=54183272", "t": "Jesus – Special Sports Edition", "e": "Multi-sport", "l": "English", "y": null, "s": 1999, "w": 460, "h": 640}, {"id": "video-cricket", "src": "assets/covers/video-cricket.webp?v=8791aefb", "t": "Cricket", "e": "Cricket", "l": "English", "y": null, "s": 1999.4, "w": 448, "h": 640}, {"id": "video-guide-to-the-games-sydney", "src": "assets/covers/video-guide-to-the-games-sydney.webp?v=421c42f3", "t": "More Than Gold – Guide to the Games, Sydney Olympics", "e": "Olympics, Sydney 2000", "l": "English", "y": 2000, "s": 2000, "w": 480, "h": 640}, {"id": "web-japan-sports-bible", "src": "assets/covers/web-japan-sports-bible.webp?v=439ecaf4", "t": "Sports Bible スポーツバイブル", "e": "All sports", "l": "Japanese", "y": null, "s": 2000.5, "w": 460, "h": 640}, {"id": "web-2002-sports-devotional-bible", "src": "assets/covers/web-2002-sports-devotional-bible.webp?v=fcf3cc96", "t": "Sports Devotional Bible (NIV)", "e": "All sports", "l": "English", "y": 2002, "s": 2002, "w": 677, "h": 640}, {"id": "video-surfers-guide-to-god", "src": "assets/covers/video-surfers-guide-to-god.webp?v=496475cb", "t": "Surfers Guide to God – Gospel of Mark", "e": "Surfing", "l": "English", "y": null, "s": 2004, "w": 435, "h": 640}, {"id": "web-canada-break-away-hockey-nt", "src": "assets/covers/web-canada-break-away-hockey-nt.webp?v=4c92db4a", "t": "Break-Away Hockey New Testament", "e": "Ice hockey", "l": "English", "y": null, "s": 2005, "w": 410, "h": 640}, {"id": "web-brazil-atletas-de-cristo", "src": "assets/covers/web-brazil-atletas-de-cristo.webp?v=7b7e6b0d", "t": "Bíblia do Atleta (Atletas de Cristo)", "e": "All sports", "l": "Portuguese", "y": null, "s": 2006, "w": 443, "h": 640}, {"id": "video-chinese-blue", "src": "assets/covers/video-chinese-blue.webp?v=7ed78788", "t": "More Precious than Gold (Chinese)", "e": "Athletics / Olympics", "l": "Chinese", "y": null, "s": 2007.5, "w": 435, "h": 640}, {"id": "web-2008-australia-surfers-bible", "src": "assets/covers/web-2008-australia-surfers-bible.webp?v=cd5d67dc", "t": "Surfers Bible New Testament (NLT)", "e": "Surfing", "l": "English", "y": 2008, "s": 2008, "w": 421, "h": 640}, {"id": "web-2009-niv-stock-car-racing", "src": "assets/covers/web-2009-niv-stock-car-racing.webp?v=8ad238f2", "t": "NIV Thinline Bible – Stock Car Racing Edition", "e": "Motor racing", "l": "English", "y": 2009, "s": 2009, "w": 409, "h": 640}, {"id": "video-champions-2010", "src": "assets/covers/video-champions-2010.webp?v=146ef587", "t": "Champions", "e": "Football", "l": "English", "y": 2010, "s": 2010, "w": 864, "h": 640}, {"id": "video-sports-spectrum", "src": "assets/covers/video-sports-spectrum.webp?v=7d008860", "t": "Sports Spectrum pocket magazine – Kevin Durant", "e": "Basketball", "l": "English", "y": null, "s": 2010.5, "w": 460, "h": 640}, {"id": "web-netherlands-marcus-sporters", "src": "assets/covers/web-netherlands-marcus-sporters.webp?v=a0cce27e", "t": "Marcus – Goed nieuws voor sporters", "e": "Football / all sports", "l": "Dutch", "y": null, "s": 2011, "w": 446, "h": 640}, {"id": "web-2012-germany-fussball-bibel", "src": "assets/covers/web-2012-germany-fussball-bibel.webp?v=a0e41fc1", "t": "Fußball-Bibel", "e": "Euro 2012 / football", "l": "German", "y": 2012, "s": 2012, "w": 452, "h": 640}, {"id": "web-2012-niv-game-plan-for-life", "src": "assets/covers/web-2012-niv-game-plan-for-life.webp?v=abcdcbab", "t": "NIV Game Plan for Life Bible", "e": "American football (Joe Gibbs)", "l": "English", "y": 2012, "s": 2012, "w": 407, "h": 640}, {"id": "web-2014-brazil-host-city-bibles", "src": "assets/covers/web-2014-brazil-host-city-bibles.webp?v=8e9606c3", "t": "Host-city Bibles (12 covers, group photo)", "e": "FIFA World Cup 2014", "l": "Portuguese", "y": 2014, "s": 2014, "w": 516, "h": 640}, {"id": "web-2014-brazil-segredo-da-vitoria", "src": "assets/covers/web-2014-brazil-segredo-da-vitoria.webp?v=c8ddcc54", "t": "Bíblia Sagrada – O Segredo da Vitória", "e": "FIFA World Cup 2014", "l": "Portuguese", "y": 2014, "s": 2014, "w": 431, "h": 640}, {"id": "web-2014-fca-athletes-bible-all-in", "src": "assets/covers/web-2014-fca-athletes-bible-all-in.webp?v=32485dc7", "t": "The Athlete's Bible: All In", "e": "All sports", "l": "English", "y": 2014, "s": 2014, "w": 472, "h": 640}, {"id": "web-2014-fca-team-bible-all-in", "src": "assets/covers/web-2014-fca-team-bible-all-in.webp?v=63689db8", "t": "The Team Bible: All In", "e": "All sports", "l": "English", "y": 2014, "s": 2014, "w": 483, "h": 640}, {"id": "web-2014-germany-more-sportbibel", "src": "assets/covers/web-2014-germany-more-sportbibel.webp?v=f6dc97bd", "t": "MORE. Die SPORTbibel", "e": "FIFA World Cup 2014 / all sports", "l": "German", "y": 2014, "s": 2014, "w": 442, "h": 640}, {"id": "web-2014-scotland-penny-gospel", "src": "assets/covers/web-2014-scotland-penny-gospel.webp?v=f85865cc", "t": "More Than Gold – The Penny Gospel (Luke)", "e": "Glasgow 2014 Commonwealth Games", "l": "English", "y": 2014, "s": 2014, "w": 416, "h": 640}, {"id": "web-2015-biblia-del-deportista", "src": "assets/covers/web-2015-biblia-del-deportista.webp?v=034701cc", "t": "La Biblia del Deportista: Invicto", "e": "All sports", "l": "Spanish", "y": 2015, "s": 2015, "w": 447, "h": 640}, {"id": "web-2015-fca-athletes-bible-undefeated", "src": "assets/covers/web-2015-fca-athletes-bible-undefeated.webp?v=91340d77", "t": "Athlete's Bible: Undefeated Edition", "e": "All sports", "l": "English", "y": 2015, "s": 2015, "w": 453, "h": 640}, {"id": "web-2016-brazil-rio", "src": "assets/covers/web-2016-brazil-rio.webp?v=ec73dbef", "t": "Rio! Scripture booklet", "e": "Rio 2016 Olympics", "l": "Portuguese", "y": 2016, "s": 2016, "w": 795, "h": 640}, {"id": "web-2016-fca-athletes-bible-rise", "src": "assets/covers/web-2016-fca-athletes-bible-rise.webp?v=42d9c820", "t": "Athlete's Bible: Rise Edition", "e": "All sports", "l": "English", "y": 2016, "s": 2016, "w": 408, "h": 640}, {"id": "web-2016-fca-coachs-bible", "src": "assets/covers/web-2016-fca-coachs-bible.webp?v=91cef61f", "t": "The Coach's Bible", "e": "All sports", "l": "English", "y": 2016, "s": 2016, "w": 441, "h": 640}, {"id": "web-2016-fca-competitors-bible", "src": "assets/covers/web-2016-fca-competitors-bible.webp?v=7d1eb561", "t": "The Competitor's Bible", "e": "All sports", "l": "English", "y": 2016, "s": 2016, "w": 441, "h": 640}, {"id": "web-2017-fca-athletes-bible-one", "src": "assets/covers/web-2017-fca-athletes-bible-one.webp?v=bb33289f", "t": "Athlete's Bible: One Edition", "e": "All sports", "l": "English", "y": 2017, "s": 2017, "w": 436, "h": 640}, {"id": "web-2018-fca-athletes-bible-strong", "src": "assets/covers/web-2018-fca-athletes-bible-strong.webp?v=54535479", "t": "Athlete's Bible: Strong Edition", "e": "All sports", "l": "English", "y": 2018, "s": 2018, "w": 426, "h": 640}, {"id": "web-2018-netherlands-gaan-voor-goud", "src": "assets/covers/web-2018-netherlands-gaan-voor-goud.webp?v=82224423", "t": "Sportbijbel: Gaan voor goud", "e": "All sports", "l": "Dutch", "y": 2018, "s": 2018, "w": 457, "h": 640}, {"id": "web-2019-fca-athletes-bible-lets-go", "src": "assets/covers/web-2019-fca-athletes-bible-lets-go.webp?v=3ec52a37", "t": "Athlete's Bible: Let's Go Edition", "e": "All sports", "l": "English", "y": 2019, "s": 2019, "w": 430, "h": 640}, {"id": "web-2020-fca-athletes-bible-100", "src": "assets/covers/web-2020-fca-athletes-bible-100.webp?v=5b632b14", "t": "Athlete's Bible: 100% Edition", "e": "All sports", "l": "English", "y": 2020, "s": 2020, "w": 566, "h": 640}, {"id": "web-2022-germany-fussball-bibel", "src": "assets/covers/web-2022-germany-fussball-bibel.webp?v=f9987d9f", "t": "Fußball-Bibel (Edition 2022)", "e": "FIFA World Cup 2022", "l": "German", "y": 2022, "s": 2022, "w": 428, "h": 640}, {"id": "web-2024-paris-plus-precieux-que-lor", "src": "assets/covers/web-2024-paris-plus-precieux-que-lor.webp?v=ed93c861", "t": "Plus précieux que l'or – Nouveau Testament", "e": "Paris 2024 Olympics & Paralympics", "l": "French", "y": 2024, "s": 2024, "w": 448, "h": 640}, {"id": "web-2026-brazil-rumo-a-vitoria", "src": "assets/covers/web-2026-brazil-rumo-a-vitoria.webp?v=e5c81b70", "t": "Bíblia Sagrada Rumo à Vitória", "e": "FIFA World Cup 2026", "l": "Portuguese", "y": 2026, "s": 2026, "w": 437, "h": 640}, {"id": "web-2026-canada-trilingual-john", "src": "assets/covers/web-2026-canada-trilingual-john.webp?v=37c93ca5", "t": "The Great Play – Trilingual Gospel of John", "e": "FIFA World Cup 2026", "l": "English / French / Spanish", "y": 2026, "s": 2026, "w": 443, "h": 640}, {"id": "web-2026-csb-athletes-bible", "src": "assets/covers/web-2026-csb-athletes-bible.webp?v=d7e8d5a2", "t": "CSB Athlete's Bible (revised)", "e": "All sports", "l": "English", "y": 2026, "s": 2026, "w": 507, "h": 640}, {"id": "web-2026-csb-coachs-bible", "src": "assets/covers/web-2026-csb-coachs-bible.webp?v=5c1a9221", "t": "CSB Coach's Bible (revised)", "e": "All sports", "l": "English", "y": 2026, "s": 2026, "w": 506, "h": 640}, {"id": "web-2026-ptl-world-cup-gospels", "src": "assets/covers/web-2026-ptl-world-cup-gospels.webp?v=54e6d35d", "t": "World Cup Gospel of John (one of 10 covers)", "e": "FIFA World Cup 2026", "l": "20 languages", "y": 2026, "s": 2026, "w": 445, "h": 640}, {"id": "web-2026-uk-goal-of-life", "src": "assets/covers/web-2026-uk-goal-of-life.webp?v=ce715052", "t": "Goal of Life – Gospel of Mark", "e": "FIFA World Cup 2026", "l": "English", "y": 2026, "s": 2026, "w": 467, "h": 640}, {"id": "web-2026-usa-youth-sports-nt", "src": "assets/covers/web-2026-usa-youth-sports-nt.webp?v=331efb30", "t": "Youth Sports New Testament (CEV)", "e": "FIFA World Cup 2026 / all sports", "l": "English", "y": 2026, "s": 2026, "w": 390, "h": 640}, {"id": "web-2026-usa-youth-sports-nt-spanish", "src": "assets/covers/web-2026-usa-youth-sports-nt-spanish.webp?v=26d32ed6", "t": "Nuevo Testamento Jóvenes Deportistas (TLA)", "e": "FIFA World Cup 2026 / all sports", "l": "Spanish", "y": 2026, "s": 2026, "w": 389, "h": 640}];
+const TN_END_IMGS = { pitch: "assets/tn-end-pitch.webp?v=17c15bb8" };   /* the walk out: down the players' tunnel and out onto the pitch */
 const intro4 = $('#intro4');
 const TN = { built: false, raf: 0 };
 function tnBuild() {
@@ -839,10 +884,11 @@ function tnBuild() {
     z -= SP;
     return it;
   });
-  const FINALE_Z = z - 2.4;
-  const END = FINALE_Z - 2.2;
+  const ZX = z + SP - 3.6;                 /* the mouth of the tunnel, a few strides past the last cover */
+  const FINALE_Z = ZX - 5.0;               /* the two Bibles, out on the grass */
+  const END = ZX;
   TN.items = items; TN.END = END; TN.total = TN_COVERS.length;
-  TN.FINALE_Z = FINALE_Z;
+  TN.FINALE_Z = FINALE_Z; TN.ZX = ZX;
 
   /* the tunnel itself: concrete walls with LED strips and chase lights that run as you do */
   const wallMat = new THREE.ShaderMaterial({
@@ -865,13 +911,12 @@ function tnBuild() {
         col += ceil*band(fract(vW.z/3.0), 0.5, 0.04)*band(vW.x, 0.0, 0.6)*vec3(0.5,0.55,0.6);
         /* the stadium light pouring in from the far end */
         float toEnd = clamp(1.0 - (vW.z - uEnd)/14.0, 0.0, 1.0);
-        col += vec3(0.75,0.85,1.0)*pow(toEnd, 3.0)*0.35;
         float d = length(vW - cameraPosition);
-        col = mix(col, vec3(0.0), smoothstep(5.0, 24.0, d)*(1.0 - pow(toEnd,2.0)*0.6));
+        col = mix(col, vec3(0.0), smoothstep(5.0, 24.0, d));   /* no light pouring in from the end: the distance is simply black */
         gl_FragColor = vec4(col, 1.0);
       }`
   });
-  const L0 = 4, LEN = -END + L0 + 6;
+  const L0 = 4, LEN = L0 - END;   /* the walls, floor and ceiling run to the mouth and stop */
   const mkPlane = (w, h, pos, rot) => { const m = new THREE.Mesh(new THREE.PlaneGeometry(w, h), wallMat); m.position.set(...pos); m.rotation.set(...rot); scene.add(m); return m; };
   mkPlane(LEN, CEIL - FLOOR, [-HW, (CEIL + FLOOR) / 2, L0 - LEN / 2], [0, Math.PI / 2, 0]);
   mkPlane(LEN, CEIL - FLOOR, [HW, (CEIL + FLOOR) / 2, L0 - LEN / 2], [0, -Math.PI / 2, 0]);
@@ -888,7 +933,6 @@ function tnBuild() {
         float lane = smoothstep(0.02, 0.0, abs(abs(vW.x) - 0.55));
         col += lane*vec3(0.18,0.2,0.24);
         float toEnd = clamp(1.0 - (vW.z - uEnd)/14.0, 0.0, 1.0);
-        col += vec3(0.6,0.7,0.9)*pow(toEnd,3.0)*0.25;
         float d = length(vW - cameraPosition);
         float a = mix(0.8, 1.0, smoothstep(6.0, 20.0, d));
         col = mix(col, vec3(0.0), smoothstep(5.0, 24.0, d));
@@ -907,12 +951,44 @@ function tnBuild() {
       vec3 c = mix(vec3(1.0), vec3(0.55,0.7,1.0), smoothstep(0.0, 0.5, r)); gl_FragColor = vec4(c*(smoothstep(0.62, 0.0, r)), 1.0); }`
   });
   const endGlow = new THREE.Mesh(new THREE.PlaneGeometry(HW * 2.6, (CEIL - FLOOR) * 1.5), endMat);
-  endGlow.position.set(0, (CEIL + FLOOR) / 2, END - 1.0); scene.add(endGlow);
+  endGlow.position.set(0, (CEIL + FLOOR) / 2, END - 1.0); scene.add(endGlow); endGlow.visible = false;   /* the real way out does this now */
 
   /* soft pools of light on the wall behind each cover */
   const glowTex = (() => { const c = document.createElement('canvas'); c.width = c.height = 128; const g = c.getContext('2d');
     const r = g.createRadialGradient(64, 64, 0, 64, 64, 64); r.addColorStop(0, 'rgba(255,236,214,.55)'); r.addColorStop(.5, 'rgba(255,220,190,.14)'); r.addColorStop(1, 'rgba(255,220,190,0)');
     g.fillStyle = r; g.fillRect(0, 0, 128, 128); return new THREE.CanvasTexture(c); })();
+
+  /* the way out: the tunnel ends in a doorway onto the pitch, with caged lamps on the walls either side */
+  { const ow = 0.8, oh = 0.9, r0 = 0.38;
+    const door = (path, g) => { path.moveTo(-ow - g, FLOOR); path.lineTo(ow + g, FLOOR); path.lineTo(ow + g, oh + g - r0); path.quadraticCurveTo(ow + g, oh + g, ow + g - r0, oh + g);
+      path.lineTo(-ow - g + r0, oh + g); path.quadraticCurveTo(-ow - g, oh + g, -ow - g, oh + g - r0); path.lineTo(-ow - g, FLOOR); return path; };
+    const wall = new THREE.Shape(); wall.moveTo(-HW - 0.05, FLOOR - 0.05); wall.lineTo(HW + 0.05, FLOOR - 0.05); wall.lineTo(HW + 0.05, CEIL + 0.05); wall.lineTo(-HW - 0.05, CEIL + 0.05); wall.lineTo(-HW - 0.05, FLOOR - 0.05);
+    wall.holes.push(door(new THREE.Path(), 0));
+    const frame = new THREE.Mesh(new THREE.ShapeGeometry(wall, 20), new THREE.MeshBasicMaterial({ color: 0x030304 }));   /* (linear colour: shows as a very dark grey) */
+    frame.position.z = ZX; scene.add(frame);
+    /* the doorway's depth, and a thin edge of stadium light round it */
+    const ring = door(new THREE.Shape(), 0.035); ring.holes.push(door(new THREE.Path(), 0));
+    const rim = new THREE.Mesh(new THREE.ShapeGeometry(ring, 20), new THREE.MeshBasicMaterial({ color: 0x9fb4d6, transparent: true, opacity: 0.55, blending: THREE.AdditiveBlending, depthWrite: false }));
+    rim.position.z = ZX + 0.004; scene.add(rim);
+    [-1, 1].forEach(side => {
+      const jamb = new THREE.Mesh(new THREE.PlaneGeometry(0.22, oh - FLOOR), new THREE.MeshBasicMaterial({ color: 0x020203, side: THREE.DoubleSide }));
+      jamb.rotation.y = side * Math.PI / 2; jamb.position.set(side * ow, (oh + FLOOR) / 2, ZX - 0.11); scene.add(jamb);
+      [ZX + 0.8, ZX + 3.3].forEach(zz => {
+        const lamp = new THREE.Mesh(new THREE.BoxGeometry(0.06, 0.11, 0.28), new THREE.MeshBasicMaterial({ color: 0xfff2da, fog: false }));
+        lamp.position.set(side * (HW - 0.04), 0.93, zz); scene.add(lamp);
+        const halo = new THREE.Mesh(new THREE.PlaneGeometry(1.5, 1.5), new THREE.MeshBasicMaterial({ map: glowTex, transparent: true, depthWrite: false, blending: THREE.AdditiveBlending, opacity: 0.95 }));
+        halo.rotation.y = -side * Math.PI / 2; halo.position.set(side * (HW - 0.012), 0.82, zz); scene.add(halo);
+        const pool = new THREE.Mesh(new THREE.PlaneGeometry(1.6, 1.8), new THREE.MeshBasicMaterial({ map: glowTex, transparent: true, depthWrite: false, blending: THREE.AdditiveBlending, opacity: 0.45 }));
+        pool.rotation.x = -Math.PI / 2; pool.position.set(side * (HW - 0.55), FLOOR + 0.004, zz); pool.renderOrder = 3; scene.add(pool);
+      });
+    });
+    /* a drain grate across the threshold */
+    const gc = document.createElement('canvas'); gc.width = 256; gc.height = 32; const gg = gc.getContext('2d');
+    gg.fillStyle = '#2a2c31'; gg.fillRect(0, 0, 256, 32); gg.fillStyle = '#07080a'; for (let x = 3; x < 256; x += 6) gg.fillRect(x, 5, 3, 22);
+    const gt = new THREE.CanvasTexture(gc); gt.wrapS = THREE.RepeatWrapping; gt.repeat.set(6, 1);
+    const grate = new THREE.Mesh(new THREE.PlaneGeometry(ow * 2, 0.2), new THREE.MeshBasicMaterial({ map: gt }));
+    grate.rotation.x = -Math.PI / 2; grate.position.set(0, FLOOR + 0.005, ZX + 0.14); grate.renderOrder = 3; scene.add(grate);
+  }
 
   /* year numbers painted on the floor where each dated year begins */
   const yearTex = y => { const c = document.createElement('canvas'); c.width = 512; c.height = 200; const g = c.getContext('2d');
@@ -949,7 +1025,8 @@ function tnBuild() {
      their own scene, drawn last, so the tunnel can fade to black around them and they stay
      clean and bright on black. */
   const finaleScene = new THREE.Scene();
-  const FH = 1.5, FGAP = 0.14;
+  const FH = 1.5, FGAP = 0.14, CY = FLOOR + FH / 2 + 0.01;   /* the covers stand on the grass */
+  TN.CY = CY;
   TN.finale = [];
   let pairW = 0;
   finaleCovers.forEach(c => { pairW += FH * c.w / c.h; }); pairW += FGAP;
@@ -958,17 +1035,73 @@ function tnBuild() {
     const w = FH * c.w / c.h;
     const tex = loader.load(c.src); tex.encoding = THREE.sRGBEncoding; tex.anisotropy = aniso;
     tex.minFilter = THREE.LinearMipmapLinearFilter;
-    const face = new THREE.Mesh(new THREE.PlaneGeometry(w, FH), new THREE.MeshBasicMaterial({ map: tex, fog: false }));
-    face.position.set(fx + w / 2, 0.12, FINALE_Z);
-    const it = { c, i: items.length + k, z: FINALE_Z, finale: true, x: fx + w / 2, y: 0.12, w, h: FH };
+    const face = new THREE.Mesh(new THREE.PlaneGeometry(w, FH), focusMat(tex)); face.renderOrder = 2;
+    tex.onUpdate = () => { if (!face.material.userData.blurred && tex.image) { face.material.userData.u.mapBlur.value = blurTex(tex.image); face.material.userData.blurred = true; } };
+    face.position.set(fx + w / 2, CY, FINALE_Z);
+    const it = { c, i: items.length + k, z: FINALE_Z, finale: true, x: fx + w / 2, y: CY, w, h: FH, face };
     face.userData.item = it; finaleScene.add(face); TN.hits.push(face); TN.finale.push(it);
+    /* standing on the grass: a soft contact shadow under each cover */
+    const sh = new THREE.Mesh(new THREE.PlaneGeometry(w * 1.5, 0.6), new THREE.MeshBasicMaterial({ map: shadowTex(), transparent: true, opacity: 0.85, depthWrite: false, fog: false }));
+    sh.rotation.x = -Math.PI / 2; sh.position.set(fx + w / 2, FLOOR + 0.006, FINALE_Z + 0.06); sh.renderOrder = 1; finaleScene.add(sh);
     fx += w + FGAP;
   });
   TN.pairW = pairW; TN.FH = FH;
+  /* out of focus, into focus: each picture carries a soft copy of itself (drawn small, then scaled
+     back up) and the material blends towards the sharp one as the camera arrives */
+  function blurTex(img) {
+    const W = img.naturalWidth || img.width, Hh = img.naturalHeight || img.height; if (!W) return null;
+    const sw = Math.max(8, Math.round(W / 22)), sh = Math.max(8, Math.round(Hh / 22));
+    const a = document.createElement('canvas'); a.width = sw; a.height = sh; const ga = a.getContext('2d'); ga.imageSmoothingQuality = 'high'; ga.drawImage(img, 0, 0, sw, sh);
+    const b = document.createElement('canvas'); b.width = sw * 4; b.height = sh * 4; const gb = b.getContext('2d'); gb.imageSmoothingQuality = 'high'; gb.drawImage(a, 0, 0, b.width, b.height);
+    const t = new THREE.CanvasTexture(b); t.minFilter = THREE.LinearFilter; return t;
+  }
+  function focusMat(tex, extra) {
+    const m = new THREE.MeshBasicMaterial(Object.assign({ map: tex, fog: false }, extra || {}));
+    m.userData.u = { uBlur: { value: 1 }, mapBlur: { value: tex } };
+    m.onBeforeCompile = sh => {
+      sh.uniforms.uBlur = m.userData.u.uBlur; sh.uniforms.mapBlur = m.userData.u.mapBlur;
+      sh.fragmentShader = 'uniform float uBlur;\nuniform sampler2D mapBlur;\n' + sh.fragmentShader.replace('#include <map_fragment>',
+        '#ifdef USE_MAP\n vec4 texelColor = mix(texture2D(map, vUv), texture2D(mapBlur, vUv), uBlur);\n texelColor = mapTexelToLinear(texelColor);\n diffuseColor *= texelColor;\n#endif');
+    };
+    TN.focusMats = TN.focusMats || []; TN.focusMats.push(m);
+    return m;
+  }
+  function shadowTex() {
+    if (TN._shTex) return TN._shTex;
+    const c = document.createElement('canvas'); c.width = 256; c.height = 64; const g = c.getContext('2d');
+    const r = g.createRadialGradient(128, 32, 4, 128, 32, 128); r.addColorStop(0, 'rgba(0,0,0,.75)'); r.addColorStop(.45, 'rgba(0,0,0,.35)'); r.addColorStop(1, 'rgba(0,0,0,0)');
+    g.setTransform(1, 0, 0, .25, 0, 24); g.fillStyle = r; g.fillRect(0, 0, 256, 256);
+    return (TN._shTex = new THREE.CanvasTexture(c));
+  }
   /* a black veil drawn over the tunnel, under the two covers */
   const veilScene = new THREE.Scene(), veilCam = new THREE.OrthographicCamera(-1, 1, 1, -1, 0, 1);
   const veil = new THREE.Mesh(new THREE.PlaneGeometry(2, 2), new THREE.MeshBasicMaterial({ color: 0x000000, transparent: true, opacity: 0, depthTest: false, depthWrite: false }));
   veilScene.add(veil);
+  /* the walk out: the real players' tunnel, then the pitch, cross-fading in over the veil; and a soft
+     black gradient over the lower screen so the words stay readable */
+  { const c = document.createElement('canvas'); c.width = 4; c.height = 512; TN.gradCv = c;
+    TN.gradTex = new THREE.CanvasTexture(c);
+    TN.endGrad = new THREE.Mesh(new THREE.PlaneGeometry(2, 2), new THREE.MeshBasicMaterial({ map: TN.gradTex, transparent: true, opacity: 0, depthTest: false, depthWrite: false }));
+    veilScene.add(TN.endGrad); }  /* the stadium, a real place in the scene just beyond the far end of the tunnel: seen down the corridor from
+     the start, it grows as you run, and when the tunnel lets go it is all around the two Bibles */
+  const bdScene = new THREE.Scene(), ZB = FINALE_Z - 12; TN.ZB = ZB;
+  /* real grass from the doorway out to the far side, cut from the stadium photo and tiled (mirrored, so no seams) */
+  const grassCv = document.createElement('canvas'); grassCv.width = grassCv.height = 256;
+  { const g = grassCv.getContext('2d'); g.fillStyle = '#1f4a1c'; g.fillRect(0, 0, 256, 256); }
+  const grassTex = new THREE.CanvasTexture(grassCv); grassTex.wrapS = grassTex.wrapT = THREE.MirroredRepeatWrapping; grassTex.repeat.set(26, 18);
+  grassTex.encoding = THREE.sRGBEncoding; grassTex.anisotropy = aniso;
+  TN.ground = new THREE.Mesh(new THREE.PlaneGeometry(44, ZX - ZB), focusMat(grassTex));
+  TN.ground.rotation.x = -Math.PI / 2; TN.ground.position.set(0, FLOOR, (ZX + ZB) / 2); TN.ground.material.color.setRGB(0.82, 0.88, 0.82); bdScene.add(TN.ground);
+  /* the stadium itself: the crowd and the lights beyond the grass */
+  { const t = loader.load(TN_END_IMGS.pitch, tt => {
+      TN.backdrop.material.userData.u.mapBlur.value = blurTex(tt.image);
+      const g = grassCv.getContext('2d'); g.drawImage(tt.image, 560, 590, 330, 150, 0, 0, 256, 256); grassTex.needsUpdate = true;
+      const gb = blurTex(grassCv); gb.wrapS = gb.wrapT = THREE.MirroredRepeatWrapping; TN.ground.material.userData.u.mapBlur.value = gb;
+    });
+    t.encoding = THREE.sRGBEncoding; t.minFilter = THREE.LinearMipmapLinearFilter; t.anisotropy = aniso;
+    TN.backdrop = new THREE.Mesh(new THREE.PlaneGeometry(1, 1), focusMat(t));
+    TN.backdrop.position.z = ZB - 0.05; bdScene.add(TN.backdrop); }
+  TN.bdScene = bdScene; TN.FH0 = FH;
   TN.finaleScene = finaleScene; TN.veilScene = veilScene; TN.veilCam = veilCam; TN.veil = veil;
   renderer.autoClear = false;
   (document.fonts && document.fonts.load ? document.fonts.load('800 100px Archivo') : Promise.resolve()).then(() => {
@@ -997,6 +1130,21 @@ function tnBuild() {
     /* with the view offset the cover centre sits 37% down; lifting the camera's aim moves it up to 'centre' */
     TN.liftY = (0.37 - Math.max(centre, (topM + half) / H)) * 2 * tv * TN.stopD;
     TN.tv = tv; TN.th = th;
+    TN.coverY = Math.max(centre, (topM + half) / H); TN.coverB = TN.coverY + half / H; TN.textTop = textTop / H; TN.aspect = r.width / H;
+    if (TN.backdrop) {   /* the photo's grass line sits where our grass ends, and it is big enough to fill the view from the doorway on */
+      const ia = 1619 / 971, fyH = 0.505, dd = TN.ZX - TN.ZB + 1.5;
+      const yTop = 0.1 + 0.74 * tv * dd * 1.12 + 0.5;
+      const hb = Math.max((yTop - FLOOR) / fyH, (2 * th * dd * 1.2) / ia);
+      TN.backdrop.scale.set(hb * ia, hb, 1); TN.backdrop.position.y = FLOOR + (fyH - 0.5) * hb;
+    }
+    if (TN.gradCv) {   /* clear over the pitch and the Bibles, darkening from just above the words down */
+      const g = TN.gradCv.getContext('2d'), gr = g.createLinearGradient(0, 0, 0, 512), a = Math.max(0, Math.min(1, TN.textTop - 0.08)), b = Math.min(1, TN.textTop + 0.1);
+      g.clearRect(0, 0, 4, 512);
+      /* a shade over the whole photo (drawn under the Bibles, so they stay bright), deepening behind the words */
+      gr.addColorStop(0, 'rgba(0,0,0,.62)'); gr.addColorStop(Math.min(a, 0.25), 'rgba(0,0,0,.45)'); gr.addColorStop(a, 'rgba(0,0,0,.45)');
+      gr.addColorStop(b, 'rgba(0,0,0,.78)'); gr.addColorStop(1, 'rgba(0,0,0,.9)');
+      g.fillStyle = gr; g.fillRect(0, 0, 4, 512); TN.gradTex.needsUpdate = true;
+    }
   };
   TN.size = size;
   addEventListener('resize', () => { if (!intro4.hidden) size(); });
@@ -1156,7 +1304,7 @@ tnSetHL(tnHL);
 /* where the camera is for a given moment of the story: through the wall covers during
    pages 4 and 5, then easing to a stop in front of the two Youth Sports New Testaments */
 function tnZOf(T) {
-  const Z0 = 1.2, Zstop = TN.FINALE_Z + (TN.stopD || 3.1), Zapp = Zstop + 4.4;
+  const Z0 = 1.2, Zstop = TN.FINALE_Z + (TN.stopD || 3.1), Zapp = TN.ZX + 6;   /* the last stretch: up to the doorway, through it, and out onto the grass */
   const Twall = TN_G0[2], Tfin = Twall + 6;
   if (T <= Twall) {
     const u = T / Twall, ramp = Math.min(1, T / 2.5);   /* a gentle start */
@@ -1194,10 +1342,12 @@ function tnLoop(t0) {
     const cam = TN.camera;
     /* the finale: the tunnel fades to black and the camera settles so both covers sit in the upper screen */
     const Twall = TN_G0[2];
-    const fade = Math.max(0, Math.min(1, (TN.T - Twall - 1.5) / 4.0));
-    const fe = fade * fade * (3 - 2 * fade);
+    const s01 = x => { const u = Math.max(0, Math.min(1, x)); return u * u * (3 - 2 * u); };
+    const Zst = TN.FINALE_Z + (TN.stopD || 3.1);
+    const fe = s01((TN.ZX + 2.5 - TN.z) / (TN.ZX + 2.5 - Zst));            /* 0 in the tunnel, 1 standing in front of the Bibles */
+    const out = s01((TN.ZX - TN.z) / Math.max(0.5, TN.ZX - Zst) * 1.6);    /* through the doorway: settle down to look at them */
     TN.fz = (TN.fz || 0) + (((TN.focus && fe > 0.5) ? 1 : 0) - (TN.fz || 0)) * (1 - Math.pow(0.03, dt));
-    const bx = Math.sin(t * 0.7) * 0.03 * (1 - fe), by = 0.05 + Math.sin(t * 1.1) * 0.02 * (1 - fe) + (still ? 0 : Math.min(0.04, Math.abs(speed) * 0.006) * Math.sin(t * 9)) + (0.12 - TN.liftY - 0.05) * fe;
+    const bx = Math.sin(t * 0.7) * 0.03 * (1 - fe), by = 0.05 + Math.sin(t * 1.1) * 0.02 * (1 - fe) + (still ? 0 : Math.min(0.04, Math.abs(speed) * 0.006) * Math.sin(t * 9)) + (TN.CY - TN.liftY - 0.05) * out;   /* rise early, so the Bibles are already above the words as they come in */
     let px = bx, py = by, pz = TN.z;
     if (TN.focus || TN.fz > 0.001) {
       const f = TN.focus || TN.lastFocus;
@@ -1210,8 +1360,8 @@ function tnLoop(t0) {
     if (TN.focus) TN.lastFocus = TN.focus;
     cam.position.set(px, py, pz);
     cam.rotation.set(TN.pitch * (1 - fe * 0.7), TN.yaw * (1 - fe * 0.7), 0, 'YXZ');
-    if ((fe > 0.4) !== intro4.classList.contains('finale') && fe > 0.4 && TN.size) TN.size();   /* re-measure the words as the finale arrives */
-    intro4.classList.toggle('finale', fe > 0.4);
+    if ((fe > 0.12) !== intro4.classList.contains('finale') && fe > 0.12 && TN.size) TN.size();   /* re-measure the words as the finale arrives */
+    intro4.classList.toggle('finale', fe > 0.12);   /* the year and progress step aside early, before the Bibles reach them */
     intro4.classList.toggle('focused', TN.fz > 0.2);
     TN.scene.children[0].material.uniforms.uTime.value = t;
     TN.scene.children[0].material.uniforms.uRun.value += speed * dt * -1.0;
@@ -1231,9 +1381,18 @@ function tnLoop(t0) {
     TN.goBtn.classList.toggle('on', TN.T >= TN_GO);
     const R = TN.renderer;
     R.clear();
-    if (fe < 0.999) R.render(TN.scene, cam);
-    TN.veil.material.opacity = fe; if (fe > 0.001) R.render(TN.veilScene, TN.veilCam);
-    if (fe > 0.001) R.clearDepth(); R.render(TN.finaleScene, cam);  // keep the tunnel depth until the fade, so wall covers sit in front
+    /* focus pull: soft while far away, sharp as the camera settles in front of the Bibles */
+    { const u = Math.max(0, Math.min(1, (TN.z - Zst) / 4)), bl = u * u * (3 - 2 * u);   /* soft all the way out of the door; sharp only in the last few steps */
+      (TN.focusMats || []).forEach(m => { m.userData.u.uBlur.value = bl; }); }
+    /* outside stays in the dark until the doorway is close: down the tunnel it is just a glow at the end */
+    { const k = s01(1 - (TN.z - TN.ZX) / 7);   /* fully black until the last few strides before the doorway */
+      TN.backdrop.material.color.setScalar(k); TN.ground.material.color.setRGB(0.82 * k, 0.88 * k, 0.82 * k);
+      TN.outK = k; (TN.finale || []).forEach(it => { const m = it.face && it.face.material; if (m) m.color.setScalar(k); }); }   /* the two Bibles too: only out of the dark as you near the door */
+    TN.endGrad.material.opacity = s01(fe * 2);
+    R.render(TN.scene, cam);                       /* the tunnel, ending in its doorway */
+    if (TN.z - TN.ZX < 7) R.render(TN.bdScene, cam);   /* outside: grass and the stadium, seen through the doorway, then all around */
+    if (TN.endGrad.material.opacity > 0.001) R.render(TN.veilScene, TN.veilCam);
+    if (TN.z - TN.ZX < 7) R.render(TN.finaleScene, cam);   /* the two Bibles, on the grass: not drawn at all from further back */
     TN.raf = requestAnimationFrame(step);
   };
   TN.raf = requestAnimationFrame(step);
@@ -1272,14 +1431,15 @@ const STORY = [
   { id: '7b', book: 'gospel', html: `<p class="lead">It also gives an overview of the <b>Gospel</b> and a way to respond.</p>
       ${BOOK_UI}`,
     buttons: [{ label: 'Continue', next: true }] },
-  { id: '8', html: `<p class="lead">And guess what? All of this <b>in the palm of your hand</b>. The words of life, and relevant tools inviting you and your team to be part of an amazing adventure in the Scriptures&hellip;</p>
-      <span class="rule" aria-hidden="true"></span>
+  { id: '8', now: 2, html: `<p class="lead">And guess what? All of this <b>in the palm of your hand</b>. The words of life, and relevant tools inviting you and your team to be part of an amazing adventure in the Scriptures&hellip;</p>
+      <div class="st-art st-hands" aria-hidden="true"><span class="st-glow"></span><span class="st-rays"></span><span class="st-rays st-rays2"></span><img alt="" src="assets/st-hands.webp?v=75485f8c"></div>
       <p>This pilot aims to make a sports-themed, printed Word of God accessible in <b>more languages</b> and in <b>more countries</b>.</p>
       <p>It&rsquo;s a pilot with huge potential as the sports movement partners with Bible agencies.</p>
       <p>This is linked to a <b class="dg">2nd pilot</b> &ndash; a Scripture strategy that is</p>
-      <p class="stack"><b class="dg">agile,</b><br><b class="dg">digital,</b><br><b class="dg">resilient</b><br><b class="dg">and unlimited.</b></p>`,
+      <p class="stack"><b class="dg">agile, digital,</b><br><b class="dg">resilient and unlimited.</b></p>`,
     buttons: [{ label: 'Continue', next: true }] },
-  { id: '9', html: `<p class="lead">We all know the power of the <b>printed Word of God</b>. We also are seeing the spread of the <b class="dg">digital Word of God</b> on phones worldwide.</p>
+  { id: '9', now: 2, html: `<div class="st-art st-team" aria-hidden="true"><span class="st-fl st-fl-l"></span><span class="st-fl st-fl-r"></span><span class="st-pool"></span><span class="st-halo"></span><img alt="" src="assets/st-team.webp?v=3e4c35ac"></div>
+      <p class="lead">We all know the power of the <b>printed Word of God</b>. We also are seeing the spread of the <b class="dg">digital Word of God</b> on phones worldwide.</p>
       <p class="story-link-row"><button type="button" class="story-link" id="see-data">See the data on Bibles</button></p>
       <p>Imagine the possibility of a <b class="dg">global sports Bible</b>, driven and developed by the sports movement, in many languages, free to use and interactive in ways that we have never seen before.</p>
       <p class="blueline">Rather than imagine it &hellip;</p>`,
@@ -1312,7 +1472,12 @@ function renderStory(i) {
   $$('.story-link[data-toast]', box).forEach(b => b.onclick = () => { const t = $('#story-toast'); t.textContent = b.dataset.toast; t.hidden = false; clearTimeout(storyToastT); storyToastT = setTimeout(() => t.hidden = true, 2200); });
   if (pg.after) box.insertAdjacentHTML('beforeend', pg.after);
   /* stagger the fade-in, one line after another */
-  [...box.children].forEach((el, k) => el.style.setProperty('--d', (0.25 + k * 0.45).toFixed(2) + 's'));
+  /* the printed-page books arrive all at once; pages with 'now' show their first items straight away, then the rest fade up */
+  const now = pg.book ? 99 : (pg.now || 0);
+  [...box.children].forEach((el, k) => {
+    if (k < now) el.style.transition = 'none';
+    else el.style.setProperty('--d', ((now ? 0.35 : 0.25) + (k - now) * 0.45).toFixed(2) + 's');
+  });
   bookDestroy();
   if (pg.book) requestAnimationFrame(() => bookInit(pg.book));
   $('.story-scroll').scrollTop = 0;
