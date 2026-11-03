@@ -159,9 +159,9 @@ main { position: relative; flex: 1; min-height: 0; margin: 9.2px 9.2px 0; backgr
 .scrap .co-go { position: absolute; right: var(--gr, -8px); bottom: var(--gb, -16px); width: 50px; height: 39px; z-index: 3; }
 /* arrows that point at the thing to click: placed on the paper's edge nearest it, turned to face it */
 .scrap .co-go.at-tl { right: auto; bottom: auto; left: 6px; top: -22px; }
-.scrap .co-go.at-tr { bottom: auto; right: 4px; top: -26px; }
+.scrap .co-go.at-tr { bottom: auto; right: 4px; top: -26px; transform: rotate(-100deg); }   /* pointing up, before the page fine-tunes it */
 .scrap .co-go.at-b { right: auto; left: 50%; margin-left: -25px; bottom: -6px; }
-.scrap .co-go.aimed { transition: rotate .3s ease; }
+.scrap .co-go.aimed { transition: transform .3s ease; }
 .scrap .co-x { top: var(--xt, 6px); right: var(--xr, 8px); color: rgba(29,26,22,.65); z-index: 3; }
 .scrap .co-clip { width: 112px; height: 128px; right: auto; left: var(--cx, 60%); top: var(--cy, -70px); }
 .callout.paper { background: none; box-shadow: none; border-radius: 0; padding: 0; width: var(--pw, 290px); max-width: calc(100% - 16px); color: #1d1a16;
@@ -283,7 +283,8 @@ main { position: relative; flex: 1; min-height: 0; margin: 9.2px 9.2px 0; backgr
 .dsec p { margin: 0; font: 500 13px/1.35 "Archivo", var(--sys); color: #4a4036; }
 .dt-outer { position: relative; }
 .dt-outer .dt-flag { position: absolute; left: 10px; top: -10px; z-index: 1; padding: 4px 9px 3px; background: #ffe236; color: #1d1a16; rotate: -3deg; font: 700 10.5px/1 "Archivo", var(--sys); letter-spacing: .08em; text-transform: uppercase; box-shadow: 0 2px 4px rgba(0,0,0,.35); pointer-events: none; }
-.phone:has(.linked-page.home-nomark:not([hidden])) .watermark, .phone:has(.linked-page.nomark:not([hidden])) .watermark { display: none; }   /* the games fill the screen */
+.phone:has(.linked-page.home-nomark:not([hidden])) .watermark, .phone:has(.linked-page.nomark:not([hidden])) .watermark { display: none; }
+.linked-page.home-nomark .lp-bar { display: none; }   /* Pray Play Say's home page has its own "Back to Mark"; its other pages keep the bar */   /* the games fill the screen */
 .dtile { display: block; width: 100%; text-align: left; padding: 0; border-radius: 14px; overflow: hidden; background: var(--surface); border: 1px solid var(--line); box-shadow: 0 8px 18px rgba(0,0,0,.35); transition: transform .2s ease, box-shadow .2s ease; }
 .dtile:hover, .dtile:focus-visible { transform: translateY(-2px); box-shadow: 0 12px 24px rgba(0,0,0,.45), 0 0 0 2px rgba(124,200,255,.5); }
 .dtile img { display: block; width: 100%; height: auto; }
@@ -1235,7 +1236,7 @@ function coAim() {
   const t = CALLOUTS[coIdx].target && CALLOUTS[coIdx].target(); if (!t) return;
   const tr = (t.getClientRects()[0] || t.getBoundingClientRect());
   $$('.co-go.aim', coEl).forEach(g => {
-    g.style.rotate = '0deg';
+    g.style.transform = 'none';
     /* a corner arrow sits on whichever side of the paper is nearer the thing it points at */
     if (g.classList.contains('at-tr') || g.classList.contains('at-tl')) {
       const pr = g.closest('.piece').getBoundingClientRect(), right = (tr.left + tr.width / 2) > pr.left + pr.width / 2;
@@ -1243,7 +1244,7 @@ function coAim() {
     }
     const gr = g.getBoundingClientRect();
     const a = Math.atan2((tr.top + tr.height / 2) - (gr.top + gr.height / 2), (tr.left + tr.width / 2) - (gr.left + gr.width / 2)) * 180 / Math.PI;
-    g.classList.add('aimed'); g.style.rotate = a.toFixed(1) + 'deg';
+    g.classList.add('aimed'); g.style.transform = 'rotate(' + a.toFixed(1) + 'deg)';
   });
 }
 addEventListener('resize', () => setTimeout(coAim, 50));
