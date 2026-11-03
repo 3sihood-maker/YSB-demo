@@ -1087,16 +1087,21 @@ function tnBuild() {
   const bdScene = new THREE.Scene(), ZB = FINALE_Z - 12; TN.ZB = ZB;
   /* real grass from the doorway out to the far side, cut from the stadium photo and tiled (mirrored, so no seams) */
   const grassCv = document.createElement('canvas'); grassCv.width = grassCv.height = 256;
-  { const g = grassCv.getContext('2d'); g.fillStyle = '#1f4a1c'; g.fillRect(0, 0, 256, 256); }
-  const grassTex = new THREE.CanvasTexture(grassCv); grassTex.wrapS = grassTex.wrapT = THREE.MirroredRepeatWrapping; grassTex.repeat.set(26, 18);
+  { /* drawn here rather than cut from the photo, so it is always grass whatever picture is behind it:
+       night-pitch green, mown in two-tone stripes, with a fine speckle of blades */
+    const g = grassCv.getContext('2d');
+    g.fillStyle = '#4f6b12'; g.fillRect(0, 0, 256, 128); g.fillStyle = '#3f5a0e'; g.fillRect(0, 128, 256, 128);
+    for (let i = 0; i < 9000; i++) { const x = Math.random() * 256, y = Math.random() * 256, l = Math.random();
+      g.fillStyle = l < .5 ? 'rgba(20,34,4,.35)' : 'rgba(150,180,60,.22)'; g.fillRect(x, y, 1, 1 + Math.random() * 2); } }
+  const grassTex = new THREE.CanvasTexture(grassCv); grassTex.wrapS = grassTex.wrapT = THREE.RepeatWrapping; grassTex.repeat.set(10, 7);
   grassTex.encoding = THREE.sRGBEncoding; grassTex.anisotropy = aniso;
   TN.ground = new THREE.Mesh(new THREE.PlaneGeometry(44, ZX - ZB), focusMat(grassTex));
   TN.ground.rotation.x = -Math.PI / 2; TN.ground.position.set(0, FLOOR, (ZX + ZB) / 2); TN.ground.material.color.setRGB(0.82, 0.88, 0.82); bdScene.add(TN.ground);
   /* the stadium itself: the crowd and the lights beyond the grass */
   { const t = loader.load(TN_END_IMGS.pitch, tt => {
       TN.backdrop.material.userData.u.mapBlur.value = blurTex(tt.image);
-      const g = grassCv.getContext('2d'); g.drawImage(tt.image, 560, 590, 330, 150, 0, 0, 256, 256); grassTex.needsUpdate = true;
-      const gb = blurTex(grassCv); gb.wrapS = gb.wrapT = THREE.MirroredRepeatWrapping; TN.ground.material.userData.u.mapBlur.value = gb;
+      TN.bdAspect = tt.image.width / tt.image.height; if (TN.size) TN.size();
+      const gb = blurTex(grassCv); gb.wrapS = gb.wrapT = THREE.RepeatWrapping; TN.ground.material.userData.u.mapBlur.value = gb;
     });
     t.encoding = THREE.sRGBEncoding; t.minFilter = THREE.LinearMipmapLinearFilter; t.anisotropy = aniso;
     TN.backdrop = new THREE.Mesh(new THREE.PlaneGeometry(1, 1), focusMat(t));
@@ -1132,7 +1137,7 @@ function tnBuild() {
     TN.tv = tv; TN.th = th;
     TN.coverY = Math.max(centre, (topM + half) / H); TN.coverB = TN.coverY + half / H; TN.textTop = textTop / H; TN.aspect = r.width / H;
     if (TN.backdrop) {   /* the photo's grass line sits where our grass ends, and it is big enough to fill the view from the doorway on */
-      const ia = 1619 / 971, fyH = 0.505, dd = TN.ZX - TN.ZB + 1.5;
+      const ia = TN.bdAspect || 1619 / 971, fyH = 0.505, dd = TN.ZX - TN.ZB + 1.5;
       const yTop = 0.1 + 0.74 * tv * dd * 1.12 + 0.5;
       const hb = Math.max((yTop - FLOOR) / fyH, (2 * th * dd * 1.2) / ia);
       TN.backdrop.scale.set(hb * ia, hb, 1); TN.backdrop.position.y = FLOOR + (fyH - 0.5) * hb;
